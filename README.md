@@ -19,7 +19,8 @@ Fornece métricas e relatórios para acompanhar o progresso da produção, avali
 Permite o cadastro de funcionários, atribuição de cargos e controle de acesso às funcionalidades do sistema.
 # Logo: 
 
-![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/317b767b-b6b9-41ec-a06a-31741c9dcf53)
+![WhatsApp Image 2024-05-14 at 10 24 01](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/924958c4-378b-4428-92fb-d4357738ca74)
+
 
 # BackLog Inicial / Brundwon Geral:
 
