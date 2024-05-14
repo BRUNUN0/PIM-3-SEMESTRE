@@ -30,13 +30,14 @@ Permite o cadastro de funcionários, atribuição de cargos e controle de acesso
 
 
 # Sprint BackLog(sprint 1 e 2):
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%201%20e%202
 
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/a46d47e6-02b5-4156-8f62-0686d62755cf)
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/8abf6f4f-c373-439d-a67d-1965a9a1a20e)
 
 
 # Sprint 3 / BurnDown:
-
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%203
 
 ![sprint 3](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/402885ad-564b-41d5-8994-fa76e40983e4)
 
@@ -44,7 +45,7 @@ Permite o cadastro de funcionários, atribuição de cargos e controle de acesso
 
 
 # Sprint 4 / BurnDown:
-
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%204
 
 ![Sprint 4](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/b36d979c-6354-44b9-a386-75a6b1b1ed67)
 
@@ -53,15 +54,16 @@ Permite o cadastro de funcionários, atribuição de cargos e controle de acesso
 
 
 # Sprint 5 / BurnDown:
-
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%205
 
 ![sprint 5](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/0fabb12b-3d00-4714-b16e-438396dee118)
 
 
 ![BrunDwon](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/7ecef916-d26f-4892-aaee-b5153d3dc860)
 
-# Sprint 6 / BurnDown:
 
+# Sprint 6 / BurnDown:
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%206
 
 ![Sprint 6](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/3361ee8e-e9cd-4784-a82d-8285076e9f33)
 
@@ -70,7 +72,7 @@ Permite o cadastro de funcionários, atribuição de cargos e controle de acesso
 
 
 #Sprint 7 / BurnDown:
-
+https://github.com/BRUNUN0/PIM-3-SEMESTRE/tree/main/SCRUM/Sprint%207
 
 ![Sprint 7](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/e9f170c2-f0d9-4787-8774-39c63e9bc9f5)
 
