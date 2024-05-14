@@ -8,7 +8,7 @@ O objetivo do PixFarm é fornecer uma plataforma de gestão eficiente para admin
 
 # Funcionalidades
 Gestão da Produção: 
-Permite o cadastro e monitoramento das plantações, incluindo informações sobre espécies cultivadas, estágios de crescimento, níveis de consumo de agua, entre outros.
+Permite o cadastro e monitoramento das plantações, Acompanhando indices, gerenciando fonecedores e estoque de materia prima/produtos finais, entre outros.
 
 # Planejamento de Tarefas: 
 Facilita a distribuição de tarefas para os funcionários, permitindo aos gestores atribuir atividades específicas ou criar grupos de trabalho para realizar determinadas operações na fazenda.
