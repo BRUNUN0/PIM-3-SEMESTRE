@@ -7,15 +7,58 @@ A PIXFARM é o software de gerenciamento de fornecedores, clientes, produtos, es
 
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/317b767b-b6b9-41ec-a06a-31741c9dcf53)
 
-#BackLog Inicial:
+#BackLog Inicial / Brundwon Geral:
 
-[Backlog.pdf](https://github.com/BRUNUN0/PIM-3-SEMESTRE/files/15312190/Backlog.pdf)
+![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/02dee92b-9652-479f-bd44-64180d8d2070)
 
 
-#Sprint BackLog:
+![BrunDown](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/a1f12a5d-029c-4553-919d-467fe3c6b9c2)
+
+
+#Sprint BackLog(sprint 1 e 2):
 
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/a46d47e6-02b5-4156-8f62-0686d62755cf)
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/8abf6f4f-c373-439d-a67d-1965a9a1a20e)
 
 
+#Sprint 3 / BurnDown:
+
+
+![sprint 3](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/402885ad-564b-41d5-8994-fa76e40983e4)
+
+![BurnDwon](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/cc5689a0-d3dc-4949-9e76-3543276cb828)
+
+
+#Sprint 4 / BurnDown:
+
+
+![Sprint 4](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/b36d979c-6354-44b9-a386-75a6b1b1ed67)
+
+
+![BrunDwon](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/7790c2c0-a1d6-4b40-9c6c-65c229060c18)
+
+
+#Sprint 5 / BurnDown:
+
+
+![sprint 5](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/0fabb12b-3d00-4714-b16e-438396dee118)
+
+
+![BrunDwon](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/7ecef916-d26f-4892-aaee-b5153d3dc860)
+
+#Sprint 6 / BurnDown:
+
+
+![Sprint 6](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/3361ee8e-e9cd-4784-a82d-8285076e9f33)
+
+
+![BurnDwon](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/c4cc573d-9cfc-4146-8038-4a237566a936)
+
+
+#Sprint 7 / BurnDown:
+
+
+![Sprint 7](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/e9f170c2-f0d9-4787-8774-39c63e9bc9f5)
+
+![BurnDown](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/5e1b0db7-88af-4de5-b500-63405a5caf2e)
 
