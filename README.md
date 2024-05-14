@@ -1,8 +1,21 @@
 # PIXFARM
 
 
-A PIXFARM é o software de gerenciamento de fornecedores, clientes, produtos, estoques e todo ciclo produtivo da fazenda.
+#Objetivo
+O objetivo do PixFarm é fornecer uma plataforma de gestão eficiente para administrar todos os aspectos da produção agrícola e a gestão de recursos humanos da fazenda. Isso inclui o planejamento e acompanhamento das atividades de cultivo, alocação de tarefas para funcionários e monitoramento do desempenho geral da fazenda.
 
+#Funcionalidades
+Gestão da Produção: 
+Permite o cadastro e monitoramento das plantações, incluindo informações sobre espécies cultivadas, estágios de crescimento, níveis de consumo de agua, entre outros.
+
+#Planejamento de Tarefas: 
+Facilita a distribuição de tarefas para os funcionários, permitindo aos gestores atribuir atividades específicas ou criar grupos de trabalho para realizar determinadas operações na fazenda.
+
+#Monitoramento de Desempenho: 
+Fornece métricas e relatórios para acompanhar o progresso da produção, avaliar o desempenho dos funcionários e identificar áreas de melhoria.
+
+#Gestão de Funcionários: 
+Permite o cadastro de funcionários, atribuição de cargos e controle de acesso às funcionalidades do sistema.
 #Logo: 
 
 ![image](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/317b767b-b6b9-41ec-a06a-31741c9dcf53)
