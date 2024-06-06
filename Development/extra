@@ -1,0 +1,103 @@
+/* BOTÃO PLANTAÇÃO */
+.botao-plantacao {
+    width: 280px;
+    height: 130px;
+    position: relative;
+    border: 0;
+    background-color: rgba(217, 217, 217, 0);
+
+    /* Formatação do texto do botão */
+    font-size: 28px;
+    font-weight: 500;
+    color: #6D6D6D;
+    text-align: center;
+    display: inline-block;
+}
+/* Posição do icone do botão home */
+.icon-plantacao {
+    width: 100%;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    height: 55px;
+    flex-shrink: 0;
+}
+/* Adicionando animação de sobrebor e mudando a cor. */
+.botao-plantacao:hover {
+    color: #13330d;
+    border-left: 2px solid #6D6D6D;
+    border-right: 2px solid #6D6D6D;
+}
+.botao-plantacao:hover .icon-plantacao path {
+    fill: #13330d;
+}
+
+
+/* BOTÃO CONSUMO */
+.botao-consumo {
+    width: 280px;
+    height: 130px;
+    position: relative;
+    border: 0;
+    background-color: rgba(217, 217, 217, 0);
+
+    /* Formatação do texto do botão */
+    font-size: 28px;
+    font-weight: 500;
+    color: #6D6D6D;
+    text-align: center;
+    display: inline-block;
+}
+/* Posição do icone do botão home */
+.icon-consumo {
+    width: 100%;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    height: 55px;
+    flex-shrink: 0;
+}
+/* Adicionando animação de sobrebor e mudando a cor. */
+.botao-consumo:hover {
+    color: #13330d;
+    border-left: 2px solid #6D6D6D;
+    border-right: 2px solid #6D6D6D;
+}
+.botao-consumo:hover .icon-consumo path {
+    fill: #13330d;
+}
+
+
+/* BOTÃO ATIVIDADES */
+.botao-atividades {
+    width: 280px;
+    height: 130px;
+    position: relative;
+    border: 0;
+    background-color: rgba(217, 217, 217, 0);
+
+    /* Formatação do texto do botão */
+    font-size: 28px;
+    font-weight: 500;
+    color: #6D6D6D;
+    text-align: center;
+    display: inline-block;
+}
+/* Posição do icone do botão home */
+.icon-atividades {
+    width: 100%;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    height: 55px;
+    flex-shrink: 0;
+}
+/* Adicionando animação de sobrebor e mudando a cor. */
+.botao-atividades:hover {
+    color: #13330d;
+    border-left: 2px solid #6D6D6D;
+    border-right: 2px solid #6D6D6D;
+}
+.botao-atividades:hover .icon-atividades path {
+    fill: #13330d;
+}

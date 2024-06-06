@@ -1,0 +1,69 @@
+.navbar {
+width: 100%;
+position: relative;
+background-color: #D9FFBA;
+padding-top: 0px;
+text-align: center;
+height: 218px;
+}
+
+.logo {
+    width: 3.5%;
+    height: auto;
+    margin-bottom: 0px;
+    object-fit: cover;
+}
+
+
+/* Configuração dos botões */
+.botoes {
+    display: flex;
+    justify-content: center;
+    gap: 120px;
+}
+/* BOTÃO HOME */
+.botao-home, .botao-plantacao, .botao-consumo, .botao-atividades {
+    width: 280px;
+    height: 130px;
+    position: relative;
+    border: 0;
+    background-color: rgba(217, 217, 217, 0);
+
+    /* Formatação do texto do botão */
+    font-size: 28px;
+    font-weight: 500;
+    color: #6D6D6D;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Posição do icone do botão home */
+.icon-home, .icon-plantacao, .icon-consumo, .icon-atividades {
+    width: 100%;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    height: 55px;
+    flex-shrink: 0;
+
+}
+/* Adicionando animação de sobrebor e mudando a cor. */
+.botao-home:hover, .botao-plantacao:hover, .botao-consumo:hover, .botao-atividades:hover {
+    color: #13330d;
+    border-left: 2px solid #6D6D6D;
+    border-right: 2px solid #6D6D6D;
+}
+.botao-home:hover .icon-home path, .botao-plantacao:hover .icon-plantacao path, .botao-consumo:hover .icon-consumo path, .botao-atividades:hover .icon-atividades path {
+    fill: #13330d;
+}
+
+/* Cor de identificação da pagina atual do usuário */
+.active {
+    color: #0069CC; /* Cor azul para o botão ativo */
+}
+.active .icon-home path,
+.active .icon-plantacao path,
+.active .icon-consumo path,
+.active .icon-atividades path {
+    fill: #0069CC; /* Cor azul para o ícone do botão ativo */
+}
