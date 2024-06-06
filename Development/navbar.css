@@ -19,7 +19,7 @@ height: 218px;
 .botoes {
     display: flex;
     justify-content: center;
-    gap: 120px;
+    gap: 100px;
 }
 /* BOTÃO HOME */
 .botao-home, .botao-plantacao, .botao-consumo, .botao-atividades {
