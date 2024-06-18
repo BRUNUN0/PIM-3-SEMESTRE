@@ -1,30 +1,17 @@
- // Função para definir o botão ativo
-    function setActiveButton() {
-        // Obtenha o caminho do arquivo atual
-        const path = window.location.pathname;
-        const currentPage = path.split("/").pop();
-
-        // Defina um mapeamento das páginas para os botões
-        const pageToButtonMap = {
-            'home.html': 'botao-home',
-            'plantacao.html': 'botao-plantacao',
-            'consumo.html': 'botao-consumo',
-            'atividades.html': 'botao-atividades'
-        };
-
-        // Obtenha o ID do botão correspondente à página atual
-        const activeButtonClass = pageToButtonMap[currentPage];
-
-        // Adicione a classe 'active' ao botão correspondente
-        if (activeButtonClass) {
-            document.querySelector(`.${activeButtonClass}`).classList.add('active');
-     }
+function redirecionarHome() {
+    window.location.href = "home.html";
+}
+function redirecionarPlantação() {
+    window.location.href = "plantacao.html";
+}
+function redirecionarConsumo() {
+    window.location.href = "consumo.html";
+}
+function redirecionarAtividades() {
+    window.location.href = "atividades.html";
 }
 
-// Execute a função ao carregar a página
-window.onload = setActiveButton;
-
-
-document.querySelector('.botao-entrar').addEventListener('click', function() {
-    window.location.href = 'home.html';
-    });
+document.getElementById('botao-home').onclick = redirecionarHome;
+document.getElementById('botao-plantacao').onclick = redirecionarPlantação;
+document.getElementById('botao-consumo').onclick = redirecionarConsumo;
+document.getElementById('botao-atividades').onclick = redirecionarAtividades;

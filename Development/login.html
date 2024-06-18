@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
   	<meta name="viewport" content="initial-scale=1, width=device-width">
   	
-  	<link rel="stylesheet"  href="login.css" />
+  	<link rel="stylesheet"  href="Assets/login.css" />
     <link rel="stylesheet"  href="Assets/global.css" />
   	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&display=swap" />
   	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" />
@@ -26,7 +26,7 @@
 
       			<div class="circulo"></div>
                 
-      				<button type=button class="botao-entrar">Entrar</button>
+      				<button type=button class="botao-entrar" id="botao-login">Entrar</button>
 
       			<input type="text" class="campo-id" placeholder="Digite seu ID">
 
@@ -35,7 +35,12 @@
                 <img class="logo-icon" alt="" src="Assets/images/logo.png">
   	</div>
   	
-	<script src="teste.js"></script>
+	<script>
+		function Login() {
+			window.location.href = "home.html";
+		}
+		document.getElementById('botao-login').onclick = Login;
+	</script>
   	
 </body>
 </html>
