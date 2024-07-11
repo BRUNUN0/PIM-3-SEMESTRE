@@ -1,3 +1,4 @@
+// Redirecionamento dos botões da navbar
 function redirecionarHome() {
     window.location.href = "home.html";
 }
@@ -11,6 +12,7 @@ function redirecionarAtividades() {
     window.location.href = "atividades.html";
 }
 
+// Ativação dos botões da navbar
 document.getElementById('botao-home').onclick = redirecionarHome;
 document.getElementById('botao-plantacao').onclick = redirecionarPlantação;
 document.getElementById('botao-consumo').onclick = redirecionarConsumo;
@@ -30,6 +32,8 @@ function fecharMenu() {
 }
 document.getElementById('foto-perfil').onclick = abrirMenu;
 document.addEventListener('click', fecharMenu);
+
+//Redirecionamento dos Botões do Menu
 
 
 // Função Relógio
