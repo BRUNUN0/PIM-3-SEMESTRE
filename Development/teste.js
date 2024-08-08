@@ -19,21 +19,52 @@ document.getElementById('botao-consumo').onclick = redirecionarConsumo;
 document.getElementById('botao-atividades').onclick = redirecionarAtividades;
 
 // Abrir pop-up do menu
-function abrirMenu() {
+function abrirMenu(event) {
     document.getElementById('menu').classList.toggle('hidden');
     event.stopPropagation();
 }
 // Fechar pop-up do menu
-function fecharMenu() {
+function fecharMenu(event) {
     const menu = document.getElementById('menu');
     if (!menu.classList.contains('hidden') && !menu.contains(event.target)) {
-        menu.classList.add('hidden')
+        menu.classList.add('hidden');
     }
 }
 document.getElementById('foto-perfil').onclick = abrirMenu;
 document.addEventListener('click', fecharMenu);
 
 //Redirecionamento dos Botões do Menu
+document.addEventListener('DOMContentLoaded', function() {
+    function popupMinhaConta() {
+        const botaoPerfil = document.getElementById('botao-perfil');
+        const popupPerfil = document.getElementById('popup-perfil');
+        const botaoFecha = document.getElementById('fecha-perfil');
+        const menu = document.getElementById('menu');
+
+        // Função para abrir o popup e esconder o menu
+        botaoPerfil.addEventListener('click', function() {
+            popupPerfil.classList.remove('hidden');
+            menu.classList.add('hidden'); // Esconde o menu
+        });
+
+        // Função para fechar o popup
+        botaoFecha.addEventListener('click', function() {
+            popupPerfil.classList.add('hidden');
+        });
+
+        // Fechar popup ao clicar fora dele
+        window.addEventListener('click', function(event) {
+            if (event.target === popupPerfil) {
+                popupPerfil.classList.add('hidden');
+            }
+        });
+    }
+
+    popupMinhaConta();
+});
+
+
+
 
 
 // Função Relógio
