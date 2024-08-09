@@ -15,6 +15,45 @@
             <div class="navbar">
                 <img class="logo" alt="" src="Assets/images/logo.png">
                 <img id="foto-perfil" class="foto-perfil" alt="" src="Assets/images/perfil.png">
+                <div id="menu" class="menu hidden">
+                    <button class="botao-perfil" id="botao-perfil">
+                        <svg class="icon-perfil" width="50" height="50" viewBox="0 0 50 50" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path id="Vector"
+                                d="M22.5 0C25.4837 0 28.3452 1.18526 30.455 3.29505C32.5647 5.40483 33.75 8.26631 33.75 11.25C33.75 14.2337 32.5647 17.0952 30.455 19.205C28.3452 21.3147 25.4837 22.5 22.5 22.5C19.5163 22.5 16.6548 21.3147 14.545 19.205C12.4353 17.0952 11.25 14.2337 11.25 11.25C11.25 8.26631 12.4353 5.40483 14.545 3.29505C16.6548 1.18526 19.5163 0 22.5 0ZM22.5 5.625C21.0082 5.625 19.5774 6.21763 18.5225 7.27252C17.4676 8.32742 16.875 9.75816 16.875 11.25C16.875 12.7418 17.4676 14.1726 18.5225 15.2275C19.5774 16.2824 21.0082 16.875 22.5 16.875C23.9918 16.875 25.4226 16.2824 26.4775 15.2275C27.5324 14.1726 28.125 12.7418 28.125 11.25C28.125 9.75816 27.5324 8.32742 26.4775 7.27252C25.4226 6.21763 23.9918 5.625 22.5 5.625ZM22.5 25.3125C30.0094 25.3125 45 29.0531 45 36.5625V45H0V36.5625C0 29.0531 14.9906 25.3125 22.5 25.3125ZM22.5 30.6562C14.1469 30.6562 5.34375 34.7625 5.34375 36.5625V39.6562H39.6562V36.5625C39.6562 34.7625 30.8531 30.6562 22.5 30.6562Z"
+                                fill="black" />
+                        </svg>
+                        Minha Conta
+                    </button>
+                    <button class="botao-administrador" id="botao-administrador">
+                        <svg class="icon-administrador" width="50" height="50" viewBox="0 0 50 50" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="eos-icons:admin-outlined">
+                                <path id="Vector"
+                                    d="M25.0003 47.9167C13.4232 45.3438 4.16699 34.4208 4.16699 22.9167V10.4167L25.0003 2.08334L45.8337 10.4167V22.9167C45.8337 34.425 36.5774 45.3438 25.0003 47.9167ZM8.33366 12.5V22.9167C8.45271 27.7336 10.1469 32.3788 13.1569 36.1414C16.167 39.9039 20.327 42.5765 25.0003 43.75C29.6736 42.5765 33.8337 39.9039 36.8437 36.1414C39.8537 32.3788 41.5479 27.7336 41.667 22.9167V12.5L25.0003 6.25001L8.33366 12.5Z"
+                                    fill="black" />
+                                <path id="Vector_2"
+                                    d="M25.0003 22.9167C27.8768 22.9167 30.2087 20.5848 30.2087 17.7083C30.2087 14.8319 27.8768 12.5 25.0003 12.5C22.1238 12.5 19.792 14.8319 19.792 17.7083C19.792 20.5848 22.1238 22.9167 25.0003 22.9167Z"
+                                    fill="black" />
+                                <path id="Vector_3"
+                                    d="M14.583 31.25C15.6099 33.1213 17.1155 34.6861 18.9458 35.7842C20.7761 36.8824 22.8653 37.4745 24.9997 37.5C27.134 37.4745 29.2232 36.8824 31.0536 35.7842C32.8839 34.6861 34.3895 33.1213 35.4163 31.25C35.3643 27.3 28.4538 25 24.9997 25C21.5268 25 14.6351 27.3 14.583 31.25Z"
+                                    fill="black" />
+                            </g>
+                        </svg>
+                        Administrar Sistema
+                    </button>
+                    <button class="botao-sair" id="botao-sair">
+                        <svg class="icon-sair" width="50" height="50" viewBox="0 0 50 50" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="material-symbols:logout">
+                                <path id="Vector"
+                                    d="M38 6C39.1 6 40.0413 6.39134 40.824 7.174C41.6067 7.95667 41.9987 8.89867 42 10L42 38C42 39.1 41.608 40.0413 40.824 40.824C40.04 41.6067 39.0987 41.9987 38 42H24V38H38L38 10L24 10V6H38ZM16 14L18.75 16.9L13.65 22L30 22V26L13.65 26L18.75 31.1L16 34L6 24L16 14Z"
+                                    fill="black" />
+                            </g>
+                        </svg>
+                        Sair
+                    </button>
+                </div>
                 <div class="relogio" id="relogio">00:00:00</div>
                 <div class="botoes">
                     <button type="button" class="botao-home" id="botao-home">
@@ -53,6 +92,41 @@
                         </svg>
                         Atividades
                     </button>
+                </div>
+            </div>
+            <div id="popup-perfil" class="popup hidden">
+                <div class="popup-content">
+                    <span id="fecha-perfil" class="botao-fechar">&times;</span>
+                    <div class="titulo-popup">
+                        <svg class="perfil-popup" width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path id="Vector" d="M22.5 0C25.4837 0 28.3452 1.18526 30.455 3.29505C32.5647 5.40483 33.75 8.26631 33.75 11.25C33.75 14.2337 32.5647 17.0952 30.455 19.205C28.3452 21.3147 25.4837 22.5 22.5 22.5C19.5163 22.5 16.6548 21.3147 14.545 19.205C12.4353 17.0952 11.25 14.2337 11.25 11.25C11.25 8.26631 12.4353 5.40483 14.545 3.29505C16.6548 1.18526 19.5163 0 22.5 0ZM22.5 5.625C21.0082 5.625 19.5774 6.21763 18.5225 7.27252C17.4676 8.32742 16.875 9.75816 16.875 11.25C16.875 12.7418 17.4676 14.1726 18.5225 15.2275C19.5774 16.2824 21.0082 16.875 22.5 16.875C23.9918 16.875 25.4226 16.2824 26.4775 15.2275C27.5324 14.1726 28.125 12.7418 28.125 11.25C28.125 9.75816 27.5324 8.32742 26.4775 7.27252C25.4226 6.21763 23.9918 5.625 22.5 5.625ZM22.5 25.3125C30.0094 25.3125 45 29.0531 45 36.5625V45H0V36.5625C0 29.0531 14.9906 25.3125 22.5 25.3125ZM22.5 30.6562C14.1469 30.6562 5.34375 34.7625 5.34375 36.5625V39.6562H39.6562V36.5625C39.6562 34.7625 30.8531 30.6562 22.5 30.6562Z" fill="black"/>
+                        </svg>
+                        <h2>Minha Conta</h2>
+                    </div>
+                    <div class="form-group">
+                        <label for="id">ID</label>
+                        <input type="text" id="id" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="data-nascimento">Data de nascimento</label>
+                        <input type="date" id="data-nascimento" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone1">Telefone 1</label>
+                        <input type="text" id="telefone1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone2">Telefone 2</label>
+                        <input type="text" id="telefone2" readonly>
+                    </div>
                 </div>
             </div>
         </nav>
