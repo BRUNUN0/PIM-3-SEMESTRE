@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const popupPerfil = document.getElementById('popup-perfil');
         const botaoFecha = document.getElementById('fecha-perfil');
         const menu = document.getElementById('menu');
+        const botaoSair = document.getElementById('botao-sair');
 
         // Função para abrir o popup e esconder o menu
         botaoPerfil.addEventListener('click', function() {
