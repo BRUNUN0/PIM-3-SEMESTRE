@@ -1,0 +1,59 @@
+ft.Column(
+                    controls=[
+                        ft.Container(
+                            bgcolor="#7FA677",
+                            width=350,
+                            height=350,
+                            alignment=ft.alignment.center,
+                            border_radius=ft.border_radius.all(10),
+                            content=ft.Column(
+                                controls=[
+                                    # Campo ID
+                                    ft.TextField(
+                                        label="ID",
+                                        width=250,
+                                        height=50,
+                                        border_radius=ft.border_radius.all(8),
+                                        bgcolor=ft.colors.WHITE,
+                                        color=ft.colors.BLACK,
+                                        text_style=ft.TextStyle(size=16),
+                                        label_style=ft.TextStyle(
+                                            color=ft.colors.BLACK,
+                                            size=14
+                                        )
+                                    ),
+                                    # Campo Senha
+                                    ft.TextField(
+                                        label="Senha",
+                                        width=250,
+                                        height=50,
+                                        password=True,
+                                        border_radius=ft.border_radius.all(8),
+                                        bgcolor=ft.colors.WHITE,
+                                        color=ft.colors.BLACK,
+                                        text_style=ft.TextStyle(size=16),
+                                        label_style=ft.TextStyle(
+                                            color=ft.colors.BLACK,
+                                            size=14
+                                        )
+                                    ),
+                                    # Botão Entrar
+                                    ft.ElevatedButton(
+                                        text="Entrar",
+                                        width=100,
+                                        height=40,
+                                        bgcolor=ft.colors.GREEN_900,
+                                        color=ft.colors.WHITE,
+                                        on_click=lambda e: print("Login clicado")
+                                    ),
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20
+                            )
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    expand=True  # Para centralizar o container de login
+                ),

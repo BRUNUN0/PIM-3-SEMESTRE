@@ -1,3 +1,14 @@
+criar venv
+    python -m venv venv
+    venv/Scripts/activate
+
+instalar dependências do projeto
+    pip install -r requirements.txt
+
+
+
+    
+
 # PIXFARM
 ![WhatsApp Image 2024-05-14 at 10 24 01](https://github.com/BRUNUN0/PIM-3-SEMESTRE/assets/131329545/924958c4-378b-4428-92fb-d4357738ca74)
 
