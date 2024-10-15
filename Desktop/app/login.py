@@ -26,6 +26,20 @@ def Login(page: ft.Page):
                             border_radius=ft.border_radius.all(10),
                             content=ft.Column(
                                 controls=[
+                                    ft.Container(
+                                        content=ft.Image(
+                                            src="Desktop\app\assets\Logo.png",
+                                            width=100,
+                                            height=100,
+                                            fit=ft.ImageFit.CONTAIN,
+                                        ),
+                                        width=130,
+                                        height=130,
+                                        alignment=ft.alignment.top_center,
+                                        padding=ft.padding(top=-60),
+                                        border_radius=ft.border_radius.all(100),
+                                        bgcolor="#7FA677"
+                                    ),
                                     # Campo ID
                                     ft.TextField(
                                         label="ID",
@@ -69,7 +83,7 @@ def Login(page: ft.Page):
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 spacing=20
                             )
-                        )
+                        ),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -77,17 +91,17 @@ def Login(page: ft.Page):
                 ),
 
                 # Logo
-                ft.Container(
-                    content=ft.Image(
-                        src="app/assets/logo.png",
-                        fit=ft.ImageFit.CONTAIN
-                    ),
-                    top=120,
-                    width=150,
-                    height=150,
-                    border_radius=ft.border_radius.all(100),
-                    bgcolor="#7FA677",
-                )
+                # ft.Container(
+                #     content=ft.Image(
+                #         src="app/assets/logo.png",
+                #         fit=ft.ImageFit.CONTAIN
+                #     ),
+                #     top=120,
+                #     width=150,
+                #     height=150,
+                #     border_radius=ft.border_radius.all(100),
+                #     bgcolor="#7FA677",
+                # )
             ],
             alignment=ft.alignment.center  # Centraliza todos os itens no Stack
         ),
