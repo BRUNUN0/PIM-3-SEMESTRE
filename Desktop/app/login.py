@@ -7,7 +7,7 @@ def Login(page: ft.Page):
             controls=[
                 # Background
                 ft.Container(
-                    image_src="app/assets/teste1.jpg",
+                    image_src="Desktop/app/assets/Logo.png",
                     image_fit=ft.ImageFit.COVER,
                     expand=True  # Preenche todo o espaço
                 ),
@@ -28,7 +28,7 @@ def Login(page: ft.Page):
                                 controls=[
                                     ft.Container(
                                         content=ft.Image(
-                                            src="Desktop\app\assets\Logo.png",
+                                            src="Desktop/app/assets/Logo.png",
                                             width=100,
                                             height=100,
                                             fit=ft.ImageFit.CONTAIN,
@@ -36,7 +36,7 @@ def Login(page: ft.Page):
                                         width=130,
                                         height=130,
                                         alignment=ft.alignment.top_center,
-                                        padding=ft.padding(top=-60),
+                                        # padding=ft.padding(top=-60),
                                         border_radius=ft.border_radius.all(100),
                                         bgcolor="#7FA677"
                                     ),
