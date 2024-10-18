@@ -2,6 +2,10 @@ import flet as ft
 
 def Login(page: ft.Page):
     
+    def login(e):
+        print("Login Solicitado")
+        page.go('/home')
+    
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -34,7 +38,7 @@ def Login(page: ft.Page):
                                 height=40,
                                 bgcolor=ft.colors.GREEN_900,
                                 color=ft.colors.WHITE,
-                                on_click= lambda e: print("Login Solicitado")
+                                on_click= lambda e: login(e)
                             )
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN
