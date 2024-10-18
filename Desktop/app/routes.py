@@ -1,6 +1,7 @@
 import flet as ft
 from app.home import Home
-from app.login import Login
+from app.teste import Login
+
 
 def rotas(page: ft.Page):
     def route_change(route):

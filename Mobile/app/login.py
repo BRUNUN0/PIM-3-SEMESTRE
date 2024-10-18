@@ -5,6 +5,9 @@ def Login(page: ft.Page):
     def login(e):
         print("Login Solicitado")
         page.go('/home')
+        
+    def rec_senha(e):
+        print("Esqueci minha senha, socorro!")
     
     def logo():
         logo = ft.Container(
@@ -30,7 +33,7 @@ def Login(page: ft.Page):
                                 text="Esqueci minha senha",
                                 width=180,
                                 height=40,
-                                on_click= lambda e: print("Esqueci minha senha, socorro!")
+                                on_click= lambda e: rec_senha(e)
                             ),
                             ft.ElevatedButton(
                                 text="Entrar",

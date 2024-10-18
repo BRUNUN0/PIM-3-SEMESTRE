@@ -1,11 +1,26 @@
 import flet as ft
 
 def Home(page: ft.Page):
-    return ft.Container(
+    
+    Main = ft.Container(
+        width=390,
+        height=860,
+        bgcolor='#7FA677',
+        border_radius=20,
+        
         content=ft.Column(
             controls=[
-                ft.TextField("Página Home"),
-                ft.ElevatedButton("Ir Login", on_click=lambda _: page.go('/login'))
-            ]
+                ft.Container(
+                    content=ft.Stack(
+                        controls=[
+                            ...
+                        ]
+                    )
+                )
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
     )
+    
+    return Main
