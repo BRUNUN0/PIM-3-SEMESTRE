@@ -2,7 +2,8 @@ import functions as fc
 
 
 def main():
-    fc.DbcLogin
+    return fc.connect_to_sql_server()
+
 
 
 def Vlogin():

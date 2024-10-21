@@ -2,19 +2,23 @@ import pyodbc
 
 
 # === Conexão Banco ===
-dados_conexao = {
-    "Driver={SQL Server};"
-    "Server=TIN7069;"
-    "Database=PIXFARM;"
-}
-conexao = pyodbc.connect(dados_conexao, autocommit= True)
-print("conexão efetuada")
-cursor = conexao.cursor()
+def connect_to_sql_server():
+    cnn_str = r'Driver={SQL Server};Server=TIN7069\SQLEXPRESS;Database=PIXFARM;'
+
+    try:
+        conn = pyodbc.connect(cnn_str)
+        return conn
+    except pyodbc.Error as e:
+        print(f"Erro ao conectar ao SQL Server: {e}")
+        return None
+   
+
+
 
 # === Funções Banco ===
 
 def DbcLogin():
-    comando_login = "SELECT * FROM PIXFARM "
+    comando_login = "SELECT 'Nome', 'Senha' FROM PIXFARM "
     
     return print(comando_login.tostring())
 
