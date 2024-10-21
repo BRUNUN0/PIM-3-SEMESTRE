@@ -62,6 +62,9 @@ def Home(page: ft.Page):
         return clima
     
     def planta():
+        def on_click_container(e):
+            print("Container Clicado")
+            
         planta = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
@@ -71,6 +74,7 @@ def Home(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=2, right=2),
+            on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
             
             content=ft.Row(
                 controls=[
