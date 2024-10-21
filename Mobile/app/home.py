@@ -61,6 +61,67 @@ def Home(page: ft.Page):
         
         return clima
     
+    def planta():
+        planta = ft.Container(
+            bgcolor="#99C2A2",
+            border=ft.border.all(
+                color=ft.colors.BLACK
+            ),
+            width=340,
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=2, right=2),
+            
+            content=ft.Row(
+                controls=[
+                    ft.Icon(
+                        name=ft.icons.FOREST,
+                        size=30
+                        ),
+                    ft.Text(
+                        value="Nome da Planta"
+                        ),
+                    
+                    ft.Container(
+                        alignment=ft.alignment.center_right,
+                        
+                        content=ft.Image(
+                            src="app/assets/Logo.png",
+                            width=30,
+                        )
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        )
+        
+        return planta
+    
+    def plantacao():
+        plantacao = ft.Container(
+            bgcolor=ft.colors.WHITE,
+            width=360,
+            height=380,
+            border_radius=16,
+            padding=ft.padding.only(top=5),
+            
+            content=ft.Column(
+                controls=[
+                    ft.Text(value="Plantação", size=16),
+                    ft.Column(
+                        controls=[
+                            planta()
+                        ]
+                    )
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                # alignment=ft.MainAxisAlignment.CENTER,
+                # vertical_alignment=ft.CrossAxisAlignment.START
+            )
+        )
+        
+        return plantacao
+    
     
     
     Main = ft.Container(
@@ -84,6 +145,14 @@ def Home(page: ft.Page):
                     content=ft.Stack(
                         controls=[
                             clima()
+                        ]
+                    )
+                ),
+                ft.Container(
+                    padding=ft.padding.only(top=5),
+                    content=ft.Stack(
+                        controls=[
+                            plantacao()    
                         ]
                     )
                 )
