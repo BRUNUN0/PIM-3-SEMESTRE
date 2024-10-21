@@ -7,7 +7,7 @@ def main(page: ft.Page):
     page.window.height = 926
     rotas(page)
 
-    page.go("/login")
+    page.go("/")
     page.update()
 
 if __name__ == "__main__":
