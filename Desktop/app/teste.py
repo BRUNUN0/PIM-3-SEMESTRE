@@ -10,26 +10,29 @@ def Login(page: ft.Page):
                     fit=ft.ImageFit.COVER,
                     )
             ),
-            # ft.Container(
-            #     content=ft.Container(
-            #         bgcolor=ft.colors.with_opacity(0.4, ft.colors.BLACK),
-            #         expand=True
-            #     )
-            # )
+            ft.Container(
+                content=ft.Container(
+                    bgcolor=ft.colors.with_opacity(0.4, ft.colors.BLACK),
+                    # expand=True
+                )
+            )
         )
         return background
     
     Main = ft.Container(
-        expand=True,
+        # expand=True,
         bgcolor='#7FA677',
         border_radius=20,
         
-        content=ft.Stack(
-            expand=True,
+        content=ft.Column(
             controls=[
                 ft.Container(
-                    background(),
-                    # bgcolor=ft.colors.with_opacity(0.4, ft.colors.BLACK),
+                    content=ft.stack(
+                        controls=[
+                            background(),
+                            # bgcolor=ft.colors.with_opacity(0.4, ft.colors.BLACK),
+                        ]
+                    )
                 )
             ]
         )
