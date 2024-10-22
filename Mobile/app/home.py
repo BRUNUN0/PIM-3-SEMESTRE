@@ -114,8 +114,10 @@ def Home(page: ft.Page):
                     ft.Text(value="Plantação", size=16),
                     ft.Column(
                         controls=[
-                            planta()
-                        ]
+                            planta() for i in range(10)
+                        ],
+                        spacing=6,
+                        scroll='auto'
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
