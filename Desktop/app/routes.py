@@ -1,6 +1,6 @@
 import flet as ft
 from app.home import Home
-from app.teste1 import Login
+from app.login import Login
 
 
 def rotas(page: ft.Page):

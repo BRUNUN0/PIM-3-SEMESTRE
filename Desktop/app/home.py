@@ -3,19 +3,27 @@ import flet as ft
 def Home(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
+        
+    def AppBar():
+        AppBar = ft.Container(
+            bgcolor=ft.colors.BLUE
+        )
+        
+        return AppBar
 
-    return ft.Container(
-        bgcolor='cyan',
-        height=300,
-        alignment=ft.alignment.center,
-        content=ft.Column(
+    Main = ft.Container(
+        expand=True,
+
+        content=ft.Row(
             controls=[
-                ft.Text('Home', size=40, weight=ft.FontWeight.BOLD),
-                ft.ElevatedButton(
-                    text='Logout',
-                    on_click=sair  # Lógica de logout
+                ft.Container(
+                    AppBar()
                 )
             ],
-            alignment=ft.MainAxisAlignment.CENTER
+            alignment=ft.MainAxisAlignment.CENTER,
         )
     )
+    
+    # page.on_resized = page.update()
+
+    return Main
