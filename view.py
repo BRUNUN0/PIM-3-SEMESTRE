@@ -1,18 +1,25 @@
 import functions as fc
+import os
 
 
-def main():
-    return fc.connect_to_sql_server()
+f = False
 
-
-
-def Vlogin():
+while f != True:
     print("=== LOGIN ===\n\n")
-    login = input(print("Login: "))
-    senha = input(print("Senha: "))
-    
+
+    login = input("Login: ")
+    senha = input("Senha: ")
+
+
     _ = fc.Login(login, senha)
 
     if(_ == True):
-        print("Login")
-    else: print("Login ou senha incorretos. ")
+        print("Login feito ")
+        f = True
+    else: 
+        print("Login ou senha incorretos. ")
+        f = False
+
+
+
+
