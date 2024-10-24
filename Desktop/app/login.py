@@ -13,7 +13,7 @@ def Login(page: ft.Page):
             border_radius=ft.border_radius.all(100),
             # padding=ft.padding.only(top=-70),
             content=ft.Image(
-                src="app/assets/Logo.png",
+                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=130,
                 height=130,
             ),
