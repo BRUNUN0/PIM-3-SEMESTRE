@@ -1,0 +1,163 @@
+CREATE DATABASE PIXFARM
+
+USE PIXFARM
+
+CREATE TABLE Fornecedor (
+    id_fornecedor INT IDENTITY(1,1) PRIMARY KEY,
+    Nome NVARCHAR(100),
+    Nome_Fantasia NVARCHAR(100),
+    CNPJ CHAR(14),
+    Email NVARCHAR(100),
+    Telefone NVARCHAR(20),
+    Rua NVARCHAR(100),
+    Numero NVARCHAR(10),
+    Bairro NVARCHAR(50),
+    CEP CHAR(8),
+    Cidade NVARCHAR(50),
+    Estado CHAR(2)
+);
+
+CREATE TABLE Compra (
+    id_compra INT IDENTITY(1,1) PRIMARY KEY,
+    fk_id_fornecedor INT,
+    Data_compra DATE,
+    
+    FOREIGN KEY (fk_id_fornecedor) REFERENCES Fornecedor(id_fornecedor)
+);
+
+CREATE TABLE Materia_Prima (
+    id_materia INT IDENTITY(1,1) PRIMARY KEY,
+    fk_id_fornecedor INT,
+    Nome NVARCHAR(100),
+    Quantidade INT,
+    
+    FOREIGN KEY (fk_id_fornecedor) REFERENCES Fornecedor(id_fornecedor)
+);
+
+CREATE TABLE Item_Compra (
+    fk_id_compra INT,
+    fk_id_fornecedor INT,
+    fk_id_materia INT,
+    Quantidade INT,
+    
+    FOREIGN KEY (fk_id_compra) REFERENCES Compra(id_compra),
+    FOREIGN KEY (fk_id_fornecedor) REFERENCES Fornecedor(id_fornecedor),
+    FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia)
+);
+
+ALTER TABLE Item_Compra ADD CONSTRAINT FK_ITEM_COMPRA_1
+FOREIGN KEY (fk_id_compra) REFERENCES Compra(id_compra);
+
+ALTER TABLE Item_Compra ADD CONSTRAINT FK_ITEM_COMPRA_2
+FOREIGN KEY (fk_id_fornecedor) REFERENCES Fornecedor(id_fornecedor);
+
+ALTER TABLE Item_Compra ADD CONSTRAINT FK_ITEM_COMPRA_3
+FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia);
+
+
+CREATE TABLE Cargo (
+    id_cargo INT IDENTITY(1,1) PRIMARY KEY,
+    Cargo NVARCHAR(50),
+    Descricao NVARCHAR(MAX),
+    Salario DECIMAL(10,2)
+);
+
+CREATE TABLE Funcionario (
+    id_funcionario INT IDENTITY(1,1) PRIMARY KEY,
+    Nome NVARCHAR(100),
+    CPF CHAR(11),
+    Sexo CHAR(1),
+    Cargo NVARCHAR(50),
+    Senha NVARCHAR(30),
+    Nascimento DATE,
+    Email NVARCHAR(100),
+    Setor NVARCHAR(50),
+    fk_Data_Inicio DATE
+);
+
+CREATE TABLE Historico_Cargo (
+    fk_id_cargo INT,
+    fk_id_funcionario INT,
+    Data_Inicio DATE,
+    Data_Fim DATE,
+    
+    PRIMARY KEY (fk_id_cargo, fk_id_funcionario, Data_Inicio),
+    FOREIGN KEY (fk_id_cargo) REFERENCES Cargo(id_cargo),
+    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario)
+);
+
+CREATE TABLE Cliente (
+    id_cliente INT IDENTITY(1,1) PRIMARY KEY,
+    Nome NVARCHAR(100),
+    CNPJ CHAR(14),
+    Email NVARCHAR(100),
+    Rua NVARCHAR(100),
+    Numero NVARCHAR(10),
+    Bairro NVARCHAR(50),
+    CEP CHAR(8),
+    Cidade NVARCHAR(50),
+    Estado CHAR(2)
+);
+
+CREATE TABLE Pedido (
+    id_pedido INT IDENTITY(1,1) PRIMARY KEY,
+    Data_Pedido DATE,
+    fk_id_cliente INT,
+    
+    FOREIGN KEY (fk_id_cliente) REFERENCES Cliente(id_cliente)
+);
+
+CREATE TABLE Produto (
+    id_produto INT IDENTITY(1,1) PRIMARY KEY,
+    Produto NVARCHAR(100),
+    Quantidade INT
+);
+
+CREATE TABLE Item_Pedido (
+    fk_id_pedido INT,
+    fk_id_cliente INT,
+    fk_id_produto INT,
+    Quantidade INT,
+    
+    PRIMARY KEY (fk_id_pedido, fk_id_cliente, fk_id_produto),
+    FOREIGN KEY (fk_id_pedido) REFERENCES Pedido(id_pedido),
+    FOREIGN KEY (fk_id_cliente) REFERENCES Cliente(id_cliente),
+    FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto) -- Certifique-se de que a tabela Produto já existe
+);
+
+CREATE TABLE Atividade (
+    id_atividade INT IDENTITY(1,1) PRIMARY KEY,
+    fk_id_funcionario INT,
+    fk_Plantio NVARCHAR(100),
+    Descricao NVARCHAR(MAX),
+    Prioridade INT,
+    Duracao TIME,
+    Concluido BIT,
+    
+    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario) -- Certifique-se de que a tabela Funcionario já existe
+);
+
+CREATE TABLE Item_Producao (
+    Plantio NVARCHAR(100) PRIMARY KEY,
+    fk_id_materia INT,
+    fk_id_produto INT,
+    fk_id_atividade INT,
+    Quantidade INT,
+    Data_Inicio DATE,
+    Data_Fim DATE,
+    
+    FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia), -- Certifique-se de que a tabela Materia_Prima já existe
+    FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto),     -- Certifique-se de que a tabela Produto já existe
+    FOREIGN KEY (fk_id_atividade) REFERENCES Atividade(id_atividade) -- Certifique-se de que a tabela Atividade já existe
+);
+
+CREATE TABLE Central_de_Dados (
+    DataHora DATETIME NOT NULL,
+    Umidade DECIMAL(5,2),
+    Temperatura DECIMAL(5,2),
+    Iluminacao DECIMAL(5,2),
+    VelocidadeV DECIMAL(5,2),
+    DirecaoV DECIMAL(5,2),
+    Consumo DECIMAL(8,2),
+    Consumo_Total DECIMAL(10,2)
+);

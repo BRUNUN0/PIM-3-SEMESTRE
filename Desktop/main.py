@@ -9,7 +9,7 @@ def main(page: ft.Page):
     page.window.resizable = False
     rotas(page)
 
-    page.go("/")
+    page.go("/login")
     page.update()
 
 if __name__ == "__main__":

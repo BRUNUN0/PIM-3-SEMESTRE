@@ -1,11 +1,12 @@
 import flet as ft
+import sqlite3
 
 def Home(page: ft.Page):
     
     def logo():
         logo = ft.Container(
             content=ft.Image(
-                src="app/assets/Logo.png",
+                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/4-SEMESTRE/Mobile/app/assets/Logo.png",
                 width=50,
                 height=50,
             ),
@@ -56,14 +57,79 @@ def Home(page: ft.Page):
             width=360,
             height=160,
             border_radius=16,
-            padding=ft.padding.only(left=10, right=10),
+            padding=ft.padding.only(top=5,left=10),
+            
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        controls=[
+                            ft.Container(
+                                width=100,
+                                height=100,
+                                bgcolor=ft.colors.BLUE,
+                            ),
+                            ft.Container(
+                                width=100,
+                                height=100,
+                                bgcolor=ft.colors.RED
+                            ),
+                            ft.Container(
+                                width=100,
+                                height=100,
+                                bgcolor=ft.colors.GREEN
+                            )
+                        ]
+                    )
+                ]
+            )
         )
         
         return clima
     
-    def planta():
+    # def detalhes(e, nome, imagem):
+    #     conn = sqlite3.connect('PIXFARM.db')
+    #     cursor = conn.cursor()
+    #     cursor.execute('SELECT nome_planta, imagem FROM producao')
+    #     plantas = cursor.fetchall()
+    #     conn.close()
+        
+    #     lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
+        
+    #     detalhes = ft.AlertDialog(
+    #         title=ft.Text(
+    #             value='Nome',
+    #             size=20,
+    #             weight='bold',
+    #             color=ft.colors.BLACK
+    #         ),
+    #         content=ft.Column(
+    #             controls=[
+    #                 ft.Container(
+                        
+    #                 )
+    #             ],
+    #             width=335,
+    #             height=400
+    #         )
+    #     )
+        
+    #     return detalhes
+    
+    def planta(nome, imagem):
         def on_click_container(e):
-            print("Container Clicado")
+            page.dialog = ft.AlertDialog(
+                title=ft.Text(f"Detalhes da {nome}"),
+                content=ft.Container(
+                    width=50,
+                    height=50,
+                    bgcolor=ft.colors.BLUE                    
+                ),
+                actions=[
+                    ft.TextButton("Fechar", on_click=print("Olá Mundo"))
+                ]
+            )
+            page.dialog.open = True
+            page.update()
             
         planta = ft.Container(
             bgcolor="#99C2A2",
@@ -73,24 +139,25 @@ def Home(page: ft.Page):
             width=340,
             height=50,
             border_radius=9,
-            padding=ft.padding.only(left=2, right=2),
+            padding=ft.padding.only(left=12, right=12),
             on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
             
             content=ft.Row(
                 controls=[
                     ft.Icon(
                         name=ft.icons.FOREST,
+                        color=ft.colors.BLACK,
                         size=30
                         ),
                     ft.Text(
-                        value="Nome da Planta"
+                        value=nome
                         ),
                     
                     ft.Container(
                         alignment=ft.alignment.center_right,
                         
                         content=ft.Image(
-                            src="app/assets/Logo.png",
+                            src=imagem,
                             width=30,
                         )
                     )
@@ -102,6 +169,15 @@ def Home(page: ft.Page):
         return planta
     
     def plantacao():
+        
+        conn = sqlite3.connect('PIXFARM.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT nome_planta, imagem FROM producao')
+        plantas = cursor.fetchall()
+        conn.close()
+        
+        lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
+        
         plantacao = ft.Container(
             bgcolor=ft.colors.WHITE,
             width=360,
@@ -113,16 +189,13 @@ def Home(page: ft.Page):
                 controls=[
                     ft.Text(value="Plantação", size=16),
                     ft.Column(
-                        controls=[
-                            planta() for i in range(10)
-                        ],
+                        controls=
+                        lista_plantas,
                         spacing=6,
                         scroll='auto'
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                # alignment=ft.MainAxisAlignment.CENTER,
-                # vertical_alignment=ft.CrossAxisAlignment.START
             )
         )
         
@@ -131,8 +204,9 @@ def Home(page: ft.Page):
     
     
     Main = ft.Container(
-        width=390,
-        height=860,
+        # width=390,
+        # height=860,
+        expand=True,
         bgcolor='#7FA677',
         border_radius=20,
         

@@ -1,0 +1,18 @@
+CREATE TRIGGER tr_Update_Materia_Prima_On_Compra
+ON Compra
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @id_item INT, @quantidade INT;
+
+    SELECT @id_item = i.fk_id_item, @quantidade = i.Quantidade
+    FROM inserted i;
+
+    IF EXISTS (SELECT 1 FROM Materia_Prima WHERE fk_id_item = @id_item)
+        UPDATE Materia_Prima
+        SET Quantidade = Quantidade + @quantidade
+        WHERE fk_id_item = @id_item;
+    ELSE
+        INSERT INTO Materia_Prima (fk_id_item, Quantidade)
+        VALUES (@id_item, @quantidade);
+END;

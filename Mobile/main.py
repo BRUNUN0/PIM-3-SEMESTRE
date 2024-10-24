@@ -3,8 +3,8 @@ from app.routes import rotas
 
 def main(page: ft.Page):
     page.title = "PIXFARM"
-    page.window.width = 428
-    page.window.height = 926
+    # page.window.width = 428
+    # page.window.height = 926
     rotas(page)
 
     page.go("/login")
