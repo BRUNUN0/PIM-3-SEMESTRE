@@ -17,9 +17,16 @@ def Home(page: ft.Page):
                 ft.Container(
                     content=ft.Column(
                         controls=[
-                            ft.IconButton(
-                                icon=ft.icons.HOME,
-                                icon_size=32,
+                            ft.ElevatedButton(
+                                content=ft.Image(
+                                    src='https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/4-SEMESTRE/Desktop/app/assets/planta.png?raw=true',
+                                    width=500,
+                                    height=500,
+                                    ),
+                                width=50,
+                                height=50,
+                                # icon=ft.icons.HOME,
+                                # icon_size=32,
                                 on_click=lambda e: print("Home clicado"),
                             ),
                             ft.Text(

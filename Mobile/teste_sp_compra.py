@@ -5,7 +5,7 @@ def registrar_compra(cnpj_fornecedor, data_compra, itens_compra):
     # Conectar ao banco de dados
     conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
                           'Server=BRUNO-NOTE\SQLEXPRESS;'
-                          'Database=PIXFARM;'
+                          'Database=teste;'
                           'Trusted_Connection=yes;')
     cursor = conn.cursor()
 

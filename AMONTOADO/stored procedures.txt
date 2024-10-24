@@ -74,3 +74,257 @@ BEGIN
     INSERT INTO Item_Compra (fk_id_compra, fk_id_fornecedor, fk_id_materia, Quantidade)
     VALUES (@id_compra, @id_fornecedor, @id_materia, @QuantidadeMateriaPrima);
 END;
+
+
+
+
+
+
+
+CREATE PROCEDURE CadastrarFuncionario 
+    @Nome NVARCHAR(100),
+    @CPF CHAR(11),
+    @Sexo CHAR(1),
+    @Cargo NVARCHAR(50),
+    @Descricao NVARCHAR(MAX),
+    @Salario DECIMAL(10,2),
+    @Senha NVARCHAR(30),
+    @Nascimento DATE,
+    @Email NVARCHAR(100),
+    @Setor NVARCHAR(50),
+    @Data_Inicio DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @id_cargo INT;
+
+    -- Verificar se o cargo já existe
+    SELECT @id_cargo = id_cargo 
+    FROM Cargo 
+    WHERE Cargo = @Cargo;
+
+    -- Se o cargo não existir, cria um novo e recupera o ID gerado
+    IF @id_cargo IS NULL
+    BEGIN
+        INSERT INTO Cargo (Cargo, Descricao, Salario)
+        VALUES (@Cargo, @Descricao, @Salario);
+
+        SET @id_cargo = SCOPE_IDENTITY();
+    END
+
+    -- Inserir o novo funcionário com a fk_id_cargo
+    DECLARE @id_funcionario INT;
+    INSERT INTO Funcionario (
+        Nome, CPF, Sexo, fk_id_cargo, Senha, Nascimento, Email, Setor, fk_Data_Inicio
+    ) VALUES (
+        @Nome, @CPF, @Sexo, @id_cargo, @Senha, @Nascimento, @Email, @Setor, @Data_Inicio
+    );
+
+    SET @id_funcionario = SCOPE_IDENTITY();
+
+    -- Inserir o histórico de cargo
+    INSERT INTO Historico_Cargo (
+        fk_id_cargo, fk_id_funcionario, Data_Inicio
+    ) VALUES (
+        @id_cargo, @id_funcionario, @Data_Inicio
+    );
+
+    PRINT 'Funcionário cadastrado com sucesso.';
+END;
+
+
+
+
+
+
+
+
+
+
+
+CREATE PROCEDURE PromoverFuncionario 
+    @id_funcionario INT,
+    @NovoCargo NVARCHAR(50),
+    @Descricao NVARCHAR(MAX),
+    @Salario DECIMAL(10,2),
+    @Data_Promocao DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @id_cargo INT;
+    DECLARE @cargo_atual INT;
+    DECLARE @data_inicio_atual DATE;
+
+    -- Obter o cargo atual do funcionário e a data de início do histórico
+    SELECT @cargo_atual = fk_id_cargo, @data_inicio_atual = fk_Data_Inicio
+    FROM Funcionario
+    WHERE id_funcionario = @id_funcionario;
+
+    -- Verificar se o novo cargo já existe
+    SELECT @id_cargo = id_cargo 
+    FROM Cargo 
+    WHERE Cargo = @NovoCargo;
+
+    -- Se o novo cargo não existir, cria um novo e recupera o ID gerado
+    IF @id_cargo IS NULL
+    BEGIN
+        INSERT INTO Cargo (Cargo, Descricao, Salario)
+        VALUES (@NovoCargo, @Descricao, @Salario);
+
+        SET @id_cargo = SCOPE_IDENTITY();
+    END
+
+    -- Atualizar a tabela Historico_Cargo para definir a data de término do cargo antigo
+    UPDATE Historico_Cargo
+    SET Data_Fim = @Data_Promocao
+    WHERE fk_id_funcionario = @id_funcionario 
+      AND fk_id_cargo = @cargo_atual
+      AND Data_Inicio = @data_inicio_atual
+      AND Data_Fim IS NULL;
+
+    -- Atualizar o cargo do funcionário na tabela Funcionario
+    UPDATE Funcionario
+    SET fk_id_cargo = @id_cargo,
+        fk_Data_Inicio = @Data_Promocao
+    WHERE id_funcionario = @id_funcionario;
+
+    -- Inserir um novo registro de histórico de cargo para o novo cargo
+    INSERT INTO Historico_Cargo (
+        fk_id_cargo, fk_id_funcionario, Data_Inicio
+    ) VALUES (
+        @id_cargo, @id_funcionario, @Data_Promocao
+    );
+
+    PRINT 'Funcionário promovido com sucesso.';
+END;
+
+
+
+
+
+
+
+
+CREATE PROCEDURE InserirCliente
+    @Nome NVARCHAR(100),
+    @CNPJ CHAR(14), -- CNPJ é obrigatório
+    @Email NVARCHAR(100),
+    @Rua NVARCHAR(100),
+    @Numero NVARCHAR(10),
+    @Bairro NVARCHAR(50),
+    @CEP CHAR(8),
+    @Cidade NVARCHAR(50),
+    @Estado CHAR(2)
+AS
+BEGIN
+    -- Verificar se o CNPJ existe
+    IF NOT EXISTS (SELECT 1 FROM Fornecedor WHERE CNPJ = @CNPJ)
+    BEGIN
+        RAISERROR('Fornecedor com o CNPJ %s não existe.', 16, 1, @CNPJ);
+        RETURN; -- Saia da procedure se o CNPJ não existir
+    END
+    
+    -- Verificar se o cliente já existe
+    IF NOT EXISTS (SELECT 1 FROM Cliente WHERE CNPJ = @CNPJ)
+    BEGIN
+        INSERT INTO Cliente (Nome, CNPJ, Email, Rua, Numero, Bairro, CEP, Cidade, Estado)
+        VALUES (@Nome, @CNPJ, @Email, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
+    END
+    ELSE
+    BEGIN
+        RAISERROR('Cliente com o CNPJ %s já existe.', 16, 1, @CNPJ);
+    END
+END;
+
+
+
+
+
+
+
+
+
+########### VERIFICAR
+
+
+
+
+CREATE PROCEDURE IniciarProducao
+    @Plantio NVARCHAR(100),
+    @fk_id_pedido INT,
+    @fk_id_materia INT,
+    @fk_id_produto INT,
+    @Quantidade INT,
+    @DataInicio DATE,
+    @FaseAtual NVARCHAR(100)
+AS
+BEGIN
+    DECLARE @QuantidadeDisponivel INT;
+
+    -- Verificar se a quantidade de matéria-prima está disponível
+    SELECT @QuantidadeDisponivel = Quantidade
+    FROM Materia_Prima
+    WHERE id_materia = @fk_id_materia;
+
+    IF @QuantidadeDisponivel < @Quantidade
+    BEGIN
+        RAISERROR('Quantidade de matéria-prima insuficiente. Disponível: %d, Necessária: %d', 16, 1, @QuantidadeDisponivel, @Quantidade);
+        RETURN;
+    END
+
+    -- Inserir nova produção na tabela Item_Producao
+    INSERT INTO Item_Producao (Plantio, fk_id_pedido, fk_id_materia, fk_id_produto, Quantidade, Data_Inicio, Fase_Atual)
+    VALUES (@Plantio, @fk_id_pedido, @fk_id_materia, @fk_id_produto, @Quantidade, @DataInicio, @FaseAtual);
+
+    -- Subtrair a quantidade utilizada da tabela Materia_Prima
+    UPDATE Materia_Prima
+    SET Quantidade = Quantidade - @Quantidade
+    WHERE id_materia = @fk_id_materia;
+
+    PRINT 'Produção iniciada com sucesso!';
+END;
+
+
+
+
+
+
+
+
+
+
+
+CREATE PROCEDURE FinalizarProducao
+    @Plantio NVARCHAR(100),
+    @DataFim DATE
+AS
+BEGIN
+    DECLARE @Quantidade INT;
+    DECLARE @fk_id_produto INT;
+
+    -- Obter a quantidade da produção
+    SELECT @Quantidade = Quantidade, 
+           @fk_id_produto = fk_id_produto
+    FROM Item_Producao
+    WHERE Plantio = @Plantio;
+
+    IF @Quantidade IS NULL
+    BEGIN
+        RAISERROR('Produção não encontrada com o nome: %s', 16, 1, @Plantio);
+        RETURN;
+    END
+
+    -- Atualizar a fase atual e a data de fim
+    UPDATE Item_Producao
+    SET Fase_Atual = 'Finalizada',
+        Data_Fim = @DataFim
+    WHERE Plantio = @Plantio;
+
+    -- Inserir no estoque de produtos finalizados
+    INSERT INTO Produto (Nome, Quantidade)
+    VALUES ('Produto Finalizado: ' + @Plantio, @Quantidade);
+
+    PRINT 'Produção finalizada e produtos transferidos para o estoque.';
+END;
