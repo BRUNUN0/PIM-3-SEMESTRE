@@ -1,0 +1,76 @@
+CREATE PROCEDURE InserirFornecedor
+    @Nome NVARCHAR(100),
+    @CNPJ CHAR(14),
+    @Email NVARCHAR(100),
+    @Telefone NVARCHAR(20),
+    @Rua NVARCHAR(100),
+    @Numero NVARCHAR(10),
+    @Bairro NVARCHAR(50),
+    @CEP CHAR(8),
+    @Cidade NVARCHAR(50),
+    @Estado CHAR(2)
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Fornecedor WHERE CNPJ = @CNPJ)
+    BEGIN
+        INSERT INTO Fornecedor (Nome, CNPJ, Email, Telefone, Rua, Numero, Bairro, CEP, Cidade, Estado)
+        VALUES (@Nome, @CNPJ, @Email, @Telefone, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
+    END
+    ELSE
+    BEGIN
+        RAISERROR('Fornecedor com o CNPJ %s já existe.', 16, 1, @CNPJ);
+    END
+END;
+
+
+
+
+
+
+
+CREATE PROCEDURE RegistrarCompra
+    @CNPJFornecedor CHAR(14),
+    @DataCompra DATE,
+    @NomeMateriaPrima NVARCHAR(100),
+    @QuantidadeMateriaPrima INT
+AS
+BEGIN
+    DECLARE @id_fornecedor INT;
+    DECLARE @id_materia INT;
+    DECLARE @id_compra INT;
+
+    -- Verificar se o fornecedor já existe
+    SELECT @id_fornecedor = id_fornecedor FROM Fornecedor WHERE CNPJ = @CNPJFornecedor;
+
+    IF @id_fornecedor IS NULL
+    BEGIN
+        RAISERROR('Fornecedor com o CNPJ %s não encontrado.', 16, 1, @CNPJFornecedor);
+        RETURN;
+    END
+
+    -- Inserir a compra
+    INSERT INTO Compra (fk_id_fornecedor, Data_compra)
+    VALUES (@id_fornecedor, @DataCompra);
+
+    SET @id_compra = SCOPE_IDENTITY(); -- Captura o ID da compra recém-inserida
+
+    -- Inserir ou atualizar a matéria-prima
+    IF NOT EXISTS (SELECT 1 FROM Materia_Prima WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor)
+    BEGIN
+        INSERT INTO Materia_Prima (fk_id_fornecedor, Nome, Quantidade)
+        VALUES (@id_fornecedor, @NomeMateriaPrima, @QuantidadeMateriaPrima);
+    END
+    ELSE
+    BEGIN
+        UPDATE Materia_Prima
+        SET Quantidade = Quantidade + @QuantidadeMateriaPrima
+        WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor;
+    END
+
+    -- Obter o ID da matéria-prima
+    SELECT @id_materia = id_materia FROM Materia_Prima WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor;
+
+    -- Inserir o item da compra
+    INSERT INTO Item_Compra (fk_id_compra, fk_id_fornecedor, fk_id_materia, Quantidade)
+    VALUES (@id_compra, @id_fornecedor, @id_materia, @QuantidadeMateriaPrima);
+END;
