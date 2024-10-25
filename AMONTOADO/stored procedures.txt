@@ -296,35 +296,100 @@ END;
 
 
 
-CREATE PROCEDURE FinalizarProducao
-    @Plantio NVARCHAR(100),
-    @DataFim DATE
+CREATE PROCEDURE Finaliza_Producao
+    @id_plantio INT,
+    @data_fim DATE,
+    @validade INT
 AS
 BEGIN
-    DECLARE @Quantidade INT;
-    DECLARE @fk_id_produto INT;
+    BEGIN TRANSACTION;
 
-    -- Obter a quantidade da produção
-    SELECT @Quantidade = Quantidade, 
-           @fk_id_produto = fk_id_produto
-    FROM Item_Producao
-    WHERE Plantio = @Plantio;
+    BEGIN TRY
+        -- Atualizar a tabela Producao
+        UPDATE Producao
+        SET Data_Fim = @data_fim,
+            Fase_Atual = 'Finalizada'
+        WHERE id_plantio = @id_plantio;
 
-    IF @Quantidade IS NULL
-    BEGIN
-        RAISERROR('Produção não encontrada com o nome: %s', 16, 1, @Plantio);
-        RETURN;
-    END
+        -- Verificar se a atualização foi bem-sucedida
+        IF @@ROWCOUNT = 0
+        BEGIN
+            RAISERROR('Nenhum registro encontrado com o id_plantio fornecido.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
-    -- Atualizar a fase atual e a data de fim
-    UPDATE Item_Producao
-    SET Fase_Atual = 'Finalizada',
-        Data_Fim = @DataFim
-    WHERE Plantio = @Plantio;
+        -- Inserir na tabela Produto
+        DECLARE @produto NVARCHAR(100);
+        DECLARE @quantidade INT;
 
-    -- Inserir no estoque de produtos finalizados
-    INSERT INTO Produto (Nome, Quantidade)
-    VALUES ('Produto Finalizado: ' + @Plantio, @Quantidade);
+        -- Selecionar os dados do plantio finalizado
+        SELECT @produto = Nome, @quantidade = Quantidade
+        FROM Producao
+        WHERE id_plantio = @id_plantio;
 
-    PRINT 'Produção finalizada e produtos transferidos para o estoque.';
+        -- Inserir os dados na tabela Produto
+        INSERT INTO Produto (Produto, Quantidade, Data_Validade)
+        VALUES (@produto, @quantidade, DATEADD(DAY, @validade, GETDATE()));
+
+        -- Commitar as mudanças
+        COMMIT TRANSACTION;
+
+        PRINT 'Produção finalizada e produto adicionado com sucesso!';
+
+    END TRY
+    BEGIN CATCH
+        -- Rollback em caso de erro
+        ROLLBACK TRANSACTION;
+
+        PRINT 'Erro ao finalizar a produção: ' + ERROR_MESSAGE();
+    END CATCH
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE PROCEDURE RegistrarAtividade
+    @fk_id_funcionario INT,
+    @fk_id_plantio INT,
+    @descricao NVARCHAR(MAX),
+    @prioridade INT,
+    @duracao TIME,
+    @fase_atual NVARCHAR(100) -- Novo parâmetro para Fase_Atual
+AS
+BEGIN
+    BEGIN TRY
+        -- Iniciar uma transação
+        BEGIN TRANSACTION;
+
+        -- Inserir a nova atividade
+        INSERT INTO Atividade (fk_id_funcionario, fk_id_Plantio, Descricao, Prioridade, Duracao)
+        VALUES (@fk_id_funcionario, @fk_id_plantio, @descricao, @prioridade, @duracao);
+
+        -- Atualizar a fase atual da tabela Producao
+        UPDATE Producao
+        SET Fase_Atual = @fase_atual
+        WHERE id_plantio = @fk_id_plantio; -- Usar o ID do plantio
+
+        -- Commitar as mudanças
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- Se ocorrer um erro, reverter a transação
+        ROLLBACK TRANSACTION;
+        
+        -- Retornar mensagem de erro
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrorMessage, 16, 1);
+    END CATCH
 END;

@@ -103,11 +103,10 @@ CREATE TABLE Pedido (
 
 CREATE TABLE Produto (
     id_produto INT IDENTITY(1,1) PRIMARY KEY,
-    fk_id_pedido INT,
     Produto NVARCHAR(100),
     Quantidade INT,
+    Data_Validade DATE,
 
-    FOREIGN KEY (fk_id_pedido) REFERENCES Pedido(id_pedido)
 );
 
 CREATE TABLE Item_Pedido (
@@ -119,32 +118,32 @@ CREATE TABLE Item_Pedido (
     PRIMARY KEY (fk_id_pedido, fk_id_cliente, fk_id_produto),
     FOREIGN KEY (fk_id_pedido) REFERENCES Pedido(id_pedido),
     FOREIGN KEY (fk_id_cliente) REFERENCES Cliente(id_cliente),
-    FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto) -- Certifique-se de que a tabela Produto já existe
+    FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto)
 );
 
 CREATE TABLE Atividade (
     id_atividade INT IDENTITY(1,1) PRIMARY KEY,
     fk_id_funcionario INT,
-    fk_id_Plantio NVARCHAR(100),
+    fk_id_Plantio INT,
     Descricao NVARCHAR(MAX),
     Prioridade INT,
     Duracao TIME,
-    Concluido BIT,
     
-    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario) -- Certifique-se de que a tabela Funcionario já existe
-    FOREIGN KEY (fk_id_Plantio) REFERENCES Item_Producao(Plantio)
+    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario),
+    FOREIGN KEY (fk_id_Plantio) REFERENCES Producao(id_Plantio)
 );
 
-CREATE TABLE Item_Producao (
-    id_plantio INT IDENTITY(1,1) PRIMARY KEY,
-    Plantio NVARCHAR(100) PRIMARY KEY,
+CREATE TABLE Producao (
+    id_plantio INT IDENTITY(1,1),
+    Plantio NVARCHAR(100),
     fk_id_materia INT,
-    Nome 
+    Nome VARCHAR(100),
     Quantidade INT,
     Data_Inicio DATE,
     Fase_Atual NVARCHAR(100),
     Data_Fim DATE,
     
+	PRIMARY KEY(id_plantio),
     FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia), -- Certifique-se de que a tabela Materia_Prima já existe
 );
 
