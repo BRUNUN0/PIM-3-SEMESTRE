@@ -21,7 +21,7 @@ else:
 def DbcLogin(login):
 
     cursor = conn.cursor()
-    cursor.execute(f"SELECT Nome, Senha, id_login FROM Funcionario WHERE id_login = ?", login)
+    cursor.execute("SELECT Nome, Senha, id_login FROM Funcionario WHERE id_login = ?", login)
     con_bd = cursor.fetchone() # Retorna uma tupla com a seguinte sequencia (Nome | Senha | Login)
     print(con_bd)
     return con_bd
