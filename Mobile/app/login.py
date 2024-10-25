@@ -12,7 +12,7 @@ def Login(page: ft.Page):
     def logo():
         logo = ft.Container(
             content=ft.Image(
-                src="app/assets/Logo.png",
+                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=150,
                 height=150,
             ),
@@ -63,7 +63,6 @@ def Login(page: ft.Page):
                             width=300,
                             height=50,
                             border_radius=ft.border_radius.all(8),
-                            bgcolor=ft.colors.WHITE,
                             color=ft.colors.BLACK,
                             text_style=ft.TextStyle(size=16),
                             label_style=ft.TextStyle(
@@ -75,6 +74,7 @@ def Login(page: ft.Page):
                                 label="Senha",
                                 width=300,
                                 height=50,
+                                password=True,
                                 color=ft.colors.BLACK,
                                 text_style=ft.TextStyle(size=16),
                                 label_style=ft.TextStyle(
@@ -101,10 +101,11 @@ def Login(page: ft.Page):
             )
         )
         return campos
-        
+    
     Main = ft.Container(
-        width=390,
-        height=860,
+        # width=390,
+        # height=,
+        expand=True,
         bgcolor='#7FA677',
         border_radius=20,
         
@@ -122,5 +123,6 @@ def Login(page: ft.Page):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
     )
+    page.update()
     
     return Main

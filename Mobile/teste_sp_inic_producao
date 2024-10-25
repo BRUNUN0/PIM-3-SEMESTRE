@@ -1,0 +1,47 @@
+import pyodbc
+
+def iniciar_producao(plantio, fk_id_pedido, fk_id_materia, fk_id_produto, quantidade, data_inicio, fase_atual):
+    # Conectar ao banco de dados
+    conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
+                          'Server=BRUNO-NOTE\SQLEXPRESS;'
+                          'Database=teste;'
+                          'Trusted_Connection=yes;')
+    cursor = conn.cursor()
+
+    try:
+        # Executar a stored procedure para iniciar a produção
+        cursor.execute("{CALL IniciarProducao (?, ?, ?, ?, ?, ?, ?)}", 
+                       (plantio, fk_id_pedido, fk_id_materia, fk_id_produto, quantidade, data_inicio, fase_atual))
+
+        # Commitar as mudanças
+        conn.commit()
+        print("Produção iniciada com sucesso!")
+
+    except Exception as e:
+        # Caso ocorra algum erro, reverter as mudanças
+        conn.rollback()
+        print(f"Erro ao iniciar a produção: {e}")
+
+    finally:
+        # Fechar a conexão
+        cursor.close()
+        conn.close()
+
+# Função para coletar as informações da nova produção
+def questionario_producao():
+    print("Bem-vindo ao cadastro de nova produção!")
+
+    # Coletar informações da nova produção
+    plantio = input("Digite o nome da produção: ")
+    fk_id_pedido = int(input("Digite o ID do pedido: "))
+    fk_id_materia = int(input("Digite o ID da matéria-prima: "))
+    fk_id_produto = int(input("Digite o ID do produto: "))
+    quantidade = int(input("Digite a quantidade a ser utilizada: "))
+    data_inicio = input("Digite a data de início (AAAA-MM-DD): ")
+    fase_atual = input("Digite a fase atual da produção: ")
+
+    # Chamar a função para iniciar a produção no banco de dados
+    iniciar_producao(plantio, fk_id_pedido, fk_id_materia, fk_id_produto, quantidade, data_inicio, fase_atual)
+
+# Executar o questionário
+questionario_producao()
