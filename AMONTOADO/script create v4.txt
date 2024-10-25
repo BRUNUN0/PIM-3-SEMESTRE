@@ -138,16 +138,14 @@ CREATE TABLE Atividade (
 CREATE TABLE Item_Producao (
     id_plantio INT IDENTITY(1,1) PRIMARY KEY,
     Plantio NVARCHAR(100) PRIMARY KEY,
-    fk_id_pedido INT,
     fk_id_materia INT,
-    fk_id_produto INT,
+    Nome 
     Quantidade INT,
     Data_Inicio DATE,
     Fase_Atual NVARCHAR(100),
     Data_Fim DATE,
     
     FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia), -- Certifique-se de que a tabela Materia_Prima já existe
-    FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto),     -- Certifique-se de que a tabela Produto já existe
 );
 
 CREATE TABLE Central_de_Dados (
