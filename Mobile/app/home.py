@@ -1,8 +1,31 @@
 import flet as ft
 import sqlite3
+import pyodbc
 
 def Home(page: ft.Page):
     
+    def gerenciamento_banco():
+        def conectar():
+        # Função para conectar ao banco de dados SQL Server
+            conn = pyodbc.connect(
+                'Driver=ODBC Driver 17 for SQL Server;'
+                'Server=BRUNO-NOTE\SQLEXPRESS;'
+                'Database=teste;'
+                'Trusted_Connection=yes;'
+            )
+            return conn
+        
+        def obter_plantas():
+            conn = conectar()
+            cursor = conn.cursor()
+            cursor.execute('SELECT Nome, URL FROM Materia_Prima')
+            plantas = cursor.fetchall()
+            conn.close()
+            return plantas
+        
+        return obter_plantas()
+    
+
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -116,17 +139,20 @@ def Home(page: ft.Page):
         
     #     return detalhes
     
+    
     def planta(nome, imagem):
         def on_click_container(e):
             page.dialog = ft.AlertDialog(
                 title=ft.Text(f"Detalhes da {nome}"),
-                content=ft.Container(
-                    width=50,
-                    height=50,
-                    bgcolor=ft.colors.BLUE                    
+                content=ft.Row(
+                    controls=[
+                        ft.Text("Planta:"),
+                        ft.Text(f'{nome}')
+                    ],
+                    alignment=ft.alignment.center
                 ),
                 actions=[
-                    ft.TextButton("Fechar", on_click=print("Olá Mundo"))
+                    ft.TextButton("Fechar", on_click=print('Click fechar detalhes'))
                 ]
             )
             page.dialog.open = True
@@ -163,7 +189,8 @@ def Home(page: ft.Page):
                         )
                     )
                 ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                # scroll='auto',
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
         )
         
@@ -171,12 +198,12 @@ def Home(page: ft.Page):
     
     def plantacao():
         
-        conn = sqlite3.connect('PIXFARM.db')
-        cursor = conn.cursor()
-        cursor.execute('SELECT nome_planta, imagem FROM producao')
-        plantas = cursor.fetchall()
-        conn.close()
-        
+        # conn = sqlite3.connect('PIXFARM.db')
+        # cursor = conn.cursor()
+        # cursor.execute('SELECT nome_planta, imagem FROM producao')
+        # plantas = cursor.fetchall()
+        # conn.close()
+        plantas = gerenciamento_banco()
         lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
         
         plantacao = ft.Container(
