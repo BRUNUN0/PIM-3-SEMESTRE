@@ -32,7 +32,8 @@ CREATE PROCEDURE RegistrarCompra
     @CNPJFornecedor CHAR(14),
     @DataCompra DATE,
     @NomeMateriaPrima NVARCHAR(100),
-    @QuantidadeMateriaPrima INT
+    @QuantidadeMateriaPrima INT,
+    @UrlImagem NVARCHAR(255) -- Novo parâmetro para o link da imagem
 AS
 BEGIN
     DECLARE @id_fornecedor INT;
@@ -57,13 +58,14 @@ BEGIN
     -- Inserir ou atualizar a matéria-prima
     IF NOT EXISTS (SELECT 1 FROM Materia_Prima WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor)
     BEGIN
-        INSERT INTO Materia_Prima (fk_id_fornecedor, Nome, Quantidade)
-        VALUES (@id_fornecedor, @NomeMateriaPrima, @QuantidadeMateriaPrima);
+        INSERT INTO Materia_Prima (fk_id_fornecedor, Nome, Quantidade, URL) -- Incluindo a coluna URL
+        VALUES (@id_fornecedor, @NomeMateriaPrima, @QuantidadeMateriaPrima, @UrlImagem); -- Armazenando a URL
     END
     ELSE
     BEGIN
         UPDATE Materia_Prima
-        SET Quantidade = Quantidade + @QuantidadeMateriaPrima
+        SET Quantidade = Quantidade + @QuantidadeMateriaPrima,
+            URL = @UrlImagem -- Atualizando a URL, se necessário
         WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor;
     END
 
@@ -74,6 +76,7 @@ BEGIN
     INSERT INTO Item_Compra (fk_id_compra, fk_id_fornecedor, fk_id_materia, Quantidade)
     VALUES (@id_compra, @id_fornecedor, @id_materia, @QuantidadeMateriaPrima);
 END;
+
 
 
 
@@ -246,7 +249,6 @@ END;
 
 
 
-########### VERIFICAR
 
 
 

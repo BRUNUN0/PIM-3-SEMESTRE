@@ -30,6 +30,7 @@ CREATE TABLE Materia_Prima (
     fk_id_fornecedor INT,
     Nome NVARCHAR(100),
     Quantidade INT,
+    URL varchar(255),
     
     FOREIGN KEY (fk_id_fornecedor) REFERENCES Fornecedor(id_fornecedor)
 );

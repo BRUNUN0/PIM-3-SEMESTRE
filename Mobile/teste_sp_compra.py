@@ -11,13 +11,15 @@ def registrar_compra(cnpj_fornecedor, data_compra, itens_compra):
 
     try:
         # Executar a stored procedure para registrar a compra
-        cursor.execute("{CALL RegistrarCompra (?, ?, ?, ?)}", 
-                       (cnpj_fornecedor, data_compra, itens_compra[0]['nome'], itens_compra[0]['quantidade']))
+        cursor.execute("{CALL RegistrarCompra (?, ?, ?, ?, ?)}", 
+                       (cnpj_fornecedor, data_compra, itens_compra[0]['nome'], 
+                        itens_compra[0]['quantidade'], itens_compra[0]['url']))  # Incluindo a URL
         
         # Para cada item na lista de itens de compra, chamar a stored procedure novamente
         for item in itens_compra[1:]:  # Ignorar o primeiro item, pois já foi usado na chamada anterior
-            cursor.execute("{CALL RegistrarCompra (?, ?, ?, ?)}", 
-                           (cnpj_fornecedor, data_compra, item['nome'], item['quantidade']))
+            cursor.execute("{CALL RegistrarCompra (?, ?, ?, ?, ?)}", 
+                           (cnpj_fornecedor, data_compra, item['nome'], 
+                            item['quantidade'], item['url']))  # Incluindo a URL
 
         # Commitar as mudanças
         conn.commit()
@@ -53,8 +55,9 @@ def questionario_compra():
     while True:
         nome_materia = input("Digite o nome da matéria-prima: ")
         quantidade = int(input(f"Digite a quantidade de '{nome_materia}': "))
+        url_imagem = input("Digite o link da imagem da matéria-prima: ")  # Coletando o link da imagem
 
-        itens_compra.append({'nome': nome_materia, 'quantidade': quantidade})
+        itens_compra.append({'nome': nome_materia, 'quantidade': quantidade, 'url': url_imagem})  # Incluindo a URL
 
         # Perguntar se deseja adicionar mais itens
         mais_itens = input("Deseja adicionar outro item? (s/n): ").lower()
