@@ -38,6 +38,36 @@ def Home(page: ft.Page):
         return logo
     
     def bar():
+        def dialog_perfil(e):
+            
+            def fechar(dialog):
+                dialog.open = False
+                page.update()
+                
+            dialog = ft.AlertDialog(
+                title=ft.Text(f"Detalhes do Perfil"),
+                content=ft.Container(
+                    height=300,
+                    bgcolor=ft.colors.BLUE,
+                    content=ft.Column(
+                    controls=[
+                        ft.Text("É com vc Isaque", size=16),
+                    ],
+                    spacing=6,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    )
+                ),
+                    
+                actions=[
+                    ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
+                ],
+                actions_alignment=ft.alignment.center_right
+            )
+            page.overlay.append(dialog)
+            dialog.open = True
+            page.update()
+            
+            
         appbar = ft.Container(
             # bgcolor=ft.colors.WHITE,
             width=390,
@@ -46,7 +76,6 @@ def Home(page: ft.Page):
             theme=ft.Theme(color_scheme=ft.ColorScheme(primary=ft.colors.BLACK)),
             content=ft.Row(
                 controls=[
-                    # ft.IconButton(icon=ft.icons.HOME),
                     logo(), # Chama a logo dentro da row
                     
                     # Adiciona o menu de opções
@@ -61,6 +90,7 @@ def Home(page: ft.Page):
                             ft.PopupMenuItem(
                                 icon=ft.icons.DESCRIPTION,
                                 text='Meus dados',
+                                on_click=lambda e: dialog_perfil
                                 ),
                             ft.PopupMenuItem(
                                 icon=ft.icons.LOGOUT,
@@ -110,53 +140,76 @@ def Home(page: ft.Page):
         
         return clima
     
-    # def detalhes(e, nome, imagem):
-    #     conn = sqlite3.connect('PIXFARM.db')
-    #     cursor = conn.cursor()
-    #     cursor.execute('SELECT nome_planta, imagem FROM producao')
-    #     plantas = cursor.fetchall()
-    #     conn.close()
-        
-    #     lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
-        
-    #     detalhes = ft.AlertDialog(
-    #         title=ft.Text(
-    #             value='Nome',
-    #             size=20,
-    #             weight='bold',
-    #             color=ft.colors.BLACK
-    #         ),
-    #         content=ft.Column(
-    #             controls=[
-    #                 ft.Container(
-                        
-    #                 )
-    #             ],
-    #             width=335,
-    #             height=400
-    #         )
-    #     )
-        
-    #     return detalhes
-    
     
     def planta(nome, imagem):
         def on_click_container(e):
-            page.dialog = ft.AlertDialog(
-                title=ft.Text(f"Detalhes da {nome}"),
-                content=ft.Row(
+            
+            def fechar(dialog):
+                dialog.open = False
+                page.update()
+                
+            dialog = ft.AlertDialog(
+                title=ft.Text(f"Detalhes do Plantio"),
+                content=ft.Container(
+                    height=300,
+                    bgcolor=ft.colors.BLUE,
+                    content=ft.Column(
                     controls=[
-                        ft.Text("Planta:"),
-                        ft.Text(f'{nome}')
+                        ft.Text("ID Plantio:", size=16),
+                        ft.Container(
+                            content=ft.Text(f'#ID PLANTIO', size=16),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150                        ),
+                        ft.Text("Item final", size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR NOME'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text("Data de Início", size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR DATA'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text('Quantidade', size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR QUANTIDADE'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text('Fase Atual', size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR FASE_ATUAL'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        )
                     ],
-                    alignment=ft.alignment.center
+                    spacing=6,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    )
                 ),
+                    
                 actions=[
-                    ft.TextButton("Fechar", on_click=print('Click fechar detalhes'))
-                ]
+                    ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
+                ],
+                actions_alignment=ft.alignment.center_right
             )
-            page.dialog.open = True
+            page.overlay.append(dialog)
+            dialog.open = True
             page.update()
+            
+            
             
         planta = ft.Container(
             bgcolor="#99C2A2",
