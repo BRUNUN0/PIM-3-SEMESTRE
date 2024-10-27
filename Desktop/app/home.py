@@ -8,7 +8,7 @@ def Home(page: ft.Page):
         botoes = ft.Container(
             width=400,
             height=50,
-            bgcolor=ft.colors.BLACK,
+            bgcolor="#D9FFBA",
             
             content = ft.Column(
     controls=[
@@ -17,21 +17,22 @@ def Home(page: ft.Page):
                 ft.Container(
                     content=ft.Column(
                         controls=[
-                            ft.ElevatedButton(
-                                content=ft.Image(
-                                    src='https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/4-SEMESTRE/Desktop/app/assets/planta.png?raw=true',
-                                    width=500,
-                                    height=500,
-                                    ),
+                            ft.IconButton(
+                                # content=ft.Image(
+                                    # src='https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/4-SEMESTRE/Desktop/app/assets/planta.png?raw=true',
+                                    # width=500,
+                                    # height=500,
+                                    # ),
                                 width=50,
                                 height=50,
-                                # icon=ft.icons.HOME,
-                                # icon_size=32,
+                                icon=ft.icons.HOME,
+                                icon_size=32,
                                 on_click=lambda e: print("Home clicado"),
+                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),                         
                             ),
                             ft.Text(
                                 value='Home',
-                                color=ft.colors.WHITE,
+                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
                         ],
@@ -45,13 +46,14 @@ def Home(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.SETTINGS,
+                                icon=ft.icons.ECO,
                                 icon_size=32,
-                                on_click=lambda e: print("Configurações clicado"),
+                                on_click=lambda e: print("Plantação clicado"),
+                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Configurações',
-                                color=ft.colors.WHITE,
+                                value='Plantação',
+                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
                         ],
@@ -65,13 +67,35 @@ def Home(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.INFO,
+                                icon=ft.icons.WATER_DROP,
                                 icon_size=32,
-                                on_click=lambda e: print("Info clicado"),
+                                on_click=lambda e: print("Consumo clicado"),
+                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Info',
-                                color=ft.colors.WHITE,
+                                value='Consumo',
+                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                size=16,
+                            )
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    alignment=ft.alignment.center,
+                    padding=10,
+                ),
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.IconButton(
+                                icon=ft.icons.CHECKLIST,
+                                icon_size=32,
+                                on_click=lambda e: print("Atividades clicado"),
+                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                            ),
+                            ft.Text(
+                                value='Atividades',
+                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
                         ],
@@ -94,7 +118,7 @@ def Home(page: ft.Page):
     
     def AppBar():
         AppBar = ft.Container(
-            bgcolor=ft.colors.BLUE,
+            bgcolor="#D9FFBA",
             width=page.window.width,
             height=100,
             
