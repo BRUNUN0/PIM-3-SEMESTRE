@@ -127,7 +127,8 @@ def Home(page: ft.Page):
                     ft.Container(
                         botoes()
                     )
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             )
         )
         
