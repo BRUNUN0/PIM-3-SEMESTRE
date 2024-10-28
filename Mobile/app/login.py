@@ -29,12 +29,12 @@ def Login(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
-                            ft.TextButton(
-                                text="Esqueci minha senha",
-                                width=180,
-                                height=40,
-                                on_click= lambda e: rec_senha(e)
-                            ),
+                            # ft.TextButton(
+                            #     text="Esqueci minha senha",
+                            #     width=180,
+                            #     height=40,
+                            #     on_click= lambda e: rec_senha(e)
+                            # ),
                             ft.ElevatedButton(
                                 text="Entrar",
                                 width=100,
@@ -44,7 +44,7 @@ def Login(page: ft.Page):
                                 on_click= lambda e: login(e)
                             )
                         ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                        alignment=ft.MainAxisAlignment.END
                     )
                 ],
             )   
