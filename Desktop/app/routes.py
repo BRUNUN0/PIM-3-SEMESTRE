@@ -1,6 +1,8 @@
 import flet as ft
 from app.home import Home
 from app.login import Login
+from app.adm_home import AdminHome
+
 
 
 def rotas(page: ft.Page):
@@ -12,6 +14,9 @@ def rotas(page: ft.Page):
 
         elif page.route == "/login":
             page.views.append(ft.View(route="/login", controls=[Login(page)]))
+
+        elif page.route == "/adm":
+            page.views.append(ft.View(route="/adm", controls=[AdminHome(page)]))
         
         page.update()
 

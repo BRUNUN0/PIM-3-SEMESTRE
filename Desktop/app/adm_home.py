@@ -1,10 +1,11 @@
 import flet as ft
-from datetime import datetime
+import time
 import pyodbc
-from app.components.dialogs import DialogoSaida
+from app.components.dialogs import ConfirmationDialog
+from app.components.dialogs import DetalhesPlantio
 
 
-def Home(page: ft.Page):
+def AdminHome(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
 
@@ -52,26 +53,32 @@ def Home(page: ft.Page):
         return logo
         
     def appbar_superior():
-        dialogo_saida = DialogoSaida(page)
-        
+        def go_home(e):
+            page.go('/')
+            confirmation_dialog.close_dialog()
+
+        def sair(e):
+            confirmation_dialog.open_dialog()
+
+        confirmation_dialog = ConfirmationDialog(
+            "Deseja sair de administrador?",
+            "Escolha se deseja ir para tela inicial ou sair",
+            [
+                ft.TextButton('Cancelar', on_click=lambda e: confirmation_dialog.close_dialog()),
+                ft.TextButton('Pagina Inicial', on_click=go_home)
+            ],
+            page
+        )
+
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[
                     relogio(),
                     logo(),
-                    ft.PopupMenuButton(
-                        icon=ft.icons.MENU,
+                    ft.IconButton(
+                        icon=ft.icons.LOGOUT,
                         icon_color=ft.colors.BLACK,
-                        icon_size=40,
-                        menu_position=ft.PopupMenuPosition.UNDER,
-                        
-                        items=[
-                            ft.PopupMenuItem(
-                                icon=ft.icons.LOGOUT,
-                                text='Sair',
-                                on_click=lambda e: dialogo_saida.abrir()
-                            )
-                        ]
+                        on_click=sair
                     )
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -102,7 +109,7 @@ def Home(page: ft.Page):
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
                             ),
                             ft.Text(
-                                value='Home',
+                                value='Clientes',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -117,13 +124,13 @@ def Home(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.ECO,
+                                icon=ft.icons.PERSON,
                                 icon_size=32,
                                 on_click=lambda e: print("Plantação clicado"),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Plantação',
+                                value='Funcionários',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -138,34 +145,13 @@ def Home(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.WATER_DROP,
+                                icon=ft.icons.CONTENT_PASTE_SEARCH,
                                 icon_size=32,
                                 on_click=lambda e: print("Consumo clicado"),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Consumo',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.CHECKLIST,
-                                icon_size=32,
-                                on_click=lambda e: print("Atividades clicado"),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Atividades',
+                                value='Fornecedores',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -265,74 +251,9 @@ def Home(page: ft.Page):
         return grafico
     
     def planta(nome, imagem):
-        def on_click_container(e):
-            
-            def fechar(dialog):
-                dialog.open = False
-                page.update()
-                
-            dialog = ft.AlertDialog(
-                title=ft.Text(f"Detalhes do Plantio"),
-                content=ft.Container(
-                    height=300,
-                    bgcolor=ft.colors.BLUE,
-                    content=ft.Column(
-                    controls=[
-                        ft.Text("ID Plantio:", size=16),
-                        ft.Container(
-                            content=ft.Text(f'#ID PLANTIO', size=16),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150                        ),
-                        ft.Text("Item final", size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR NOME'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text("Data de Início", size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR DATA'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text('Quantidade', size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR QUANTIDADE'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text('Fase Atual', size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR FASE_ATUAL'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        )
-                    ],
-                    spacing=6,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                    )
-                ),
-                    
-                actions=[
-                    ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
-                ],
-                actions_alignment=ft.alignment.center_right
-            )
-            page.overlay.append(dialog)
-            dialog.open = True
-            page.update()
-            
-            
+        def detalhes_planta(e):
+            detalhes = DetalhesPlantio()
+            dialog = detalhes.mostrar_detalhes(page)
             
         planta = ft.Container(
             bgcolor="#99C2A2",
@@ -343,7 +264,7 @@ def Home(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
+            on_click=detalhes_planta, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
             
             content=ft.Row(
                 controls=[
@@ -391,12 +312,6 @@ def Home(page: ft.Page):
                         spacing=6,
                         scroll='auto'
                     )
-                    # ft.Container(
-                    #     width=150,
-                    #     height=150,
-                    #     bgcolor=ft.colors.BLACK,
-                    #     # lista_plantas
-                    # )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
