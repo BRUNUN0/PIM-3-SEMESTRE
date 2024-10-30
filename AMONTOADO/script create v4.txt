@@ -122,17 +122,6 @@ CREATE TABLE Item_Pedido (
     FOREIGN KEY (fk_id_produto) REFERENCES Produto(id_produto)
 );
 
-CREATE TABLE Atividade (
-    id_atividade INT IDENTITY(1,1) PRIMARY KEY,
-    fk_id_funcionario INT,
-    fk_id_Plantio INT,
-    Descricao NVARCHAR(MAX),
-    Prioridade INT,
-    Duracao TIME,
-    
-    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario),
-    FOREIGN KEY (fk_id_Plantio) REFERENCES Producao(id_Plantio)
-);
 
 CREATE TABLE Producao (
     id_plantio INT IDENTITY(1,1),
@@ -147,6 +136,19 @@ CREATE TABLE Producao (
 	PRIMARY KEY(id_plantio),
     FOREIGN KEY (fk_id_materia) REFERENCES Materia_Prima(id_materia), -- Certifique-se de que a tabela Materia_Prima já existe
 );
+
+CREATE TABLE Atividade (
+    id_atividade INT IDENTITY(1,1) PRIMARY KEY,
+    fk_id_funcionario INT,
+    fk_id_Plantio INT,
+    Descricao NVARCHAR(MAX),
+    Prioridade INT,
+    Duracao TIME,
+    
+    FOREIGN KEY (fk_id_funcionario) REFERENCES Funcionario(id_funcionario),
+    FOREIGN KEY (fk_id_Plantio) REFERENCES Producao(id_Plantio)
+);
+
 
 CREATE TABLE Central_de_Dados (
     DataHora DATETIME NOT NULL,

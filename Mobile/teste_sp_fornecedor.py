@@ -4,7 +4,7 @@ def cadastrar_fornecedor(nome, nome_fantasia, cnpj, email, telefone, rua, numero
     # Conectar ao banco de dados
     conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
                           'Server=BRUNO-NOTE\SQLEXPRESS;'
-                          'Database=teste;'
+                          'Database=PIXFARM;'
                           'Trusted_Connection=yes;')
     cursor = conn.cursor()
 

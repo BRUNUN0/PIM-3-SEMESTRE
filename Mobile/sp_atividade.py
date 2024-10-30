@@ -4,7 +4,7 @@ def registrar_atividade(fk_id_funcionario, fk_id_plantio, descricao, prioridade,
     # Conectar ao banco de dados
     conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
                           'Server=BRUNO-NOTE\SQLEXPRESS;'
-                          'Database=teste;'
+                          'Database=PIXFARM;'
                           'Trusted_Connection=yes;')
     cursor = conn.cursor()
 

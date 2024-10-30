@@ -1,5 +1,6 @@
-CREATE PROCEDURE InserirFornecedor
+CREATE PROCEDURE [dbo].[InserirFornecedor]
     @Nome NVARCHAR(100),
+    @Nome_Fantasia NVARCHAR(100),
     @CNPJ CHAR(14),
     @Email NVARCHAR(100),
     @Telefone NVARCHAR(20),
@@ -13,8 +14,8 @@ AS
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM Fornecedor WHERE CNPJ = @CNPJ)
     BEGIN
-        INSERT INTO Fornecedor (Nome, CNPJ, Email, Telefone, Rua, Numero, Bairro, CEP, Cidade, Estado)
-        VALUES (@Nome, @CNPJ, @Email, @Telefone, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
+        INSERT INTO Fornecedor (Nome, Nome_Fantasia, CNPJ, Email, Telefone, Rua, Numero, Bairro, CEP, Cidade, Estado)
+        VALUES (@Nome, @Nome_Fantasia, @CNPJ, @Email, @Telefone, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
     END
     ELSE
     BEGIN
