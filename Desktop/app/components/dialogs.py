@@ -1,4 +1,3 @@
-from fastapi import Query
 import pyodbc
 import flet as ft
 
