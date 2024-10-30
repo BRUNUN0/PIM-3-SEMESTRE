@@ -2,7 +2,6 @@ import flet as ft
 import time
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.dialogs import DetalhesPlantio
 
 
 def AdminHome(page: ft.Page):
@@ -251,9 +250,72 @@ def AdminHome(page: ft.Page):
         return grafico
     
     def planta(nome, imagem):
-        def detalhes_planta(e):
-            detalhes = DetalhesPlantio()
-            dialog = detalhes.mostrar_detalhes(page)
+        def on_click_container(e):
+            
+            def fechar(dialog):
+                dialog.open = False
+                page.update()
+                
+            dialog = ft.AlertDialog(
+                title=ft.Text(f"Detalhes do Plantio"),
+                content=ft.Container(
+                    height=300,
+                    bgcolor=ft.colors.BLUE,
+                    content=ft.Column(
+                    controls=[
+                        ft.Text("ID Plantio:", size=16),
+                        ft.Container(
+                            content=ft.Text(f'#ID PLANTIO', size=16),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150                        ),
+                        ft.Text("Item final", size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR NOME'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text("Data de Início", size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR DATA'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text('Quantidade', size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR QUANTIDADE'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        ),
+                        ft.Text('Fase Atual', size=16),
+                        ft.Container(
+                            content=ft.Text('#VALOR FASE_ATUAL'),
+                            bgcolor='#D9D9D9',
+                            border_radius=20,
+                            alignment=ft.alignment.center,
+                            width=150
+                        )
+                    ],
+                    spacing=6,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    )
+                ),
+                    
+                actions=[
+                    ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
+                ],
+                actions_alignment=ft.alignment.center_right
+            )
+            page.overlay.append(dialog)
+            dialog.open = True
+            page.update()
             
         planta = ft.Container(
             bgcolor="#99C2A2",
@@ -264,7 +326,7 @@ def AdminHome(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=detalhes_planta, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
+            on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
             
             content=ft.Row(
                 controls=[
@@ -329,13 +391,6 @@ def AdminHome(page: ft.Page):
                             pedidos()
                         ]
                     ),
-                    # ft.Container(
-                    #     width=250,
-                    #     height=500,
-                    #     bgcolor='#D6D6D6',
-                    #     padding=ft.padding.only(left=10),
-                    #     border_radius=16
-                    # )
                 ],
                 
             )

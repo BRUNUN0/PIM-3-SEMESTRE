@@ -26,41 +26,10 @@ class BancoGerenciamento:
         plantas = cursor.fetchall()
         conn.close()
         return plantas
-
-class Planta:
-    def __init__(self, nome, imagem, page):
-        self.nome = nome
-        self.imagem = imagem
-        self.page = page
-
-    def detalhes_planta(self, e):
-        # Mostra o diálogo com detalhes da planta
-        detalhes = DetalhesPlantio()  # Assumindo que DetalhesPlantio já está definida
-        dialog = detalhes.mostrar_detalhes(self.page)
-
-    def exibir_planta(self):
-        # Cria e retorna um container para exibir a planta
-        planta = ft.Container(
-            bgcolor="#99C2A2",
-            border=ft.border.all(color=ft.colors.BLACK),
-            width=340,
-            height=50,
-            border_radius=9,
-            padding=ft.padding.only(left=12, right=12),
-            on_click=self.detalhes_planta,
-            content=ft.Row(
-                controls=[
-                    ft.Icon(name=ft.icons.FOREST, color=ft.colors.BLACK, size=30),
-                    ft.Text(value=self.nome),
-                    ft.Container(
-                        alignment=ft.alignment.center_right,
-                        content=ft.Image(src=self.imagem, width=30),
-                    )
-                ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            )
-        )
-        return planta
+    
+    def fechar_conexao(self):
+        if self.conn:
+            self.conn.close()
 
 
 
@@ -124,80 +93,3 @@ class DialogoSaida(ConfirmationDialog):
 
 
 
-
-
-
-
-class DetalhesPlantio:
-    def __init__(self, id_plantio="ID PLANTIO", item_final="#VALOR NOME", data_inicio="#VALOR DATA", quantidade="#VALOR QUANTIDADE", fase_atual="#VALOR FASE_ATUAL", page=None):
-        self.id_plantio = id_plantio
-        self.item_final = item_final
-        self.data_inicio = data_inicio
-        self.quantidade = quantidade
-        self.fase_atual = fase_atual
-        self.page = page  # Opcional, se você não passar page no construtor
-
-    def mostrar_detalhes(self):
-        dialog = ft.AlertDialog(
-            title=ft.Text(f"Detalhes do Plantio"),
-            content=ft.Column(
-                controls=[
-                    ft.Text("ID Plantio:", size=16),
-                    ft.Container(
-                        content=ft.Text(self.id_plantio, size=16),
-                        bgcolor='#D9D9D9',
-                        border_radius=20,
-                        alignment=ft.alignment.center,
-                        width=150
-                    ),
-                    ft.Text("Item final", size=16),
-                    ft.Container(
-                        content=ft.Text(self.item_final, size=16),
-                        bgcolor='#D9D9D9',
-                        border_radius=20,
-                        alignment=ft.alignment.center,
-                        width=150
-                    ),
-                    ft.Text("Data inicio", size=16),
-                    ft.Container(
-                        content=ft.Text(self.data_inicio, size=16),
-                        bgcolor='#D9D9D9',
-                        border_radius=20,
-                        alignment=ft.alignment.center,
-                        width=150
-                    ),
-                    ft.Text("Quantidade", size=16),
-                    ft.Container(
-                        content=ft.Text(self.quantidade, size=16),
-                        bgcolor='#D9D9D9',
-                        border_radius=20,
-                        alignment=ft.alignment.center,
-                        width=150
-                    ),
-                    ft.Text("Fase atual", size=16),
-                    ft.Container(
-                        content=ft.Text(self.fase_atual, size=16),
-                        bgcolor='#D9D9D9',
-                        border_radius=20,
-                        alignment=ft.alignment.center,
-                        width=150
-                    ),
-                ],
-                spacing=6,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            ),
-            actions=[
-                ft.TextButton("Fechar", on_click=lambda e: self.fechar_dialog())
-            ],
-            actions_alignment=ft.alignment.center_right
-        )
-        
-
-        def fechar_dialog(self):
-            self.dialog.open = False  # Assumindo que você atribui dialog a self.dialog dentro de mostrar_detalhes
-            self.page.update()  # Assumindo que você passou page como argumento ou tem ele definido em outro lugar
-
-        self.dialog = dialog  # Assumindo que você quer acessar a instância do diálogo mais tarde (opcional)
-        self.page.overlay.append(dialog)
-        self.dialog.open = True
-        self.page.update()
