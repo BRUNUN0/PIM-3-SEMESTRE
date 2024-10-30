@@ -1,33 +1,13 @@
 import flet as ft
 from datetime import datetime
 import pyodbc
-from app.components.dialogs import DialogoSaida
+from app.components.dialogs import DialogoSaida, GerenciamentoBanco, Detalhes
 
 
 def Home(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
 
-    def gerenciamento_banco():
-        def conectar():
-        # Função para conectar ao banco de dados SQL Server
-            conn = pyodbc.connect(
-                'Driver=ODBC Driver 17 for SQL Server;'
-                'Server=BRUNO-NOTE\SQLEXPRESS;'
-                'Database=teste;'
-                'Trusted_Connection=yes;'
-            )
-            return conn
-        
-        def obter_plantas():
-            conn = conectar()
-            cursor = conn.cursor()
-            cursor.execute('SELECT Nome, URL FROM Materia_Prima')
-            plantas = cursor.fetchall()
-            conn.close()
-            return plantas
-        
-        return obter_plantas()
         
     def relogio():
         relogio = ft.Container(
@@ -264,8 +244,18 @@ def Home(page: ft.Page):
         )
         return grafico
     
-    def planta(nome, imagem):
+    def planta(nome, imagem, id_plantio, item_final, data_inicio, quantidade, fase_atual,page):
         def on_click_container(e):
+            conteudo_detalhes = {
+                "ID Plantio": id_plantio,
+                "Item Final": item_final,
+                "Data de Início": data_inicio,
+                "Quantidade": quantidade,
+                "Fase Atual": fase_atual
+            }
+
+            detalhes = Detalhes("Detalhes do Plantio", conteudo_detalhes, page)
+            detalhes.exibir()
             
             def fechar(dialog):
                 dialog.open = False
@@ -374,8 +364,11 @@ def Home(page: ft.Page):
     
     def pedidos ():
 
-        plantas = gerenciamento_banco()
-        lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
+        banco = GerenciamentoBanco()
+        plantas_data = banco.obter_plantas()
+
+        lista_plantas = [planta(nome, imagem) for nome, imagem in plantas_data]
+
         grafico = ft.Container(
             width=350,
             height=500,

@@ -4,6 +4,7 @@ from app.home import Home
 from app.login import Login
 from app.adm_home import AdminHome
 from app.adm_clientes import AdminClientes
+from app.adm_fornecedores import AdminFornecedores
 
 
 
@@ -22,6 +23,10 @@ def rotas(page: ft.Page):
         
         elif page.route == "/adm/clientes":
             page.views.append(ft.View(route="/adm/clientes", controls=[AdminClientes(page)]))
+
+        elif page.route == "/adm/fornecedores":
+            page.views.append(ft.View(route="/adm/fornecedores", controls=[AdminFornecedores(page)]))
+
         page.update()
 
     page.on_route_change = route_change
