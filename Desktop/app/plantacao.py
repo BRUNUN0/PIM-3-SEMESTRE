@@ -5,7 +5,7 @@ from app.components.dialogs import DialogoSaida, Detalhes
 from app.components.classes import GerenciamentoBanco
 
 
-def Home(page: ft.Page):
+def Plantacao(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
 
@@ -196,140 +196,64 @@ def Home(page: ft.Page):
         
         return AppBar
 
-    def grafico_plantas():
-        dados = [
-            ("Dez", 100, ft.colors.YELLOW),
-            ("Nov", 90, ft.colors.GREEN),
-            ("Out", 85, ft.colors.GREEN),
-            ("Set", 75, ft.colors.GREEN),
-            ("Ago", 65, ft.colors.BLUE),
-            ("Jul", 55, ft.colors.BLUE),
-            ("Jun", 45, ft.colors.BLUE),
-            ("Mai", 35, ft.colors.BLUE),
-            ("Abr", 25, ft.colors.RED),
-            ("Mar", 20, ft.colors.RED),
-            ("Fev", 15, ft.colors.RED),
-            ("Jan", 10, ft.colors.RED)
-        ]
+    # def grafico_plantas():
+    #     dados = [
+    #         ("Dez", 100, ft.colors.YELLOW),
+    #         ("Nov", 90, ft.colors.GREEN),
+    #         ("Out", 85, ft.colors.GREEN),
+    #         ("Set", 75, ft.colors.GREEN),
+    #         ("Ago", 65, ft.colors.BLUE),
+    #         ("Jul", 55, ft.colors.BLUE),
+    #         ("Jun", 45, ft.colors.BLUE),
+    #         ("Mai", 35, ft.colors.BLUE),
+    #         ("Abr", 25, ft.colors.RED),
+    #         ("Mar", 20, ft.colors.RED),
+    #         ("Fev", 15, ft.colors.RED),
+    #         ("Jan", 10, ft.colors.RED)
+    #     ]
 
-        barras = ft.Column(
-            controls=[
-                ft.Row(
-                    controls=[
-                        ft.Text(label, width=50),
-                        ft.Container(
-                            width=valor * 2,
-                            height=20,
-                            bgcolor=cor,
-                        ),
-                        ft.Text(f"{valor}%", width=40)
-                    ],
-                    alignment=ft.MainAxisAlignment.START,
-                    spacing=10
-                )
-                for label, valor, cor, in dados
-            ],
-            spacing=5
-        )
+    #     barras = ft.Column(
+    #         controls=[
+    #             ft.Row(
+    #                 controls=[
+    #                     ft.Text(label, width=50),
+    #                     ft.Container(
+    #                         width=valor * 2,
+    #                         height=20,
+    #                         bgcolor=cor,
+    #                     ),
+    #                     ft.Text(f"{valor}%", width=40)
+    #                 ],
+    #                 alignment=ft.MainAxisAlignment.START,
+    #                 spacing=10
+    #             )
+    #             for label, valor, cor, in dados
+    #         ],
+    #         spacing=5
+    #     )
 
-        grafico = ft.Container(
-            width=350,
-            height=500,
-            bgcolor='#D6D6D6',
-            border_radius=16,
+    #     grafico = ft.Container(
+    #         width=350,
+    #         height=500,
+    #         bgcolor='#D6D6D6',
+    #         border_radius=16,
 
-            content=ft.Column(
-                controls=[
-                    ft.Text(value='COLUMN', size=20, weight=ft.FontWeight.BOLD),
-                    ft.Container(
-                        barras
-                    )
-                ],
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-        )
-        return grafico
+    #         content=ft.Column(
+    #             controls=[
+    #                 ft.Text(value='COLUMN', size=20, weight=ft.FontWeight.BOLD),
+    #                 ft.Container(
+    #                     barras
+    #                 )
+    #             ],
+    #             horizontal_alignment=ft.CrossAxisAlignment.CENTER
+    #         )
+    #     )
+    #     return grafico
     
     def planta(nome, imagem):
 
         def on_click_container(e):
-            print(f"Clicado: {nome}")
-            # conteudo_detalhes = {
-            #     "ID Plantio": id_plantio,
-            #     "Data de Início": data_inicio,
-            #     "Quantidade": quantidade,
-            #     "Fase Atual": fase_atual
-            # }
-
-            # detalhes = Detalhes("Detalhes do Plantio", conteudo_detalhes, page)
-            # detalhes.exibir()
-            
-            # def fechar(dialog):
-            #     dialog.open = False
-            #     page.update()
-                
-            # dialog = ft.AlertDialog(
-            #     title=ft.Text(f"Detalhes do Plantio"),
-            #     content=ft.Container(
-            #         height=300,
-            #         bgcolor=ft.colors.BLUE,
-            #         content=ft.Column(
-            #         controls=[
-            #             ft.Text("ID Plantio:", size=16),
-            #             ft.Container(
-            #                 content=ft.Text(f'#ID PLANTIO', size=16),
-            #                 bgcolor='#D9D9D9',
-            #                 border_radius=20,
-            #                 alignment=ft.alignment.center,
-            #                 width=150                        ),
-            #             ft.Text("Item final", size=16),
-            #             ft.Container(
-            #                 content=ft.Text('#VALOR NOME'),
-            #                 bgcolor='#D9D9D9',
-            #                 border_radius=20,
-            #                 alignment=ft.alignment.center,
-            #                 width=150
-            #             ),
-            #             ft.Text("Data de Início", size=16),
-            #             ft.Container(
-            #                 content=ft.Text('#VALOR DATA'),
-            #                 bgcolor='#D9D9D9',
-            #                 border_radius=20,
-            #                 alignment=ft.alignment.center,
-            #                 width=150
-            #             ),
-            #             ft.Text('Quantidade', size=16),
-            #             ft.Container(
-            #                 content=ft.Text('#VALOR QUANTIDADE'),
-            #                 bgcolor='#D9D9D9',
-            #                 border_radius=20,
-            #                 alignment=ft.alignment.center,
-            #                 width=150
-            #             ),
-            #             ft.Text('Fase Atual', size=16),
-            #             ft.Container(
-            #                 content=ft.Text('#VALOR FASE_ATUAL'),
-            #                 bgcolor='#D9D9D9',
-            #                 border_radius=20,
-            #                 alignment=ft.alignment.center,
-            #                 width=150
-            #             )
-            #         ],
-            #         spacing=6,
-            #         horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            #         )
-            #     ),
-                    
-            #     actions=[
-            #         ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
-            #     ],
-            #     actions_alignment=ft.alignment.center_right
-            # )
-            # page.overlay.append(dialog)
-            # dialog.open = True
-            # page.update()
-            
-            
+            print(f"Clicado: {nome}")  
             
         planta = ft.Container(
             bgcolor="#99C2A2",
@@ -369,7 +293,7 @@ def Home(page: ft.Page):
         
         return planta
     
-    def pedidos ():
+    def plantacao ():
 
         banco = GerenciamentoBanco()
         plantas_data = banco.obter_plantas()
@@ -391,12 +315,6 @@ def Home(page: ft.Page):
                         spacing=6,
                         scroll='auto'
                     )
-                    # ft.Container(
-                    #     width=150,
-                    #     height=150,
-                    #     bgcolor=ft.colors.BLACK,
-                    #     # lista_plantas
-                    # )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
@@ -410,8 +328,8 @@ def Home(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
-                            grafico_plantas(),
-                            pedidos()
+                            # grafico_plantas(),
+                            plantacao()
                         ]
                     ),
                     # ft.Container(

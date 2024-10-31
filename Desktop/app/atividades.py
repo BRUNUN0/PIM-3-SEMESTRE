@@ -1,11 +1,10 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco
-from app.components.dialogs import ConfirmationDialog
+from app.components.dialogs import DialogoSaida
 
 
-def AdminFornecedores(page: ft.Page):
+def Atividades(page: ft.Page):
 
     def relogio():
         relogio = ft.Container(
@@ -30,32 +29,31 @@ def AdminFornecedores(page: ft.Page):
         return logo
         
     def appbar_superior():
-        def go_home(e):
-            page.go('/')
-            confirmation_dialog.close_dialog()
-
-        def sair(e):
-            confirmation_dialog.open_dialog()
-
-        confirmation_dialog = ConfirmationDialog(
-            "Deseja sair de administrador?",
-            "Escolha se deseja ir para tela inicial ou sair",
-            [
-                ft.TextButton('Cancelar', on_click=lambda e: confirmation_dialog.close_dialog()),
-                ft.TextButton('Pagina Inicial', on_click=go_home)
-            ],
-            page
-        )
-
+        dialogo_saida = DialogoSaida(page)
+        
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[
                     relogio(),
                     logo(),
-                    ft.IconButton(
-                        icon=ft.icons.LOGOUT,
+                    ft.PopupMenuButton(
+                        icon=ft.icons.MENU,
                         icon_color=ft.colors.BLACK,
-                        on_click=sair
+                        icon_size=40,
+                        menu_position=ft.PopupMenuPosition.UNDER,
+                        
+                        items=[
+                            ft.PopupMenuItem(
+                                icon=ft.icons.ADD_MODERATOR,
+                                text='Administrar',
+                                on_click=lambda e: page.go('/adm')
+                            ),
+                            ft.PopupMenuItem(
+                                icon=ft.icons.LOGOUT,
+                                text='Sair',
+                                on_click=lambda e: dialogo_saida.abrir()
+                            )
+                        ]
                     )
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -82,11 +80,11 @@ def AdminFornecedores(page: ft.Page):
                                 height=50,
                                 icon=ft.icons.HOME,
                                 icon_size=32,
-                                on_click=lambda e: print("Home clicado"),
+                                on_click=lambda e: page.go('/'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
                             ),
                             ft.Text(
-                                value='Clientes',
+                                value='Home',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -101,13 +99,13 @@ def AdminFornecedores(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.PERSON,
+                                icon=ft.icons.ECO,
                                 icon_size=32,
-                                on_click=lambda e: print("Plantação clicado"),
+                                on_click=lambda e: page.go('/plantacao'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Funcionários',
+                                value='Plantação',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -122,13 +120,34 @@ def AdminFornecedores(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
-                                icon=ft.icons.CONTENT_PASTE_SEARCH,
+                                icon=ft.icons.BOOKMARK_ADD_SHARP,
                                 icon_size=32,
-                                on_click=lambda e: print("Consumo clicado"),
+                                on_click=lambda e: page.go('/pedidos'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
-                                value='Fornecedores',
+                                value='Pedidos',
+                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                size=16,
+                            )
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    alignment=ft.alignment.center,
+                    padding=10,
+                ),
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.IconButton(
+                                icon=ft.icons.CHECKLIST,
+                                icon_size=32,
+                                on_click=lambda e: page.go('/atividades'),
+                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                            ),
+                            ft.Text(
+                                value='Atividades',
                                 color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                 size=16,
                             )
@@ -183,7 +202,6 @@ def AdminFornecedores(page: ft.Page):
         return lista
 
     def container():
-        cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
             # height=150,
@@ -210,7 +228,7 @@ def AdminFornecedores(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: cadastro.abrir_dialog("fornecedor")
+                                    on_click=lambda e: print('Cadastrar Clicado')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

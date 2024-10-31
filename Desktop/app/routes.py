@@ -2,6 +2,9 @@ import flet as ft
 from app import adm_clientes
 from app.home import Home
 from app.login import Login
+from app.plantacao import Plantacao
+from app.pedidos import Pedidos
+from app.atividades import Atividades
 from app.adm_home import AdminHome
 from app.adm_clientes import AdminClientes
 from app.adm_fornecedores import AdminFornecedores
@@ -12,11 +15,20 @@ def rotas(page: ft.Page):
     def route_change(route):
         page.views.clear()
 
-        if page.route == "/":
+        if page.route == "/login":
+            page.views.append(ft.View(route="/login", controls=[Login(page)]))
+
+        elif page.route == "/":
             page.views.append(ft.View(route="/", controls=[Home(page)]))
 
-        elif page.route == "/login":
-            page.views.append(ft.View(route="/login", controls=[Login(page)]))
+        elif page.route == "/plantacao":
+            page.views.append(ft.View(route="/plantacao", controls=[Plantacao(page)]))
+
+        elif page.route == "/pedidos":
+            page.views.append(ft.View(route="/pedidos", controls=[Pedidos(page)]))
+
+        elif page.route == "/atividades":
+            page.views.append(ft.View(route="/atividades", controls=[Atividades(page)]))
 
         elif page.route == "/adm":
             page.views.append(ft.View(route="/adm", controls=[AdminHome(page)]))

@@ -1,103 +1,57 @@
 import pyodbc
 import flet as ft
 
-class GerenciamentoBanco:
-    def __init__(self):
-        self.conn_str = (
-            'Driver=ODBC Driver 17 for SQL Server;'
-            'Server=BRUNO-NOTE\\SQLEXPRESS;'
-            'Database=teste;'
-            'Trusted_Connection=yes;'
-        )
 
-    def conectar(self):
-        # Conecta ao banco de dados
-        return pyodbc.connect(self.conn_str)
-
-    def obter_plantas(self):
-        # Obtém os dados das plantas
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = '''
-            SELECT
-	            Producao.Nome,
-	            Materia_Prima.URL
-            FROM Producao
-            JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
-            '''
-        cursor.execute(query)
-        plantas = cursor.fetchall()
-        conn.close()
-        return plantas
-    
-    def obter_pedidos(self):
-        # Obtém os dados dos pedidos
-        conn = self.conectar()
-        cursor = conn.cursor()
-        cursor.execute('SELECT Nome, Quantidade FROM Pedidos')
-        pedidos = cursor.fetchall()
-        conn.close()
-        return pedidos
-    
-    def obter_fornecedores(self):
-        # Obtém os dados dos fornecedores
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = '''
-
-        '''
-        cursor.execute(query)
 
 
 
 class Detalhes:
-    def __init__(self, titulo, conteudo, page):
-        self.titulo = titulo
-        self.conteudo = conteudo
-        self.page = page
+    def __init__(self, title, detalhes):
+        """
+        Inicializa o diálogo de detalhes.
+        :param title: O título do diálogo.
+        :param detalhes: Um dicionário com os detalhes a serem exibidos.
+        """
+        self.title = title
+        self.detalhes = detalhes
 
-    def exibir(self):
-        def fechar(dialog):
-            dialog.open = False
-            self.page.update()
-
-        detalhes_conteudo = [
-            ft.Text(key, size=16) for key in self.conteudo.keys()
-        ]
-        
-        valores_conteudo = [
-            ft.Container(
-                content=ft.Text(str(value)),
-                bgcolor='#D9D9D9',
-                border_radius=20,
-                alignment=ft.alignment.center,
-                width=150,
-                padding=5
-            ) for value in self.conteudo.values()
-        ]
+    def exibir_dialogo(self, page):
+        """
+        Cria e exibe o AlertDialog com base nos detalhes fornecidos.
+        :param page: A página onde o diálogo será exibido.
+        """
+        # Constrói o conteúdo do diálogo com base nos detalhes
+        conteudo = ft.Column(
+            controls=[
+                ft.Text(f"{key}: {value}", size=16) for key, value in self.detalhes.items()
+            ],
+            spacing=6,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+        )
 
         dialog = ft.AlertDialog(
-            title=ft.Text(self.titulo),
+            title=ft.Text(self.title),
             content=ft.Container(
                 height=300,
-                content=ft.Column(
-                    controls=[
-                        *detalhes_conteudo,
-                        *valores_conteudo
-                    ],
-                    spacing=6,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                )
+                bgcolor=ft.colors.BLUE,
+                content=conteudo
             ),
-            actions=[
-                ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
-            ],
+            actions=[ft.TextButton("Fechar", on_click=lambda e: self.fechar_dialogo(dialog, page))],
             actions_alignment=ft.alignment.center_right
         )
 
-        self.page.overlay.append(dialog)
+        page.overlay.append(dialog)
         dialog.open = True
-        self.page.update()
+        page.update()
+
+    def fechar_dialogo(self, dialog, page):
+        """
+        Fecha o diálogo.
+        :param dialog: O diálogo a ser fechado.
+        :param page: A página onde o diálogo está sendo exibido.
+        """
+        dialog.open = False
+        page.update()
 
 
     

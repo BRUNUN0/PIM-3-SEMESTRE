@@ -1,86 +1,80 @@
-# Importando o pacote necessário
 import flet as ft
 
-# Função que cria a página do login
-def main(page: ft.Page):
-    # Container de Login
-    login_container = ft.Column(
-        controls=[
-            # Container para o logo
-            ft.Container(
-                content=ft.Image(
-                    src="logo.png",  # Substitua "logo.png" pelo caminho da sua imagem
-                    width=100,
-                    height=100,
-                    fit=ft.ImageFit.CONTAIN
-                ),
-                width=130,
-                height=130,
-                alignment=ft.alignment.center,
-                border_radius=ft.border_radius.all(100),
-                bgcolor="#7FA677"
+def tela_cadastro(page, titulo, campos):
+    # Função para salvar os dados (adapte para salvar no banco de dados)
+    def salvar_dados(e):
+        dados = {campo['label']: campo['input'].value for campo in campos}
+        print("Dados salvos:", dados)
+        # Aqui você poderia chamar uma função para salvar os dados no banco
+        page.snack_bar = ft.SnackBar(ft.Text("Cadastro salvo com sucesso!"))
+        page.snack_bar.open = True
+        page.update()
+        
+    # Criação do layout principal
+    page.title = f"Cadastro de {titulo}"
+    form_campos = [
+        ft.TextField(label=campo['label'], hint_text=campo.get('hint', '')) 
+        for campo in campos
+    ]
+    for i, campo in enumerate(campos):
+        campos[i]['input'] = form_campos[i]
+    
+    # Container principal da tela de cadastro
+    page.add(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.Text(f"Cadastro de {titulo}", size=24, weight=ft.FontWeight.BOLD),
+                    *form_campos,
+                    ft.Row(
+                        controls=[
+                            ft.ElevatedButton("Salvar", on_click=salvar_dados),
+                            ft.ElevatedButton("Cancelar", on_click=lambda e: page.go('/'))
+                        ],
+                        alignment=ft.MainAxisAlignment.END
+                    )
+                ],
+                spacing=10,
+                horizontal_alignment=ft.CrossAxisAlignment.START,
             ),
-            # Container do formulário de login
-            ft.Container(
-                bgcolor="#7FA677",
-                width=350,
-                height=250,
-                alignment=ft.alignment.center,
-                border_radius=ft.border_radius.all(10),
-                content=ft.Column(
-                    controls=[
-                        # Campo ID
-                        ft.TextField(
-                            label="ID",
-                            width=250,
-                            height=50,
-                            border_radius=ft.border_radius.all(8),
-                            bgcolor=ft.colors.WHITE,
-                            color=ft.colors.BLACK,
-                            text_style=ft.TextStyle(size=16),
-                            label_style=ft.TextStyle(
-                                color=ft.colors.BLACK,
-                                size=14
-                            )
-                        ),
-                        # Campo Senha
-                        ft.TextField(
-                            label="Senha",
-                            width=250,
-                            height=50,
-                            password=True,
-                            border_radius=ft.border_radius.all(8),
-                            bgcolor=ft.colors.WHITE,
-                            color=ft.colors.BLACK,
-                            text_style=ft.TextStyle(size=16),
-                            label_style=ft.TextStyle(
-                                color=ft.colors.BLACK,
-                                size=14
-                            )
-                        ),
-                        # Botão Entrar
-                        ft.ElevatedButton(
-                            text="Entrar",
-                            width=100,
-                            height=40,
-                            bgcolor=ft.colors.GREEN_900,
-                            color=ft.colors.WHITE,
-                            on_click=lambda e: print("Login clicado")
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=20
-                )
-            )
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True  # Para centralizar o container de login
+            padding=20,
+            margin=20,
+            border=ft.border.all(color=ft.colors.GREY),
+            border_radius=10,
+            width=400,
+            bgcolor=ft.colors.WHITE
+        )
     )
 
-    # Adiciona o container de login à página
-    page.add(login_container)
+# Exemplo de uso da função `tela_cadastro`
+def main(page):
+    # Definindo os campos de cadastro para cada tipo
+    campos_fornecedor = [
+        {'label': 'Nome do Fornecedor', 'hint': 'Digite o nome do fornecedor'},
+        {'label': 'CNPJ', 'hint': 'Digite o CNPJ'},
+        {'label': 'Endereço', 'hint': 'Digite o endereço'},
+        {'label': 'Telefone', 'hint': 'Digite o telefone de contato'},
+        {'label': 'Email', 'hint': 'Digite o email'}
+    ]
 
-# Inicia a aplicação
+    campos_cliente = [
+        {'label': 'Nome do Cliente', 'hint': 'Digite o nome do cliente'},
+        {'label': 'CPF/CNPJ', 'hint': 'Digite o CPF ou CNPJ'},
+        {'label': 'Endereço', 'hint': 'Digite o endereço'},
+        {'label': 'Telefone', 'hint': 'Digite o telefone de contato'},
+        {'label': 'Email', 'hint': 'Digite o email'}
+    ]
+
+    campos_materia_prima = [
+        {'label': 'Nome da Matéria-Prima', 'hint': 'Digite o nome da matéria-prima'},
+        {'label': 'Descrição', 'hint': 'Digite uma descrição da matéria-prima'},
+        {'label': 'Unidade de Medida', 'hint': 'Ex: Kg, Litros, Unidade'},
+        {'label': 'Preço por Unidade', 'hint': 'Digite o preço por unidade'}
+    ]
+
+    # Escolhendo qual tela abrir (para teste, você pode trocar entre as chamadas)
+    tela_cadastro(page, "Fornecedor", campos_fornecedor)
+    # tela_cadastro(page, "Cliente", campos_cliente)
+    # tela_cadastro(page, "Matéria Prima", campos_materia_prima)
+
 ft.app(target=main)

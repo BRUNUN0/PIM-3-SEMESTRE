@@ -9,7 +9,7 @@ def main(page: ft.Page):
     page.window.resizable = False
     rotas(page)
 
-    page.go("/adm/clientes")
+    page.go("/adm/fornecedores")
     # page.on_resized = page.update()
     page.update()
 
