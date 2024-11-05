@@ -8,6 +8,7 @@ def main(page: ft.Page):
     page.window.maximized = True
     page.window.resizable = False
     rotas(page)
+    print(page.route)
 
     page.go("/adm/fornecedores")
     # page.on_resized = page.update()

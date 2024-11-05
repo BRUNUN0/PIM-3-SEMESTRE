@@ -1,3 +1,4 @@
+from operator import truediv
 import flet as ft
 import pyodbc
 
@@ -108,6 +109,8 @@ class GerenciamentoBanco:
 
         
 
+import flet as ft
+
 class Cadastro:
     def __init__(self, page):
         """
@@ -123,44 +126,81 @@ class Cadastro:
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
         :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
         """
-        # Definição de campos para diferentes tipos de cadastro
+        # Definição de campos para diferentes tipos de cadastro com subtítulos
         campos_por_tipo = {
-            "fornecedor": ["Nome", "Nome Fantasia", "CNPJ", "Email", "Telefone", "Rua", "Número", "Bairro", "CEP", "Cidade", "Estado"],
-            "cliente": ["Nome", "CPF", "Email", "Telefone", "Endereço", "Cidade", "Estado"],
-            "produto": ["Nome", "Código", "Descrição", "Preço", "Estoque"],
+            "fornecedor": [
+                {"titulo": "Informações Básicas", "campos": ["Nome", "Nome Fantasia", "CNPJ", "Email", "Telefone"]},
+                {"titulo": "Endereço", "campos": ["Rua", "Número", "Bairro", "CEP", "Cidade", "Estado"]}
+            ],
+            "cliente": [
+                {"titulo": "Informações Básicas", "campos": ["Nome", "CPF", "Email", "Telefone"]},
+                {"titulo": "Endereço", "campos": ["Endereço", "Cidade", "Estado"]}
+            ],
+            "produto": [
+                {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
+            ]
         }
-        
+
         # Obter os campos específicos para o tipo de cadastro
-        campos = campos_por_tipo.get(tipo_cadastro, [])
-        
-        # Criar os campos de entrada para o diálogo
-        self.inputs = {campo: ft.TextField(label=campo, width=300) for campo in campos}
-        
-        # Botão para salvar os dados
-        botao_salvar = ft.ElevatedButton(
-            "Salvar",
-            on_click=self._salvar_dados
+        grupos_campos = campos_por_tipo.get(tipo_cadastro, [])
+
+        # Criar campos de entrada organizados com subtítulos para cada seção
+        conteudo_dialog = [
+            ft.Text(f"Cadastro de {tipo_cadastro.capitalize()}", size=20, weight="bold")
+        ]
+
+        for grupo in grupos_campos:
+            # Adicionar subtítulo para cada grupo
+            conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
+            
+            # Organizar os campos de entrada para cada grupo em linhas de dois elementos
+            campos = grupo["campos"]
+            self.inputs.update({campo: ft.TextField(label=campo, width=250) for campo in campos})
+            for i in range(0, len(campos), 2):
+                linha = ft.Row(
+                    controls=[self.inputs[campos[j]] for j in range(i, min(i+2, len(campos)))],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+                conteudo_dialog.append(linha)
+
+        # Botões para salvar e fechar o diálogo
+        botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Salvar", on_click=self._salvar_dados),
+                ft.TextButton("Fechar", on_click=self._fechar_dialog)
+            ],
+            alignment=ft.MainAxisAlignment.END
         )
-        
-        # Configuração do conteúdo do dialog
-        conteudo_dialog = [ft.Text(f"Cadastro de {tipo_cadastro.capitalize()}", size=20, weight="bold")]
-        conteudo_dialog.extend(self.inputs.values())
-        conteudo_dialog.append(botao_salvar)
-        
-        # Criar o AlertDialog
+
+        conteudo_dialog.append(botoes)
+
+        # Criar o AlertDialog com tamanho e organização controlados
         self.dialog = ft.AlertDialog(
             modal=True,
-            content=ft.Column(controls=conteudo_dialog, alignment=ft.MainAxisAlignment.CENTER)
+            content=ft.Container(
+                width=550,  # Largura controlada do diálogo
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO  # Adiciona scroll para campos extras
+                )
+            )
         )
-        
+
         # Exibir o diálogo
         self.page.dialog = self.dialog
         self.dialog.open = True
         self.page.update()
 
     def _salvar_dados(self, e):
+        # Coleta os dados dos inputs e fecha o dialog
         dados = {campo: entrada.value for campo, entrada in self.inputs.items()}
         print("Dados coletados:", dados)
         
+        self.dialog.open = False
+        self.page.update()
+
+    def _fechar_dialog(self, e):
+        # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()

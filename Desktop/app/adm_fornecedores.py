@@ -197,7 +197,8 @@ def AdminFornecedores(page: ft.Page):
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
-                        border_radius=12
+                        border_radius=12,
+                        # content=lista
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),
