@@ -36,10 +36,15 @@ def rotas(page: ft.Page):
         elif page.route == "/adm/clientes":
             page.views.append(ft.View(route="/adm/clientes", controls=[AdminClientes(page)]))
 
+        elif page.route == "/adm/funcionarios":
+            page.views.append(ft.View(route="/adm/clientes", controls=[AdminClientes(page)]))
+            
+
         elif page.route == "/adm/fornecedores":
             page.views.append(ft.View(route="/adm/fornecedores", controls=[AdminFornecedores(page)]))
 
         page.update()
+        print(page.route)
 
     page.on_route_change = route_change
     

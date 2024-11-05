@@ -75,41 +75,30 @@ class GerenciamentoBanco:
         conn.close()
         return detalhes
 
-    def inserir_fornecedor(self, nome, nome_fantasia, cnpj, email, telefone, rua, numero, bairro, cep, cidade, estado):
+    def cadastro(self, tipo_cadastro, dados):
         conn = self.conectar()
         cursor = conn.cursor()
-        try:
-            cursor.execute('''
-                CALL InserirFornecedor
-                    @Nome = ?,
-                    @Nome_Fantasia = ?,
-                    @CNPJ = ?,
-                    @Email = ?,
-                    @Telefone = ?,
-                    @Rua = ?,
-                    @Numero = ?,
-                    @Bairro = ?,
-                    @CEP = ?,
-                    @Cidade = ?,
-                    @Estado = ?;
-            ''', (nome, nome_fantasia, cnpj, email, telefone, rua, numero, bairro, cep, cidade, estado)
-            )
-            conn.commit()
-            print("Fornecedor inserido com sucesso.")
-        except pyodbc.IntegrityError as e:
-            print("Erro de integridade:", e)
-        except pyodbc.ProgrammingError as e:
-            print("Erro de programação:", e)
-        except pyodbc.Error as e:
-            print("Erro ao inserir fornecedor:", e)
-        finally:
-            cursor.close()
-            conn.close()
+        if tipo_cadastro == 'fornecedor':
+            try:
+                cursor.execute(
+                    '''{CALL InserirFornecedor (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''', 
+                        (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Telefone'], dados['Rua'], dados['Número'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
+                        )
+                conn.commit()
+                print("Fornecedor inserido com sucesso.")
+            except pyodbc.IntegrityError as e:
+                print("Erro de integridade:", e)
+            except pyodbc.ProgrammingError as e:
+                print("Erro de programação:", e)
+            except pyodbc.Error as e:
+                print("Erro ao inserir fornecedor:", e)
+            finally:
+                cursor.close()
+                conn.close()
     
 
         
 
-import flet as ft
 
 class Cadastro:
     def __init__(self, page):
@@ -120,13 +109,13 @@ class Cadastro:
         self.page = page
         self.dialog = None
         self.inputs = {}
+        self.dados_salvos = None  # Armazena temporariamente os dados salvos para possível reversão
 
     def abrir_dialog(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
         :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
         """
-        # Definição de campos para diferentes tipos de cadastro com subtítulos
         campos_por_tipo = {
             "fornecedor": [
                 {"titulo": "Informações Básicas", "campos": ["Nome", "Nome Fantasia", "CNPJ", "Email", "Telefone"]},
@@ -141,66 +130,91 @@ class Cadastro:
             ]
         }
 
-        # Obter os campos específicos para o tipo de cadastro
         grupos_campos = campos_por_tipo.get(tipo_cadastro, [])
 
-        # Criar campos de entrada organizados com subtítulos para cada seção
         conteudo_dialog = [
-            ft.Text(f"Cadastro de {tipo_cadastro.capitalize()}", size=20, weight="bold")
+            ft.Row(
+                controls=[
+                    ft.Text(f"Cadastro de {tipo_cadastro.capitalize()}", size=20, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
         ]
 
         for grupo in grupos_campos:
-            # Adicionar subtítulo para cada grupo
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
-            
-            # Organizar os campos de entrada para cada grupo em linhas de dois elementos
             campos = grupo["campos"]
             self.inputs.update({campo: ft.TextField(label=campo, width=250) for campo in campos})
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
-                    controls=[self.inputs[campos[j]] for j in range(i, min(i+2, len(campos)))],
+                    controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                 )
                 conteudo_dialog.append(linha)
 
-        # Botões para salvar e fechar o diálogo
         botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Salvar", on_click=self._salvar_dados),
-                ft.TextButton("Fechar", on_click=self._fechar_dialog)
+                ft.ElevatedButton("Salvar", on_click=self._salvar_dados)
             ],
             alignment=ft.MainAxisAlignment.END
         )
 
         conteudo_dialog.append(botoes)
 
-        # Criar o AlertDialog com tamanho e organização controlados
         self.dialog = ft.AlertDialog(
             modal=True,
             content=ft.Container(
-                width=550,  # Largura controlada do diálogo
+                width=550,
                 content=ft.Column(
                     controls=conteudo_dialog,
                     alignment=ft.MainAxisAlignment.START,
-                    scroll=ft.ScrollMode.AUTO  # Adiciona scroll para campos extras
+                    scroll=ft.ScrollMode.AUTO
                 )
             )
         )
 
-        # Exibir o diálogo
-        self.page.dialog = self.dialog
+        self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
 
     def _salvar_dados(self, e):
         # Coleta os dados dos inputs e fecha o dialog
-        dados = {campo: entrada.value for campo, entrada in self.inputs.items()}
-        print("Dados coletados:", dados)
-        
+        self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
+        print("Dados coletados:", self.dados_salvos)
+
+        # Fecha o diálogo
         self.dialog.open = False
         self.page.update()
+
+        # Insere os dados no banco e mostra o snackbar
+        self.inserir_banco()
+
+    def inserir_banco(self, tipo_cadastro):
+        banco = GerenciamentoBanco()
+        sucesso = banco.cadastro(tipo_cadastro, self.dados_salvos)
+        if sucesso:
+            snackbar = ft.SnackBar(
+                content=ft.Text("Cadastro realizado com sucesso!"),
+                duration=3000
+            )
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            self.dados_salvos = None  # Limpa os dados salvos
+        else:
+            # Exibe um snackbar de erro
+            snackbar = ft.SnackBar(
+                content=ft.Text("Ocorreu um erro ao salvar os dados."),
+                duration=3000
+            )
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
 
     def _fechar_dialog(self, e):
         # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()
+
+    
