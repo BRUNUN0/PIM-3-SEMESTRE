@@ -14,5 +14,9 @@ def main(page: ft.Page):
     # page.on_resized = page.update()
     page.update()
 
+    page.go("/")
+    # page.on_resized = page.update()
+    page.update()
+
 if __name__ == "__main__":
     ft.app(target=main)

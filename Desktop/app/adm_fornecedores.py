@@ -220,8 +220,8 @@ def AdminFornecedores(page: ft.Page):
         return planta
 
     def container():
-        lista_fornecedor = GerenciamentoBanco()
-        lista_plantas = [fornecedor(id, Nome, CNPJ) for id, Nome, CNPJ in lista_fornecedor]
+        # lista_fornecedor = GerenciamentoBanco()
+        # lista_plantas = [fornecedor(id, Nome, CNPJ) for id, Nome, CNPJ in lista_fornecedor]
 
         cadastro = Cadastro(page)
         container = ft.Container(
