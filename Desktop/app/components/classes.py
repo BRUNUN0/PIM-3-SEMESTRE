@@ -39,11 +39,11 @@ class GerenciamentoBanco:
         conn.close()
         return plantas
     
-    def obter_pedidos(self):
+    def obter_fornecedores(self):
         # Obtém os dados dos pedidos
         conn = self.conectar()
         cursor = conn.cursor()
-        cursor.execute('SELECT Nome, Quantidade FROM Pedidos')
+        cursor.execute('SELECT id, Nome, CNPJ FROM Fornecedor')
         pedidos = cursor.fetchall()
         conn.close()
         return pedidos
@@ -116,6 +116,7 @@ class Cadastro:
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
         :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
         """
+        self.tipo_cadastro = tipo_cadastro
         campos_por_tipo = {
             "fornecedor": [
                 {"titulo": "Informações Básicas", "campos": ["Nome", "Nome Fantasia", "CNPJ", "Email", "Telefone"]},
@@ -130,12 +131,12 @@ class Cadastro:
             ]
         }
 
-        grupos_campos = campos_por_tipo.get(tipo_cadastro, [])
+        grupos_campos = campos_por_tipo.get(self.tipo_cadastro, [])
 
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Cadastro de {tipo_cadastro.capitalize()}", size=20, weight="bold"),
+                    ft.Text(f"Cadastro de {self.tipo_cadastro.capitalize()}", size=20, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -190,9 +191,9 @@ class Cadastro:
         # Insere os dados no banco e mostra o snackbar
         self.inserir_banco()
 
-    def inserir_banco(self, tipo_cadastro):
+    def inserir_banco(self):
         banco = GerenciamentoBanco()
-        sucesso = banco.cadastro(tipo_cadastro, self.dados_salvos)
+        sucesso = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
         if sucesso:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),

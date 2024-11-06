@@ -2,6 +2,7 @@ from operator import truediv
 import flet as ft
 import time
 import pyodbc
+from app.components.classes import Cadastro
 from app.components.dialogs import ConfirmationDialog
 
 
@@ -103,7 +104,7 @@ def AdminClientes(page: ft.Page):
                             ft.IconButton(
                                 icon=ft.icons.PERSON,
                                 icon_size=32,
-                                on_click=lambda e: print("Plantação clicado"),
+                                on_click=lambda e: page.go('/adm/funcionarios'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
@@ -124,7 +125,7 @@ def AdminClientes(page: ft.Page):
                             ft.IconButton(
                                 icon=ft.icons.CONTENT_PASTE_SEARCH,
                                 icon_size=32,
-                                on_click=lambda e: print("Consumo clicado"),
+                                on_click=lambda e: page.go('/adm/fornecedores'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
@@ -183,6 +184,7 @@ def AdminClientes(page: ft.Page):
         return lista
 
     def container():
+        cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
             # height=150,
@@ -209,7 +211,7 @@ def AdminClientes(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: print('Cadastrar Clicado')
+                                    on_click=lambda e: cadastro.abrir_dialog('cliente')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

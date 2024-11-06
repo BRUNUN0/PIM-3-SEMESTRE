@@ -37,8 +37,7 @@ def rotas(page: ft.Page):
             page.views.append(ft.View(route="/adm/clientes", controls=[AdminClientes(page)]))
 
         elif page.route == "/adm/funcionarios":
-            page.views.append(ft.View(route="/adm/clientes", controls=[AdminClientes(page)]))
-            
+            page.views.append(ft.View(route="/adm/funcionarios", controls=[AdminClientes(page)]))
 
         elif page.route == "/adm/fornecedores":
             page.views.append(ft.View(route="/adm/fornecedores", controls=[AdminFornecedores(page)]))

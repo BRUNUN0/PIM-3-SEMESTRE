@@ -67,6 +67,11 @@ def Home(page: ft.Page):
         return app_sup
         
     def botoes():
+        def hover_btn(e):
+            e.control.icon_color=ft.colors.BLACK if e.data == "true" else None
+            e.control.update()
+        
+
         botoes = ft.Container(
             expand=True,
             # height=100,
@@ -77,6 +82,7 @@ def Home(page: ft.Page):
         ft.Row(
             controls=[
                 ft.Container(
+                    on_hover=hover_btn,
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
