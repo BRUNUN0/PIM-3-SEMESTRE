@@ -15,18 +15,23 @@ def rotas(page: ft.Page):
     def route_change(route):
         page.views.clear()
 
+        # Pagina de Login
         if page.route == "/login":
             page.views.append(ft.View(route="/login", controls=[Login(page)]))
 
+        # Home
         elif page.route == "/":
             page.views.append(ft.View(route="/", controls=[Home(page)]))
 
+        # Plantação
         elif page.route == "/plantacao":
             page.views.append(ft.View(route="/plantacao", controls=[Plantacao(page)]))
 
+        # Pedidos
         elif page.route == "/pedidos":
             page.views.append(ft.View(route="/pedidos", controls=[Pedidos(page)]))
 
+        # Atividades
         elif page.route == "/atividades":
             page.views.append(ft.View(route="/atividades", controls=[Atividades(page)]))
 
