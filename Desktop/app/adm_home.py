@@ -2,6 +2,8 @@ import flet as ft
 import time
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
+from app.components.classes import GerenciamentoBanco
+
 
 
 def AdminHome(page: ft.Page):
@@ -104,7 +106,7 @@ def AdminHome(page: ft.Page):
                                 height=50,
                                 icon=ft.icons.HOME,
                                 icon_size=32,
-                                on_click=lambda e: print("Home clicado"),
+                                on_click=lambda e: page.go('/adm/clientes'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
                             ),
                             ft.Text(
@@ -125,7 +127,7 @@ def AdminHome(page: ft.Page):
                             ft.IconButton(
                                 icon=ft.icons.PERSON,
                                 icon_size=32,
-                                on_click=lambda e: print("Plantação clicado"),
+                                on_click=lambda e: page.go('/adm/funcionarios'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(
@@ -146,7 +148,7 @@ def AdminHome(page: ft.Page):
                             ft.IconButton(
                                 icon=ft.icons.CONTENT_PASTE_SEARCH,
                                 icon_size=32,
-                                on_click=lambda e: print("Consumo clicado"),
+                                on_click=lambda e: page.go('/adm/fornecedores'),
                                 icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                             ),
                             ft.Text(

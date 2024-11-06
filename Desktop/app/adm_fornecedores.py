@@ -182,14 +182,14 @@ def AdminFornecedores(page: ft.Page):
         
         return lista
     
-    def fornecedor(id, nome, cnpj):    
+    def fornecedor(id_fornecedor, nome, cnpj):
             
-        planta = ft.Container(
+        fornecedor = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
                 color=ft.colors.BLACK
             ),
-            width=340,
+            # width=340,
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
@@ -202,7 +202,7 @@ def AdminFornecedores(page: ft.Page):
                         size=30
                         ),
                     ft.Text(
-                        value=id
+                        value=id_fornecedor
                         ),
                     
                     ft.Text(
@@ -217,11 +217,14 @@ def AdminFornecedores(page: ft.Page):
             )
         )
         
-        return planta
+        return fornecedor
 
     def container():
-        # lista_fornecedor = GerenciamentoBanco()
-        # lista_plantas = [fornecedor(id, Nome, CNPJ) for id, Nome, CNPJ in lista_fornecedor]
+        banco = GerenciamentoBanco()
+        fornecedores = banco.obter_fornecedores()
+        if fornecedores is None:
+            print('Erro aqui')
+        lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
 
         cadastro = Cadastro(page)
         container = ft.Container(
@@ -238,7 +241,11 @@ def AdminFornecedores(page: ft.Page):
                         expand=True,
                         bgcolor=ft.colors.WHITE,
                         border_radius=12,
-                        # content=lista_fornecedor.obter_fornecedores()
+                        content=ft.Column(
+                            controls=
+                            lista_fornecedores,
+                            spacing=6
+                        )
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),

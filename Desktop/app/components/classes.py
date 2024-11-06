@@ -1,4 +1,5 @@
 from operator import truediv
+from os import error
 import flet as ft
 import pyodbc
 
@@ -27,35 +28,33 @@ class GerenciamentoBanco:
         # Obtém os dados das plantas
         conn = self.conectar()
         cursor = conn.cursor()
-        query = '''
-            SELECT
-	            Producao.Nome,
-	            Materia_Prima.URL
-            FROM Producao
-            JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
-            '''
+        query = '''SELECT Nome, URL FROM Materia_Prima'''
+        # query = '''
+        #     SELECT
+	    #         Producao.Nome,
+	    #         Materia_Prima.URL
+        #     FROM Producao
+        #     JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
+        #     '''
         cursor.execute(query)
         plantas = cursor.fetchall()
         conn.close()
         return plantas
     
     def obter_fornecedores(self):
-        # Obtém os dados dos pedidos
-        conn = self.conectar()
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, Nome, CNPJ FROM Fornecedor')
-        pedidos = cursor.fetchall()
-        conn.close()
-        return pedidos
-    
-    def obter_fornecedores(self):
-        # Obtém os dados dos fornecedores
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = '''
-
-        '''
-        cursor.execute(query)
+        try:
+            # Obtém os dados dos fornecedores
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT id_fornecedor, Nome, CNPJ FROM Fornecedor'''
+            cursor.execute(query)
+            fornecedores = cursor.fetchall()
+            conn.close()
+            return fornecedores
+        except Exception as e:
+            print(f"Erro ao obter fornecedores: {e}")
+            return None
+        
 
     def obter_detalhes_plantio(self):
         conn = self.conectar()
@@ -86,6 +85,31 @@ class GerenciamentoBanco:
                         )
                 conn.commit()
                 print("Fornecedor inserido com sucesso.")
+                return True
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                cursor.close()
+                conn.close()
+                return False
+            
+        elif tipo_cadastro == 'cliente':
+            try:
+                cursor.execute(
+                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
+                    )
+                conn.commit()
             except pyodbc.IntegrityError as e:
                 print("Erro de integridade:", e)
             except pyodbc.ProgrammingError as e:
@@ -95,6 +119,26 @@ class GerenciamentoBanco:
             finally:
                 cursor.close()
                 conn.close()
+            return False
+        
+        elif tipo_cadastro == 'compra':
+            try:
+                cursor.execute(
+                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
+                    )
+                conn.commit()
+            except pyodbc.IntegrityError as e:
+                print("Erro de integridade:", e)
+            except pyodbc.ProgrammingError as e:
+                print("Erro de programação:", e)
+            except pyodbc.Error as e:
+                print("Erro ao inserir fornecedor:", e)
+            finally:
+                cursor.close()
+                conn.close()
+            return False
+                
     
 
         
@@ -123,10 +167,13 @@ class Cadastro:
                 {"titulo": "Endereço", "campos": ["Rua", "Número", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
             "cliente": [
-                {"titulo": "Informações Básicas", "campos": ["Nome", "CPF", "Email", "Telefone"]},
-                {"titulo": "Endereço", "campos": ["Endereço", "Cidade", "Estado"]}
+                {"titulo": "Informações Básicas", "campos": ["Nome", "CNPJ", "Email"]},
+                {"titulo": "Endereço", "campos": ["Rua", "Numero", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
-            "produto": [
+            "funcionario": [
+                {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
+            ],
+            "teste": [
                 {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
             ]
         }
@@ -193,7 +240,7 @@ class Cadastro:
 
     def inserir_banco(self):
         banco = GerenciamentoBanco()
-        sucesso = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
+        sucesso, error_message = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
         if sucesso:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),
@@ -206,7 +253,7 @@ class Cadastro:
         else:
             # Exibe um snackbar de erro
             snackbar = ft.SnackBar(
-                content=ft.Text("Ocorreu um erro ao salvar os dados."),
+                content=ft.Text(f"Ocorreu um erro ao salvar os dados: {error_message}"),
                 duration=3000
             )
             self.page.overlay.append(snackbar)
