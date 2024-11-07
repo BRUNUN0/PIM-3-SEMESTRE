@@ -62,22 +62,6 @@ class GerenciamentoBanco:
             query = f'''SELECT * from Fornecedor WHERE id_fornecedor = {id_fornecedor}'''
             cursor.execute(query)
             detalhes_fornecedor = cursor.fetchone()
-            # Preenche o dicionário com os detalhes obtidos
-            # dados = {
-            #     'id_fornecedor': detalhes_fornecedor[0],
-            #     'Nome': detalhes_fornecedor[1],
-            #     'Nome_Fantasia': detalhes_fornecedor[2],
-            #     'CNPJ': detalhes_fornecedor[3],
-            #     'Email': detalhes_fornecedor[4],
-            #     'Telefone': detalhes_fornecedor[5],
-            #     'Rua': detalhes_fornecedor[6],
-            #     'Numero': detalhes_fornecedor[7],
-            #     'Bairro': detalhes_fornecedor[8],
-            #     'CEP': detalhes_fornecedor[9],
-            #     'Cidade': detalhes_fornecedor[10],
-            #     'Estado': detalhes_fornecedor[11]
-            # }
-            print(detalhes_fornecedor)
             conn.close()
             return detalhes_fornecedor
         except Exception as e:
@@ -114,6 +98,20 @@ class GerenciamentoBanco:
             return clientes
         except Exception as e:
             print(f"Erro ao obter clientes: {e}")
+            return None
+        
+    def obter_detalhes_clientes(self, id_cliente):
+        try:
+            # Obter os detalhes do fornecedor
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = f'''SELECT * from Fornecedor WHERE id_cliente = {id_cliente}'''
+            cursor.execute(query)
+            detalhes_cliente = cursor.fetchone()
+            conn.close()
+            return detalhes_cliente
+        except Exception as e:
+            print(f"Erro ao obter detalhes do cliente: {e}")
             return None
 
     def cadastro(self, tipo_cadastro, dados):
@@ -357,6 +355,85 @@ class Detalhes:
             ft.Row(
                 controls=[
                     ft.Text(f"Detalhes do Fornecedor", size=18, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        ft.TextField(value=str(valor), read_only=True, width=350),
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
+            ],
+            alignment=ft.MainAxisAlignment.END
+        )
+
+        conteudo_dialog.append(botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def detalhes_cliente(self, id_cliente):
+        banco = GerenciamentoBanco()
+        """
+        Abre um AlertDialog configurado para exibir detalhes do fornecedor com o ID fornecido.
+        :param id_fornecedor: ID do fornecedor para buscar detalhes.
+        """
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = banco.obter_detalhes_clientes(id_cliente)
+
+        if detalhes is None:
+            print("Erro ao obter os detalhes do cliente.")
+            return
+
+
+        
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CNPJ": detalhes[2],
+            "Email": detalhes[3],
+            "Rua": detalhes[4],
+            "Número": detalhes[5],
+            "Bairro": detalhes[6],
+            "CEP": detalhes[7],
+            "Cidade": detalhes[8],
+            "Estado": detalhes[9]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do Cliente", size=18, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
