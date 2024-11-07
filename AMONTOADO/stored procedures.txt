@@ -213,6 +213,7 @@ END;
 
 CREATE PROCEDURE InserirCliente
     @Nome NVARCHAR(100),
+    @Nome_Fantasia NVARCHAR(100),
     @CNPJ CHAR(14), -- CNPJ é obrigatório
     @Email NVARCHAR(100),
     @Rua NVARCHAR(100),
@@ -233,8 +234,8 @@ BEGIN
     -- Verificar se o cliente já existe
     IF NOT EXISTS (SELECT 1 FROM Cliente WHERE CNPJ = @CNPJ)
     BEGIN
-        INSERT INTO Cliente (Nome, CNPJ, Email, Rua, Numero, Bairro, CEP, Cidade, Estado)
-        VALUES (@Nome, @CNPJ, @Email, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
+        INSERT INTO Cliente (Nome, Nome_Fantasia,CNPJ, Email, Rua, Numero, Bairro, CEP, Cidade, Estado)
+        VALUES (@Nome, @Nome_Fantasia,@CNPJ, @Email, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
     END
     ELSE
     BEGIN

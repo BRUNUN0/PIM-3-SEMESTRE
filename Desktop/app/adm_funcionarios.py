@@ -5,7 +5,7 @@ from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
 
-def AdminFornecedores(page: ft.Page):
+def AdminFuncionarios(page: ft.Page):
 
     def relogio():
         relogio = ft.Container(
@@ -154,6 +154,7 @@ def AdminFornecedores(page: ft.Page):
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
             width=page.window.width,
+            padding=ft.padding.all(10),
             height=175,
             expand=True,
             
@@ -175,18 +176,8 @@ def AdminFornecedores(page: ft.Page):
         
         return AppBar
     
-    def lista():
-        lista = ft.ListView(
-            expand=True,
-            controls=[ft.Text(f'Item {i}') for i in range (100)],
-            first_item_prototype=False
-        )
-        
-        return lista
     
-    def fornecedor(id_fornecedor, nome, cnpj):
-        # fornecedor_dados = {"ID": id_fornecedor, "Nome": nome, "CNPJ": cnpj}
-        # detalhes = Detalhes(fornecedor_dados)
+    def funcionario(id_funcionario, nome, cargo):
         detalhes = Detalhes(page)
             
         fornecedor = ft.Container(
@@ -194,11 +185,10 @@ def AdminFornecedores(page: ft.Page):
             border=ft.border.all(
                 color=ft.colors.BLACK
             ),
-            # width=340,
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=lambda e: detalhes.detalhes_fornecedor(id_fornecedor),
+            on_click=lambda e: detalhes.detalhes_cliente(id_funcionario),
             
             content=ft.Row(
                 controls=[
@@ -208,14 +198,14 @@ def AdminFornecedores(page: ft.Page):
                         size=30
                         ),
                     ft.Text(
-                        value=id_fornecedor
+                        value=id_funcionario
                         ),
                     
                     ft.Text(
                         value=nome
                         ),
                     ft.Text(
-                        value=cnpj
+                        # value=cargo
                     )
                 ],
                 # scroll='auto',
@@ -227,11 +217,11 @@ def AdminFornecedores(page: ft.Page):
 
     def container():
         banco = GerenciamentoBanco()
-        fornecedores = banco.obter_fornecedores()
-        if fornecedores:
-            lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
+        funcionarios = banco.obter_funcionarios()
+        if funcionarios:
+            lista_funcionarios = [funcionario(id_funcionario, nome, cargo) for id_funcionario, nome, cargo in funcionarios]
         else:
-            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
+            lista_funcionarios = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
 
         cadastro = Cadastro(page)
         container = ft.Container(
@@ -250,7 +240,7 @@ def AdminFornecedores(page: ft.Page):
                         border_radius=12,
                         content=ft.Column(
                             controls=
-                            lista_fornecedores,
+                            lista_funcionarios,
                             spacing=6
                         )
                     ),
@@ -265,7 +255,7 @@ def AdminFornecedores(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: cadastro.abrir_dialog("fornecedor")
+                                    on_click=lambda e: cadastro.abrir_dialog("funcionario")
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

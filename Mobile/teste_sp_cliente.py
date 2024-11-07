@@ -1,6 +1,6 @@
 import pyodbc
 
-def cadastrar_cliente(nome, cnpj, email, rua, numero, bairro, cep, cidade, estado):
+def cadastrar_cliente(nome, nome_fantasia, cnpj, email, rua, numero, bairro, cep, cidade, estado):
     # Conectar ao banco de dados
     conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
                           'Server=BRUNO-NOTE\SQLEXPRESS;'
@@ -10,8 +10,8 @@ def cadastrar_cliente(nome, cnpj, email, rua, numero, bairro, cep, cidade, estad
 
     try:
         # Executar a stored procedure para cadastrar cliente
-        cursor.execute("{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?)}", 
-                       (nome, cnpj, email, rua, numero, bairro, cep, cidade, estado))
+        cursor.execute("{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", 
+                       (nome, nome_fantasia, cnpj, email, rua, numero, bairro, cep, cidade, estado))
 
         # Commitar as mudanças
         conn.commit()
@@ -33,6 +33,7 @@ def questionario_cliente():
     
     # Coletar informações do cliente
     nome = input("Digite o nome do cliente: ")
+    nome_fantasia = input("Digite o nome fantasia do cliente:")
     cnpj = input("Digite o CNPJ do cliente (apenas números): ")
     email = input("Digite o e-mail do cliente: ")
     rua = input("Digite a rua do cliente: ")
@@ -43,7 +44,7 @@ def questionario_cliente():
     estado = input("Digite o estado do cliente (sigla): ")
     
     # Chamar a função para cadastrar o cliente no banco de dados
-    cadastrar_cliente(nome, cnpj, email, rua, numero, bairro, cep, cidade, estado)
+    cadastrar_cliente(nome, nome_fantasia, cnpj, email, rua, numero, bairro, cep, cidade, estado)
 
 # Executar o questionário
 questionario_cliente()

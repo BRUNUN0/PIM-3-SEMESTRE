@@ -83,6 +83,7 @@ CREATE TABLE Historico_Cargo (
 CREATE TABLE Cliente (
     id_cliente INT IDENTITY(1,1) PRIMARY KEY,
     Nome NVARCHAR(100),
+    Nome_Fantasia NVARCHAR(100),
     CNPJ CHAR(14),
     Email NVARCHAR(100),
     Rua NVARCHAR(100),

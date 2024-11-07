@@ -48,26 +48,68 @@ class GerenciamentoBanco:
             cursor.execute(query)
             fornecedores = cursor.fetchall()
             conn.close()
-            print(fornecedores)
             return fornecedores
         except Exception as e:
             print(f"Erro ao obter fornecedores: {e}")
             return None
         
-    def obter_detalhes_fornecedores(self, id_fornecedor):
+    def obter_clientes(self):
         try:
-            # Obter os detalhes do fornecedor
             conn = self.conectar()
             cursor = conn.cursor()
-            query = f'''SELECT * from Fornecedor WHERE id_fornecedor = {id_fornecedor}'''
+            query = '''SELECT id_cliente, Nome, CNPJ FROM Cliente'''
             cursor.execute(query)
-            detalhes_fornecedor = cursor.fetchone()
+            clientes = cursor.fetchall()
             conn.close()
-            return detalhes_fornecedor
+            return clientes
         except Exception as e:
-            print(f"Erro ao obter detalhes do fornecedor: {e}")
+            print(f"Erro ao obter clientes: {e}")
+            return None
+
+    def obter_funcionarios(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT 
+                            f.id_funcionario AS id,
+                            f.nome AS nome,
+                            c.cargo AS cargo
+                    FROM 
+                        Funcionario f
+                    INNER JOIN Cargo c ON c.Cargo = c.Cargo'''
+            cursor.execute(query)
+            clientes = cursor.fetchall()
+            conn.close()
+            return clientes
+        except Exception as e:
+            print(f"Erro ao obter clientes: {e}")
             return None
         
+    def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''UPDATE Fornecedor SET Nome_Fantasia = ?, Email = ?, Telefone = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_fornecedor = ?'''
+            parametros = (
+            dados_atualizados["Nome Fantasia"],
+            dados_atualizados["Email"],
+            dados_atualizados["Telefone"],
+            dados_atualizados["Rua"],
+            dados_atualizados["Número"],
+            dados_atualizados["Bairro"],
+            dados_atualizados["CEP"],
+            dados_atualizados["Cidade"],
+            dados_atualizados["Estado"],
+            id_fornecedor  # Aqui é onde o ID do fornecedor é passado
+            )
+            cursor.execute(query, parametros)
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            print(f"Erro ao atualizar dados do fornecedor: {e}")
+            conn.close()
+            return str(e)
 
     def obter_detalhes_plantio(self):
         conn = self.conectar()
@@ -87,22 +129,23 @@ class GerenciamentoBanco:
         conn.close()
         return detalhes
 
-    def obter_clientes(self):
+    def obter_detalhes_fornecedores(self, id_fornecedor):
         try:
+            # Obter os detalhes do fornecedor
             conn = self.conectar()
             cursor = conn.cursor()
-            query = '''SELECT id_cliente, Nome, CNPJ FROM Cliente'''
+            query = f'''SELECT * from Fornecedor WHERE id_fornecedor = {id_fornecedor}'''
             cursor.execute(query)
-            clientes = cursor.fetchall()
+            detalhes_fornecedor = cursor.fetchone()
             conn.close()
-            return clientes
+            return detalhes_fornecedor
         except Exception as e:
-            print(f"Erro ao obter clientes: {e}")
+            print(f"Erro ao obter detalhes do fornecedor: {e}")
             return None
         
     def obter_detalhes_clientes(self, id_cliente):
         try:
-            # Obter os detalhes do fornecedor
+            # Obter os detalhes do cliente
             conn = self.conectar()
             cursor = conn.cursor()
             query = f'''SELECT * from Cliente WHERE id_cliente = {id_cliente}'''
@@ -112,6 +155,20 @@ class GerenciamentoBanco:
             return detalhes_cliente
         except Exception as e:
             print(f"Erro ao obter detalhes do cliente: {e}")
+            return None
+
+    def obter_detalhes_funcionario(self, id_funcionario):
+        try:
+            # Obter detalhes do funcionario
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT * FROM Funcionario'''
+            cursor.execute(query)
+            detalhes_funcionario = cursor.fetchone()
+            conn.close()
+            return detalhes_funcionario
+        except Exception as e:
+            print(f"Erro ao obter detalhes do funcionario: {e}")
             return None
 
     def cadastro(self, tipo_cadastro, dados):
@@ -161,12 +218,12 @@ class GerenciamentoBanco:
                 conn.close()
             return False
         
-        elif tipo_cadastro == 'compra':
+        elif tipo_cadastro == 'funcionario':
             try:
                 cursor.execute(
-                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
-                    )
+                    '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
+                )
                 conn.commit()
             except pyodbc.IntegrityError as e:
                 print("Erro de integridade:", e)
@@ -211,7 +268,8 @@ class Cadastro:
                 {"titulo": "Endereço", "campos": ["Rua", "Numero", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
             "funcionario": [
-                {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
+                {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
+                {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data_Inicio"]}
             ],
             "teste": [
                 {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
@@ -261,7 +319,6 @@ class Cadastro:
                 )
             )
         )
-        print(f'Tipo de self.page: {type(self.page)}')
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
@@ -319,11 +376,15 @@ class Detalhes:
         self.page = page
         self.dialog = None
         self.em_edicao = False
+        self.botoes = None
         self.campos = {}
+        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ"]
 
 
 
     def detalhes_fornecedor(self, id_fornecedor):
+        self.id_fornecedor_atual = id_fornecedor
+        self._alternar_modo_edicao(None, tipo_entidade="fornecedor")
         banco = GerenciamentoBanco()
         """
         Abre um AlertDialog configurado para exibir detalhes do fornecedor com o ID fornecido.
@@ -333,18 +394,17 @@ class Detalhes:
         detalhes = banco.obter_detalhes_fornecedores(id_fornecedor)
 
         if detalhes is None:
-            self.page.snack_bar = ft.SnackBar(ft.Text("Erro ao obter detalhes do fornecedor"), bgcolor=ft.colors.RED)
+            self.page.snack_bar = ft.SnackBar(ft.Text("Erro ao obter detalhes do fornecedor."), bgcolor=ft.colors.RED)
             self.page.snack_bar.open = True
             self.page.update()
             print("Erro ao obter os detalhes do fornecedor.")
             return
 
 
-        
         # Organizar os detalhes em um dicionário para exibição
         dados = {
             "ID": detalhes[0],
-            "Nome": detalhes[1],
+            "Nome/Razão Social": detalhes[1],
             "Nome Fantasia": detalhes[2],
             "CNPJ": detalhes[3],
             "Email": detalhes[4],
@@ -382,22 +442,21 @@ class Detalhes:
                 )
             )
 
-        botoes = ft.Row(
+        self.botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao),
-                ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="fornecedor"))
             ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            alignment=ft.MainAxisAlignment.START
         )
 
-        conteudo_dialog.append(botoes)
+        conteudo_dialog.append(self.botoes)
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
             modal=True,
             content=ft.Container(
                 width=550,
-                padding=ft.padding.only(left=15, right=15),
+                # padding=ft.padding.only(left=15, right=15),
                 content=ft.Column(
                     controls=conteudo_dialog,
                     alignment=ft.MainAxisAlignment.START,
@@ -411,21 +470,23 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
+
     def detalhes_cliente(self, id_cliente):
+        self.id_cliente = id_cliente
+        self._alternar_modo_edicao(None, tipo_entidade="cliente")
         banco = GerenciamentoBanco()
-        """
-        Abre um AlertDialog configurado para exibir detalhes do fornecedor com o ID fornecido.
-        :param id_fornecedor: ID do fornecedor para buscar detalhes.
-        """
+
         # Obter detalhes do fornecedor pelo ID
         detalhes = banco.obter_detalhes_clientes(id_cliente)
 
         if detalhes is None:
-            print("Erro ao obter os detalhes do cliente.")
+            self.page.snack_bar = ft.SnackBar(ft.Text("Erro ao obter detalhes do cliente."), bgcolor=ft.colors.RED)
+            self.page.snack_bar.open = True
+            self.page.update()
+            print("Erro ao obter detalhes do fornecedor.")
             return
 
 
-        
         # Organizar os detalhes em um dicionário para exibição
         dados = {
             "ID": detalhes[0],
@@ -465,15 +526,14 @@ class Detalhes:
                 )
             )
 
-        botoes = ft.Row(
+        self.botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao),
-                ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="cliente"))
             ],
-            alignment=ft.MainAxisAlignment.END
+            alignment=ft.MainAxisAlignment.START
         )
 
-        conteudo_dialog.append(botoes)
+        conteudo_dialog.append(self.botoes)
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
@@ -493,14 +553,70 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-    def _alternar_modo_edicao(self, e):
-        print("função editar ativando")
-        """Alterna o modo de edição dos campos."""
+
+    def _alternar_modo_edicao(self, e, tipo_entidade):
+        """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
         self.em_edicao = not self.em_edicao
-        for campo in self.campos.values():
-            campo.read_only = not self.em_edicao  # Alterna entre modo de edição e leitura
+
+        if not hasattr(self, 'botoes') or self.botoes is None:
+            self.botoes = ft.Row(
+                controls=[
+                    ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao)
+                    ],
+                alignment=ft.MainAxisAlignment.START
+                )
+
+        for titulo, campo in self.campos.items():
+            if titulo not in self.campos_nao_editaveis:
+                campo.read_only = not self.em_edicao  # Alterna entre modo de edição e leitura
+            else:
+                campo.read_only = True
+                campo.opacity = 0.5
             campo.update()
+
+        if self.em_edicao:
+            # Modo de edição acionado: mostra o botão "Salvar" com tipo de entidade específico
+            if tipo_entidade == "fornecedor":
+                self.botoes.controls = [
+                    ft.ElevatedButton("Salvar", on_click=lambda e: self.salvar_alteracoes(e, tipo_entidade=tipo_entidade))
+                    ]
+            elif tipo_entidade == "cliente":
+                self.botoes.controls = [
+                    ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
+                ]
+        else:
+            self.botoes.controls = []
         self.page.update()
+
+
+    def salvar_alteracoes(self, e, tipo_entidade):
+        dados_atualizados = {}
+        for titulo, campo in self.campos.items():
+            if not campo.read_only:
+                dados_atualizados[titulo] = campo.value
+
+        banco = GerenciamentoBanco()
+
+        if tipo_entidade == "fornecedor":
+            resultado = banco.atualizar_fornecedor(dados_atualizados, self.id_fornecedor_atual)
+        elif tipo_entidade == "cliente":
+            resultado = banco.atualizar_cliente(dados_atualizados, self.id_cliente_atual)
+        elif tipo_entidade == "funcionario":
+            resultado = banco.atualizar_funcionario(dados_atualizados, self.id_funcionario_atual)
+        else:
+            print("Tipo de entidade desconhecido")
+            return
+
+        if resultado is True:
+            snack_bar = ft.SnackBar(ft.Text(f"Alterações em {tipo_entidade} realizadas com sucesso!"), bgcolor=ft.colors.GREEN)
+        else:
+            snack_bar = ft.SnackBar(ft.Text(f"Erro ao salvar alterações em {tipo_entidade}!"), bgcolor=ft.colors.RED)
+
+        self.page.overlay.append(snack_bar)
+        snack_bar.open = True
+        self.dialog.open = False
+        self.page.update()
+
 
     def _fechar_dialog(self, e=None):
         # Fecha o diálogo sem salvar
