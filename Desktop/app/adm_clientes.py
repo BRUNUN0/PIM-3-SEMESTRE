@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco
+from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
 
@@ -173,16 +173,10 @@ def AdminClientes(page: ft.Page):
         
         return AppBar
     
-    def lista():
-        lista = ft.ListView(
-            expand=True,
-            controls=[ft.Text(f'Item {i}') for i in range (100)],
-            first_item_prototype=False
-        )
-        
-        return lista
     
     def cliente(id_cliente, nome, cnpj):
+        detalhes = Detalhes(page)
+
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
@@ -193,7 +187,7 @@ def AdminClientes(page: ft.Page):
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
             # on_click=lambda e: print(id_fornecedor),
-            on_click=lambda e: print('Teste botão'),
+            on_click=lambda e: detalhes.detalhes_cliente(id_cliente),
             
             content=ft.Row(
                 controls=[

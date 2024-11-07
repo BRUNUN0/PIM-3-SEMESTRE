@@ -105,7 +105,7 @@ class GerenciamentoBanco:
             # Obter os detalhes do fornecedor
             conn = self.conectar()
             cursor = conn.cursor()
-            query = f'''SELECT * from Fornecedor WHERE id_cliente = {id_cliente}'''
+            query = f'''SELECT * from Cliente WHERE id_cliente = {id_cliente}'''
             cursor.execute(query)
             detalhes_cliente = cursor.fetchone()
             conn.close()
@@ -318,6 +318,10 @@ class Detalhes:
         """
         self.page = page
         self.dialog = None
+        self.em_edicao = False
+        self.campos = {}
+
+
 
     def detalhes_fornecedor(self, id_fornecedor):
         banco = GerenciamentoBanco()
@@ -329,6 +333,9 @@ class Detalhes:
         detalhes = banco.obter_detalhes_fornecedores(id_fornecedor)
 
         if detalhes is None:
+            self.page.snack_bar = ft.SnackBar(ft.Text("Erro ao obter detalhes do fornecedor"), bgcolor=ft.colors.RED)
+            self.page.snack_bar.open = True
+            self.page.update()
             print("Erro ao obter os detalhes do fornecedor.")
             return
 
@@ -363,11 +370,13 @@ class Detalhes:
 
         # Adicionar os campos do dicionário `dados` ao diálogo
         for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), read_only=True)
+            self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
                     controls=[
                         ft.Text(f"{titulo}:", size=14, weight="bold"),
-                        ft.TextField(value=str(valor), read_only=True, width=350),
+                        campo
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                 )
@@ -375,9 +384,10 @@ class Detalhes:
 
         botoes = ft.Row(
             controls=[
+                ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao),
                 ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
             ],
-            alignment=ft.MainAxisAlignment.END
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )
 
         conteudo_dialog.append(botoes)
@@ -396,6 +406,7 @@ class Detalhes:
             )
         )
 
+        # Exibe o dialog
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
@@ -442,11 +453,13 @@ class Detalhes:
 
         # Adicionar os campos do dicionário `dados` ao diálogo
         for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), read_only=True)
+            self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
                     controls=[
                         ft.Text(f"{titulo}:", size=14, weight="bold"),
-                        ft.TextField(value=str(valor), read_only=True, width=350),
+                        campo
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                 )
@@ -454,6 +467,7 @@ class Detalhes:
 
         botoes = ft.Row(
             controls=[
+                ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao),
                 ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
             ],
             alignment=ft.MainAxisAlignment.END
@@ -479,7 +493,69 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
+    def _alternar_modo_edicao(self, e):
+        print("função editar ativando")
+        """Alterna o modo de edição dos campos."""
+        self.em_edicao = not self.em_edicao
+        for campo in self.campos.values():
+            campo.read_only = not self.em_edicao  # Alterna entre modo de edição e leitura
+            campo.update()
+        self.page.update()
+
     def _fechar_dialog(self, e=None):
         # Fecha o diálogo sem salvar
+        self.dialog.open = False
+        self.page.update()
+
+    
+
+
+
+class Confirmacao:
+    def __init__(self, page, mensagem, on_confirmar, on_cancelar=None):
+        """
+        Inicializa a classe ConfirmacaoDialog.
+        :param page: A página onde o diálogo será exibido.
+        :param mensagem: A mensagem a ser exibida no diálogo de confirmação.
+        :param on_confirmar: Função a ser chamada quando o usuário confirmar.
+        :param on_cancelar: Função a ser chamada quando o usuário cancelar (opcional).
+        """
+        self.page = page
+        self.mensagem = mensagem
+        self.on_confirmar = on_confirmar
+        self.on_cancelar = on_cancelar
+
+        # Criar o diálogo de confirmação
+        self.dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Confirmação", size=18, weight="bold"),
+            content=ft.Text(self.mensagem),
+            actions=[
+                ft.ElevatedButton("Sim", on_click=self._confirmar),
+                ft.ElevatedButton("Cancelar", on_click=self._cancelar)
+            ]
+        )
+
+    def exibir(self):
+        """Exibe o diálogo de confirmação."""
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def _confirmar(self, e):
+        """Executa a função de confirmação e fecha o diálogo."""
+        if self.on_confirmar:
+            self.on_confirmar()
+        self._fechar()
+
+    def _cancelar(self, e):
+        """Executa a função de cancelamento (se houver) e fecha o diálogo."""
+        if self.on_cancelar:
+            self.on_cancelar()
+        self._fechar()
+
+    def _fechar(self):
+        """Fecha o diálogo e atualiza a página."""
+        self.page.overlay.remove(self.dialog)
         self.dialog.open = False
         self.page.update()

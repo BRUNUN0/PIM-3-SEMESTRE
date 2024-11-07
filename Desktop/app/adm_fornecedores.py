@@ -183,7 +183,7 @@ def AdminFornecedores(page: ft.Page):
         return lista
     
     def fornecedor(id_fornecedor, nome, cnpj):
-        fornecedor_dados = {"ID": id_fornecedor, "Nome": nome, "CNPJ": cnpj}
+        # fornecedor_dados = {"ID": id_fornecedor, "Nome": nome, "CNPJ": cnpj}
         # detalhes = Detalhes(fornecedor_dados)
         detalhes = Detalhes(page)
             
