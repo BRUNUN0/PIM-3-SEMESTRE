@@ -1,8 +1,7 @@
-from operator import truediv
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro
+from app.components.classes import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
 
 
@@ -182,8 +181,54 @@ def AdminClientes(page: ft.Page):
         )
         
         return lista
+    
+    def cliente(id_cliente, nome, cnpj):
+        fornecedor = ft.Container(
+            bgcolor="#99C2A2",
+            border=ft.border.all(
+                color=ft.colors.BLACK
+            ),
+            # width=340,
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=12, right=12),
+            # on_click=lambda e: print(id_fornecedor),
+            on_click=lambda e: print('Teste botão'),
+            
+            content=ft.Row(
+                controls=[
+                    ft.Icon(
+                        name=ft.icons.FOREST,
+                        color=ft.colors.BLACK,
+                        size=30
+                        ),
+                    ft.Text(
+                        value=id_cliente
+                        ),
+                    
+                    ft.Text(
+                        value=nome
+                        ),
+                    ft.Text(
+                        value=cnpj
+                    )
+                ],
+                # scroll='auto',
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            )
+        )
+        
+        return fornecedor
 
     def container():
+        banco = GerenciamentoBanco()
+        clientes = banco.obter_clientes()
+        if clientes:
+            lista_clientes = [cliente(id_cliente, nome, cnpj) for id_cliente, nome, cnpj in clientes]
+        else:
+            lista_clientes = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum cliente encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
+
+
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
@@ -198,7 +243,12 @@ def AdminClientes(page: ft.Page):
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
-                        border_radius=12
+                        border_radius=12,
+                        content=ft.Column(
+                            controls=
+                            lista_clientes,
+                            spacing=6
+                        )
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),

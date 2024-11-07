@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco
+from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
 
@@ -183,6 +183,9 @@ def AdminFornecedores(page: ft.Page):
         return lista
     
     def fornecedor(id_fornecedor, nome, cnpj):
+        fornecedor_dados = {"ID": id_fornecedor, "Nome": nome, "CNPJ": cnpj}
+        # detalhes = Detalhes(fornecedor_dados)
+        detalhes = Detalhes(page)
             
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
@@ -193,6 +196,8 @@ def AdminFornecedores(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
+            # on_click=lambda e: print(id_fornecedor),
+            on_click=lambda e: detalhes.detalhes_fornecedor(id_fornecedor),
             
             content=ft.Row(
                 controls=[
@@ -222,9 +227,10 @@ def AdminFornecedores(page: ft.Page):
     def container():
         banco = GerenciamentoBanco()
         fornecedores = banco.obter_fornecedores()
-        if fornecedores is None:
-            print('Erro aqui')
-        lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
+        if fornecedores:
+            lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
+        else:
+            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
 
         cadastro = Cadastro(page)
         container = ft.Container(

@@ -1,5 +1,3 @@
-from operator import truediv
-from os import error
 import flet as ft
 import pyodbc
 
@@ -50,9 +48,40 @@ class GerenciamentoBanco:
             cursor.execute(query)
             fornecedores = cursor.fetchall()
             conn.close()
+            print(fornecedores)
             return fornecedores
         except Exception as e:
             print(f"Erro ao obter fornecedores: {e}")
+            return None
+        
+    def obter_detalhes_fornecedores(self, id_fornecedor):
+        try:
+            # Obter os detalhes do fornecedor
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = f'''SELECT * from Fornecedor WHERE id_fornecedor = {id_fornecedor}'''
+            cursor.execute(query)
+            detalhes_fornecedor = cursor.fetchone()
+            # Preenche o dicionário com os detalhes obtidos
+            # dados = {
+            #     'id_fornecedor': detalhes_fornecedor[0],
+            #     'Nome': detalhes_fornecedor[1],
+            #     'Nome_Fantasia': detalhes_fornecedor[2],
+            #     'CNPJ': detalhes_fornecedor[3],
+            #     'Email': detalhes_fornecedor[4],
+            #     'Telefone': detalhes_fornecedor[5],
+            #     'Rua': detalhes_fornecedor[6],
+            #     'Numero': detalhes_fornecedor[7],
+            #     'Bairro': detalhes_fornecedor[8],
+            #     'CEP': detalhes_fornecedor[9],
+            #     'Cidade': detalhes_fornecedor[10],
+            #     'Estado': detalhes_fornecedor[11]
+            # }
+            print(detalhes_fornecedor)
+            conn.close()
+            return detalhes_fornecedor
+        except Exception as e:
+            print(f"Erro ao obter detalhes do fornecedor: {e}")
             return None
         
 
@@ -73,6 +102,19 @@ class GerenciamentoBanco:
         detalhes = cursor.fetchall()
         conn.close()
         return detalhes
+
+    def obter_clientes(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT id_cliente, Nome, CNPJ FROM Cliente'''
+            cursor.execute(query)
+            clientes = cursor.fetchall()
+            conn.close()
+            return clientes
+        except Exception as e:
+            print(f"Erro ao obter clientes: {e}")
+            return None
 
     def cadastro(self, tipo_cadastro, dados):
         conn = self.conectar()
@@ -221,6 +263,7 @@ class Cadastro:
                 )
             )
         )
+        print(f'Tipo de self.page: {type(self.page)}')
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
@@ -265,4 +308,101 @@ class Cadastro:
         self.dialog.open = False
         self.page.update()
 
-    
+
+
+
+class Detalhes:
+    def __init__(self, page):
+        """
+        Inicializa a classe DetalhesDialog para exibir os detalhes de uma entidade.
+        :param page: A página onde o dialog será mostrado.
+        :param banco: Instância de GerenciamentoBanco para consultar os dados.
+        """
+        self.page = page
+        self.dialog = None
+
+    def detalhes_fornecedor(self, id_fornecedor):
+        banco = GerenciamentoBanco()
+        """
+        Abre um AlertDialog configurado para exibir detalhes do fornecedor com o ID fornecido.
+        :param id_fornecedor: ID do fornecedor para buscar detalhes.
+        """
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = banco.obter_detalhes_fornecedores(id_fornecedor)
+
+        if detalhes is None:
+            print("Erro ao obter os detalhes do fornecedor.")
+            return
+
+
+        
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "Nome Fantasia": detalhes[2],
+            "CNPJ": detalhes[3],
+            "Email": detalhes[4],
+            "Telefone": detalhes[5],
+            "Rua": detalhes[6],
+            "Número": detalhes[7],
+            "Bairro": detalhes[8],
+            "CEP": detalhes[9],
+            "Cidade": detalhes[10],
+            "Estado": detalhes[11]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do Fornecedor", size=18, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        ft.TextField(value=str(valor), read_only=True, width=350),
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Fechar", on_click=self._fechar_dialog)
+            ],
+            alignment=ft.MainAxisAlignment.END
+        )
+
+        conteudo_dialog.append(botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def _fechar_dialog(self, e=None):
+        # Fecha o diálogo sem salvar
+        self.dialog.open = False
+        self.page.update()
