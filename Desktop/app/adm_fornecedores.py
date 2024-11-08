@@ -66,8 +66,6 @@ def AdminFornecedores(page: ft.Page):
         
     def botoes():
         botoes = ft.Container(
-            # expand=True,
-            # height=100,
             bgcolor="#D9FFBA",
             
             content = ft.Column(
@@ -174,27 +172,14 @@ def AdminFornecedores(page: ft.Page):
         )
         
         return AppBar
-    
-    def lista():
-        lista = ft.ListView(
-            expand=True,
-            controls=[ft.Text(f'Item {i}') for i in range (100)],
-            first_item_prototype=False
-        )
-        
-        return lista
+
     
     def fornecedor(id_fornecedor, nome, cnpj):
-        # fornecedor_dados = {"ID": id_fornecedor, "Nome": nome, "CNPJ": cnpj}
-        # detalhes = Detalhes(fornecedor_dados)
         detalhes = Detalhes(page)
             
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
-            border=ft.border.all(
-                color=ft.colors.BLACK
-            ),
-            # width=340,
+            border=ft.border.all(color=ft.colors.BLACK),
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
@@ -208,7 +193,7 @@ def AdminFornecedores(page: ft.Page):
                         size=30
                         ),
                     ft.Text(
-                        value=id_fornecedor
+                        value=f"ID: {id_fornecedor}"
                         ),
                     
                     ft.Text(
@@ -216,9 +201,8 @@ def AdminFornecedores(page: ft.Page):
                         ),
                     ft.Text(
                         value=cnpj
-                    )
+                    ),
                 ],
-                # scroll='auto',
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
         )
@@ -236,7 +220,6 @@ def AdminFornecedores(page: ft.Page):
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
-            # height=150,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
@@ -244,15 +227,18 @@ def AdminFornecedores(page: ft.Page):
 
             content=ft.Column(
                 controls=[
+                    ft.Text(value="Fornecedores"),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
                         border_radius=12,
+                        padding=ft.padding.all(20),
                         content=ft.Column(
                             controls=
                             lista_fornecedores,
-                            spacing=6
-                        )
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        ),
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),
@@ -272,7 +258,9 @@ def AdminFornecedores(page: ft.Page):
                         )
 
                     )
-                ]
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
 
         )
@@ -292,7 +280,6 @@ def AdminFornecedores(page: ft.Page):
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER
                     ),
                 ],
-                # alignment=ft.MainAxisAlignment.CENTER,
             )
         )
 
@@ -301,7 +288,6 @@ def AdminFornecedores(page: ft.Page):
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
 
         content=ft.Column(
             controls=[

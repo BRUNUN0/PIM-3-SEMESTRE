@@ -224,25 +224,17 @@ CREATE PROCEDURE InserirCliente
     @Estado CHAR(2)
 AS
 BEGIN
-    -- Verificar se o CNPJ existe
-    IF NOT EXISTS (SELECT 1 FROM Fornecedor WHERE CNPJ = @CNPJ)
-    BEGIN
-        RAISERROR('Fornecedor com o CNPJ %s não existe.', 16, 1, @CNPJ);
-        RETURN; -- Saia da procedure se o CNPJ não existir
-    END
-    
     -- Verificar se o cliente já existe
-    IF NOT EXISTS (SELECT 1 FROM Cliente WHERE CNPJ = @CNPJ)
-    BEGIN
-        INSERT INTO Cliente (Nome, Nome_Fantasia,CNPJ, Email, Rua, Numero, Bairro, CEP, Cidade, Estado)
-        VALUES (@Nome, @Nome_Fantasia,@CNPJ, @Email, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
-    END
-    ELSE
+    IF EXISTS (SELECT 1 FROM Cliente WHERE CNPJ = @CNPJ)
     BEGIN
         RAISERROR('Cliente com o CNPJ %s já existe.', 16, 1, @CNPJ);
+        RETURN; -- Saia da procedure se o cliente já existir
     END
-END;
 
+    -- Inserir o cliente
+    INSERT INTO Cliente (Nome, Nome_Fantasia, CNPJ, Email, Rua, Numero, Bairro, CEP, Cidade, Estado)
+    VALUES (@Nome, @Nome_Fantasia, @CNPJ, @Email, @Rua, @Numero, @Bairro, @CEP, @Cidade, @Estado);
+END;
 
 
 

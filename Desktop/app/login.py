@@ -29,15 +29,11 @@ def Login(page: ft.Page):
                     expand=True,
                     bgcolor=ft.colors.BLUE,
                     content=ft.Image(
-                        # width=1280,
-                        # height=720,
-                        # width=page.window.width,
                         src='app/assets/bg.jpg',
                         fit=ft.ImageFit.COVER,
                         expand=True
                         )
                     ),
-                    # Provavelmente será removido
                     ft.Container(
                         bgcolor=ft.colors.with_opacity(0.2, ft.colors.BLACK)
                     )
@@ -50,11 +46,6 @@ def Login(page: ft.Page):
 
     def campos():
         campos = ft.Container(
-            # bgcolor='#7FA677',
-            # width=450,
-            # height=350,
-            # alignment=ft.alignment.center,
-            # border_radius=ft.border_radius.all(10),
             content=ft.Column(
                 controls=[
                     ft.TextField(
@@ -100,7 +91,7 @@ def Login(page: ft.Page):
             text="Entrar",
             width=100,
             height=40,
-            bgcolor=ft.colors.GREEN_900,
+            bgcolor="#13330D",
             color=ft.colors.WHITE,
             on_click=lambda e: login(e)
             )

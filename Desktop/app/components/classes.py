@@ -23,28 +23,31 @@ class GerenciamentoBanco:
         return pyodbc.connect(self.conn_str)
 
     def obter_plantas(self):
-        # Obtém os dados das plantas
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = '''SELECT Nome, URL FROM Materia_Prima'''
-        # query = '''
-        #     SELECT
-	    #         Producao.Nome,
-	    #         Materia_Prima.URL
-        #     FROM Producao
-        #     JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
-        #     '''
-        cursor.execute(query)
-        plantas = cursor.fetchall()
-        conn.close()
-        return plantas
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''
+                SELECT
+                    Producao.Nome,
+                    Materia_Prima.URL
+                FROM Producao
+                JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
+                '''
+            cursor.execute(query)
+            plantas = cursor.fetchall()
+            conn.close()
+            return plantas
+        except Exception as e:
+            print(f"Erro ao obter plantas: {e}")
+            conn.close()
+            return []
     
     def obter_fornecedores(self):
         try:
             # Obtém os dados dos fornecedores
             conn = self.conectar()
             cursor = conn.cursor()
-            query = '''SELECT id_fornecedor, Nome, CNPJ FROM Fornecedor'''
+            query = '''SELECT id_fornecedor, Nome_Fantasia, CNPJ FROM Fornecedor'''
             cursor.execute(query)
             fornecedores = cursor.fetchall()
             conn.close()
@@ -85,6 +88,26 @@ class GerenciamentoBanco:
             print(f"Erro ao obter clientes: {e}")
             return None
         
+    def obter_pedidos(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT
+	                        pe.id_pedido,
+	                        pd.Produto,
+	                        i.Quantidade
+                        FROM
+                            pedido pe
+                        INNER JOIN Produto pd ON pd.Produto = pd.Produto
+                        INNER JOIN Item_Pedido i ON i.Quantidade = i.Quantidade'''
+            cursor.execute(query)
+            pedidos = cursor.fetchall()
+            conn.close()
+            return pedidos
+        except Exception as e:
+            print(f"Erro ao obter pedidos: {e}")
+            return None
+
     def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
         try:
             conn = self.conectar()
@@ -108,6 +131,56 @@ class GerenciamentoBanco:
             return True
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor: {e}")
+            conn.close()
+            return str(e)
+
+    def atualizar_cliente(self, dados_atualizados, id_cliente):
+        print(dados_atualizados)
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''UPDATE Funcionario SET  Nome_Fantasia = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
+            parametros = (
+            dados_atualizados["Nome Fantasia"],
+            dados_atualizados["Email"],
+            dados_atualizados["Rua"],
+            dados_atualizados["Número"],
+            dados_atualizados["Bairro"],
+            dados_atualizados["CEP"],
+            dados_atualizados["Cidade"],
+            dados_atualizados["Estado"],
+            id_cliente  # Aqui é onde o ID do fornecedor é passado
+        )
+            cursor.execute(query, parametros)
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"Erro ao atualizar dados do fornecedor {e}")
+            conn.close()
+            return str(e)
+
+    def atualizar_funcionario(self, dados_atualizados, id_funcionario):
+        print(dados_atualizados)
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''UPDATE Funcionario SET  Nome = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
+            parametros = (
+            dados_atualizados["Nome"],
+            dados_atualizados["Sexo"],
+            dados_atualizados["Cargo"],
+            dados_atualizados["Senha"],
+            dados_atualizados["Nascimento"],
+            dados_atualizados["Email"],
+            dados_atualizados["Setor"],
+            dados_atualizados["Data_inicial"],
+            id_funcionario
+            )
+            cursor.execute(query, parametros)
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"Erro ao atualizar dados do fornecedor {e}")
             conn.close()
             return str(e)
 
@@ -162,7 +235,22 @@ class GerenciamentoBanco:
             # Obter detalhes do funcionario
             conn = self.conectar()
             cursor = conn.cursor()
-            query = '''SELECT * FROM Funcionario'''
+            query = f'''SELECT
+                            f.id_funcionario as id,
+                            f.nome as nome,
+                            f.CPF as cpf,
+                            f.Sexo as sexo,
+                            c.cargo as cargo,
+                            f.senha as senha,
+                            f.Nascimento as nascimento,
+                            f.Email as email,
+                            f.Setor as setor,
+                            hc.Data_Inicio as data_inicio
+                            FROM
+                        Funcionario f
+                        INNER JOIN Cargo c ON c.Cargo = c.Cargo
+                        INNER JOIN Historico_Cargo hc ON hc.Data_Inicio = hc.Data_Inicio
+                        WHERE id_funcionario = {id_funcionario}'''
             cursor.execute(query)
             detalhes_funcionario = cursor.fetchone()
             conn.close()
@@ -182,7 +270,7 @@ class GerenciamentoBanco:
                         )
                 conn.commit()
                 print("Fornecedor inserido com sucesso.")
-                return True
+                return True, None
             except pyodbc.IntegrityError as e:
                 error_message = str(e).split('(')[1].split(')')[0]
                 print("Erro de integridade:", error_message)
@@ -198,25 +286,30 @@ class GerenciamentoBanco:
             finally:
                 cursor.close()
                 conn.close()
-                return False
             
         elif tipo_cadastro == 'cliente':
             try:
                 cursor.execute(
-                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
+                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
                     )
                 conn.commit()
+                return True, None
             except pyodbc.IntegrityError as e:
-                print("Erro de integridade:", e)
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
             except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
                 print("Erro de programação:", e)
+                return False, error_message
             except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
                 print("Erro ao inserir fornecedor:", e)
+                return False, error_message
             finally:
                 cursor.close()
                 conn.close()
-            return False
         
         elif tipo_cadastro == 'funcionario':
             try:
@@ -225,16 +318,22 @@ class GerenciamentoBanco:
                     (dados['Nome'], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
                 )
                 conn.commit()
+                return True, None
             except pyodbc.IntegrityError as e:
-                print("Erro de integridade:", e)
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
             except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
                 print("Erro de programação:", e)
+                return False, error_message
             except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
                 print("Erro ao inserir fornecedor:", e)
+                return False, error_message
             finally:
                 cursor.close()
                 conn.close()
-            return False
                 
     
 
@@ -264,7 +363,7 @@ class Cadastro:
                 {"titulo": "Endereço", "campos": ["Rua", "Número", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
             "cliente": [
-                {"titulo": "Informações Básicas", "campos": ["Nome", "CNPJ", "Email"]},
+                {"titulo": "Informações Básicas", "campos": ["Nome", "Nome Fantasia", "CNPJ", "Email"]},
                 {"titulo": "Endereço", "campos": ["Rua", "Numero", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
             "funcionario": [
@@ -327,7 +426,7 @@ class Cadastro:
     def _salvar_dados(self, e):
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
-        print("Dados coletados:", self.dados_salvos)
+        # print("Dados coletados:", self.dados_salvos)
 
         # Fecha o diálogo
         self.dialog.open = False
@@ -342,6 +441,7 @@ class Cadastro:
         if sucesso:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),
+                bgcolor=ft.colors.GREEN,
                 duration=3000
             )
             self.page.overlay.append(snackbar)
@@ -352,11 +452,13 @@ class Cadastro:
             # Exibe um snackbar de erro
             snackbar = ft.SnackBar(
                 content=ft.Text(f"Ocorreu um erro ao salvar os dados: {error_message}"),
+                bgcolor=ft.colors.RED,
                 duration=3000
             )
             self.page.overlay.append(snackbar)
             snackbar.open = True
             self.page.update()
+            self.dados_salvos = None
 
     def _fechar_dialog(self, e):
         # Fecha o diálogo sem salvar
@@ -378,9 +480,7 @@ class Detalhes:
         self.em_edicao = False
         self.botoes = None
         self.campos = {}
-        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ"]
-
-
+        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF"]
 
     def detalhes_fornecedor(self, id_fornecedor):
         self.id_fornecedor_atual = id_fornecedor
@@ -470,9 +570,8 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-
     def detalhes_cliente(self, id_cliente):
-        self.id_cliente = id_cliente
+        self.id_cliente_atual = id_cliente
         self._alternar_modo_edicao(None, tipo_entidade="cliente")
         banco = GerenciamentoBanco()
 
@@ -480,10 +579,11 @@ class Detalhes:
         detalhes = banco.obter_detalhes_clientes(id_cliente)
 
         if detalhes is None:
-            self.page.snack_bar = ft.SnackBar(ft.Text("Erro ao obter detalhes do cliente."), bgcolor=ft.colors.RED)
-            self.page.snack_bar.open = True
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do cliente."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
             self.page.update()
-            print("Erro ao obter detalhes do fornecedor.")
+            print("Erro ao obter os detalhes do cliente.")
             return
 
 
@@ -553,7 +653,89 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
+    def detalhes_funcionario(self, id_funcionario):
+        self.id_funcionario_atual = id_funcionario
+        self._alternar_modo_edicao(None, tipo_entidade="funcionario")
+        banco = GerenciamentoBanco()
 
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = banco.obter_detalhes_funcionario(id_funcionario)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            # print("Erro ao obter os detalhes do funcionario.")
+            return
+
+
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CPF": detalhes[2],
+            "Sexo": detalhes[3],
+            "Cargo": detalhes[4],
+            "Senha": detalhes[5],
+            "Nascimento": detalhes[6],
+            "Email": detalhes[7],
+            "Setor": detalhes[8],
+            "Data inicial": detalhes[9]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do Funcionario", size=18, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), read_only=True)
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        self.botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
+            ],
+            alignment=ft.MainAxisAlignment.START
+        )
+
+        conteudo_dialog.append(self.botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+    
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
         self.em_edicao = not self.em_edicao
@@ -575,19 +757,16 @@ class Detalhes:
             campo.update()
 
         if self.em_edicao:
-            # Modo de edição acionado: mostra o botão "Salvar" com tipo de entidade específico
-            if tipo_entidade == "fornecedor":
-                self.botoes.controls = [
-                    ft.ElevatedButton("Salvar", on_click=lambda e: self.salvar_alteracoes(e, tipo_entidade=tipo_entidade))
-                    ]
-            elif tipo_entidade == "cliente":
-                self.botoes.controls = [
-                    ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
-                ]
+            # Quando em modo de edição, mostra o botão "Salvar"
+            self.botoes.controls = [
+                ft.ElevatedButton("Salvar", on_click=lambda e: self.salvar_alteracoes(e, tipo_entidade=tipo_entidade))
+            ]
         else:
-            self.botoes.controls = []
+            # Quando em modo de leitura, mostra o botão "Editar"
+            self.botoes.controls = [
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
+            ]
         self.page.update()
-
 
     def salvar_alteracoes(self, e, tipo_entidade):
         dados_atualizados = {}
@@ -616,7 +795,6 @@ class Detalhes:
         snack_bar.open = True
         self.dialog.open = False
         self.page.update()
-
 
     def _fechar_dialog(self, e=None):
         # Fecha o diálogo sem salvar

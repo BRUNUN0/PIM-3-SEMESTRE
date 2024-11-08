@@ -188,7 +188,7 @@ def AdminFuncionarios(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=lambda e: detalhes.detalhes_cliente(id_funcionario),
+            on_click=lambda e: detalhes.detalhes_funcionario(id_funcionario),
             
             content=ft.Row(
                 controls=[
@@ -205,7 +205,7 @@ def AdminFuncionarios(page: ft.Page):
                         value=nome
                         ),
                     ft.Text(
-                        # value=cargo
+                        value=cargo
                     )
                 ],
                 # scroll='auto',
@@ -221,12 +221,11 @@ def AdminFuncionarios(page: ft.Page):
         if funcionarios:
             lista_funcionarios = [funcionario(id_funcionario, nome, cargo) for id_funcionario, nome, cargo in funcionarios]
         else:
-            lista_funcionarios = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
+            lista_funcionarios = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum funcionario encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
 
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
-            # height=150,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
@@ -234,6 +233,7 @@ def AdminFuncionarios(page: ft.Page):
 
             content=ft.Column(
                 controls=[
+                    ft.Text(value="Funcionarios"),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
@@ -241,7 +241,9 @@ def AdminFuncionarios(page: ft.Page):
                         content=ft.Column(
                             controls=
                             lista_funcionarios,
-                            spacing=6
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+
                         )
                     ),
                     ft.Container(
@@ -291,7 +293,6 @@ def AdminFuncionarios(page: ft.Page):
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
 
         content=ft.Column(
             controls=[

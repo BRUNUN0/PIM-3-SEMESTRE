@@ -9,27 +9,6 @@ from app.components.classes import GerenciamentoBanco
 def AdminHome(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
-
-    def gerenciamento_banco():
-        def conectar():
-        # Função para conectar ao banco de dados SQL Server
-            conn = pyodbc.connect(
-                'Driver=ODBC Driver 17 for SQL Server;'
-                'Server=BRUNO-NOTE\SQLEXPRESS;'
-                'Database=teste;'
-                'Trusted_Connection=yes;'
-            )
-            return conn
-        
-        def obter_plantas():
-            conn = conectar()
-            cursor = conn.cursor()
-            cursor.execute('SELECT Nome, URL FROM Materia_Prima')
-            plantas = cursor.fetchall()
-            conn.close()
-            return plantas
-        
-        return obter_plantas()
         
     def relogio():
         relogio = ft.Container(
@@ -358,9 +337,13 @@ def AdminHome(page: ft.Page):
         return planta
     
     def pedidos ():
+        banco = GerenciamentoBanco()
+        plantas = banco.obter_plantas()
+        if plantas:
+            lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
+        else:
+            lista_plantas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado")], alignment=ft.MainAxisAlignment.CENTER))]
 
-        plantas = gerenciamento_banco()
-        lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
         grafico = ft.Container(
             width=350,
             height=500,
@@ -374,7 +357,7 @@ def AdminHome(page: ft.Page):
                         controls=
                         lista_plantas,
                         spacing=6,
-                        scroll='auto'
+                        scroll=ft.ScrollMode.AUTO
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER

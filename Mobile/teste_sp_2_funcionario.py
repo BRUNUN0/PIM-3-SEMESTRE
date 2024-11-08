@@ -5,7 +5,7 @@ def cadastrar_funcionario(nome, cpf, sexo, nome_cargo, descricao, salario, senha
     # Conectar ao banco de dados
     conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
                           'Server=BRUNO-NOTE\SQLEXPRESS;'
-                          'Database=teste;'
+                          'Database=PIXFARM;'
                           'Trusted_Connection=yes;')
     cursor = conn.cursor()
 

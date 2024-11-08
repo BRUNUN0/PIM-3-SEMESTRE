@@ -226,7 +226,6 @@ def AdminClientes(page: ft.Page):
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
-            # height=150,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
@@ -234,6 +233,7 @@ def AdminClientes(page: ft.Page):
 
             content=ft.Column(
                 controls=[
+                    ft.Text(value="Clientes"),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
@@ -241,7 +241,8 @@ def AdminClientes(page: ft.Page):
                         content=ft.Column(
                             controls=
                             lista_clientes,
-                            spacing=6
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
                         )
                     ),
                     ft.Container(
@@ -282,7 +283,6 @@ def AdminClientes(page: ft.Page):
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER
                     ),
                 ],
-                # alignment=ft.MainAxisAlignment.CENTER,
             )
         )
 

@@ -1,3 +1,7 @@
+from ctypes import alignment
+from enum import auto
+from operator import truediv
+from turtle import bgcolor
 import flet as ft
 from datetime import datetime
 import pyodbc
@@ -178,6 +182,7 @@ def Plantacao(page: ft.Page):
             bgcolor="#D9FFBA",
             width=page.window.width,
             height=175,
+            expand=True,
             
             content=ft.Column(
                 controls=[
@@ -196,60 +201,6 @@ def Plantacao(page: ft.Page):
         
         return AppBar
 
-    # def grafico_plantas():
-    #     dados = [
-    #         ("Dez", 100, ft.colors.YELLOW),
-    #         ("Nov", 90, ft.colors.GREEN),
-    #         ("Out", 85, ft.colors.GREEN),
-    #         ("Set", 75, ft.colors.GREEN),
-    #         ("Ago", 65, ft.colors.BLUE),
-    #         ("Jul", 55, ft.colors.BLUE),
-    #         ("Jun", 45, ft.colors.BLUE),
-    #         ("Mai", 35, ft.colors.BLUE),
-    #         ("Abr", 25, ft.colors.RED),
-    #         ("Mar", 20, ft.colors.RED),
-    #         ("Fev", 15, ft.colors.RED),
-    #         ("Jan", 10, ft.colors.RED)
-    #     ]
-
-    #     barras = ft.Column(
-    #         controls=[
-    #             ft.Row(
-    #                 controls=[
-    #                     ft.Text(label, width=50),
-    #                     ft.Container(
-    #                         width=valor * 2,
-    #                         height=20,
-    #                         bgcolor=cor,
-    #                     ),
-    #                     ft.Text(f"{valor}%", width=40)
-    #                 ],
-    #                 alignment=ft.MainAxisAlignment.START,
-    #                 spacing=10
-    #             )
-    #             for label, valor, cor, in dados
-    #         ],
-    #         spacing=5
-    #     )
-
-    #     grafico = ft.Container(
-    #         width=350,
-    #         height=500,
-    #         bgcolor='#D6D6D6',
-    #         border_radius=16,
-
-    #         content=ft.Column(
-    #             controls=[
-    #                 ft.Text(value='COLUMN', size=20, weight=ft.FontWeight.BOLD),
-    #                 ft.Container(
-    #                     barras
-    #                 )
-    #             ],
-    #             horizontal_alignment=ft.CrossAxisAlignment.CENTER
-    #         )
-    #     )
-    #     return grafico
-    
     def planta(nome, imagem):
 
         def on_click_container(e):
@@ -286,7 +237,6 @@ def Plantacao(page: ft.Page):
                         )
                     )
                 ],
-                # scroll='auto',
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
         )
@@ -308,18 +258,143 @@ def Plantacao(page: ft.Page):
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='COLUMN', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Estoque Materia Prima', size=20, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
                         lista_plantas,
                         spacing=6,
-                        scroll='auto'
+                        scroll=ft.ScrollMode.AUTO
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
         )
         return grafico
+
+    def produto():
+        produto = ft.Container(
+            bgcolor="#99C2A2"
+        )
+        return produto
+
+    def produtos():
+        lista_produto = [produto]
+        produtos = ft.Container(
+            width=350,
+            height=500,
+            bgcolor="#D6D6D6",
+            border_radius=16,
+
+            content=ft.Column(
+                controls=[
+                    ft.Text(value='Estoque Produtos', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Column(
+                    )
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+        )
+
+        return produtos
+
+    def grupo():
+        grupo = ft.Container(
+            expand=True,
+            padding=ft.padding.only(left=15, right=15),
+            bgcolor=ft.colors.RED,
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        controls=[
+                            ft.Container(
+                                # width=300,
+                                height=200,
+                                bgcolor=ft.colors.PINK,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor')
+                                    ]
+                                )
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        spacing=10,
+                        controls=[
+                            ft.Container(
+                                width=275,
+                                height=100,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor')
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            ),
+                            ft.Container(
+                                width=275,
+                                height=100,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor')
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        spacing=10,
+                        controls=[
+                            ft.Container(
+                                width=275,
+                                height=100,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor')
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            ),
+                            ft.Container(
+                                width=275,
+                                height=100,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor')
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        spacing=10,
+                        controls=[
+                            ft.ElevatedButton("Registrar Recebimento", height=50, bgcolor="#13330D", color=ft.colors.WHITE),
+                            ft.ElevatedButton("Iniciar Nova Produção", height=50, bgcolor="#13330D", color=ft.colors.WHITE),
+                            ft.ElevatedButton("Finalizar Produção", height=50, bgcolor="#13330D", color=ft.colors.WHITE)
+                        ]
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+        )
+        return grupo
 
     def conteudo():
         conteudo = ft.Container(
@@ -328,17 +403,11 @@ def Plantacao(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
-                            # grafico_plantas(),
-                            plantacao()
+                            plantacao(),
+                            produtos(),
+                            grupo()
                         ]
-                    ),
-                    # ft.Container(
-                    #     width=250,
-                    #     height=500,
-                    #     bgcolor='#D6D6D6',
-                    #     padding=ft.padding.only(left=10),
-                    #     border_radius=16
-                    # )
+                    )
                 ],
                 
             )

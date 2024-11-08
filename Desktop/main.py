@@ -10,7 +10,7 @@ def main(page: ft.Page):
     rotas(page)
     print(page.route)
 
-    page.go("/adm/fornecedores")
+    page.go("/plantacao")
     # page.on_resized = page.update()
     page.update()
 
