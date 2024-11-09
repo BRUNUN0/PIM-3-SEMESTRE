@@ -405,11 +405,9 @@ class GerenciamentoBanco:
                 conn.close()
 
         elif tipo_cadastro == 'materia_prima':
-            print(dados)
             try:
-                cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)''',
+                cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
-
                 )
                 conn.commit()
                 return True, None
@@ -480,6 +478,7 @@ class Cadastro:
             )
         ]
 
+        self.datepicker_control = None
 
         # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
         for grupo in grupos_campos:
@@ -488,24 +487,33 @@ class Cadastro:
 
             for campo in campos:
                 if campo == "Data":  # Verifica se o campo é "Data"
+                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
+
+                    def handle_focus(e, campo=campo):
+                        if not date_field_flag["is_open"]:
+                            date_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.DatePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_format_text='Data inválida',
+                                    field_hint_text='MM/DD/YYYY',
+                                    help_text='Selecione uma data no calendário',
+                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
+                                        self.page.update(),
+                                        setattr(date_field_flag, 'is_open', False)  # Reseta a flag após seleção
+                                    ),
+                                    on_dismiss=lambda e: setattr(date_field_flag, 'is_open', False)  # Reseta a flag após cancelamento
+                                )
+                            )
+
                     date_field = ft.TextField(
                         label=campo,
                         width=250,
                         read_only=True,  # Apenas exibição
-                        on_focus=lambda e, campo=campo: self.page.open(
-                            ft.DatePicker(
-                                cancel_text='Cancelar',
-                                confirm_text='Confirmar',
-                                error_format_text='Data inválida',
-                                field_hint_text='MM/DD/YYYY',
-                                help_text='Selecione uma data no calendário',
-                                date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
-                                on_change=lambda e: (
-                                    setattr(date_field, 'value', e.control.value.strftime('%Y-%m-%d')),
-                                    self.page.update()
-                                )
-                            )
-                        )
+                        on_focus=handle_focus
                     )
                     self.inputs[campo] = date_field
                 else:
@@ -518,6 +526,8 @@ class Cadastro:
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                 )
                 conteudo_dialog.append(linha)
+
+
 
 
         botoes = ft.Row(
