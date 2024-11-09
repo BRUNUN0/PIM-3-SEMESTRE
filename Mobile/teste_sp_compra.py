@@ -3,10 +3,15 @@ from datetime import datetime
 
 def registrar_compra(cnpj_fornecedor, data_compra, itens_compra):
     # Conectar ao banco de dados
-    conn = pyodbc.connect('Driver=ODBC Driver 17 for SQL Server;'
-                          'Server=BRUNO-NOTE\SQLEXPRESS;'
-                          'Database=teste;'
-                          'Trusted_Connection=yes;')
+    conn = pyodbc.connect(
+                    'Driver=ODBC Driver 17 for SQL Server;'
+            'Server=BRUNUN;'
+            'Database=PIXFARM;'
+            'Trusted_Connection=yes;')
+                        # 'Driver=ODBC Driver 17 for SQL Server;'
+                        #   'Server=BRUNO-NOTE\SQLEXPRESS;'
+                        #   'Database=teste;'
+                        #   'Trusted_Connection=yes;')
     cursor = conn.cursor()
 
     try:

@@ -254,7 +254,7 @@ def Home(page: ft.Page):
     def em_producao ():
 
         banco = GerenciamentoBanco()
-        producoes = banco.obter_plantas()
+        producoes = banco.obter_producao()
         if producoes:
             lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
         else:

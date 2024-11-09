@@ -29,23 +29,23 @@ class GerenciamentoBanco:
         # Conecta ao banco de dados
         return pyodbc.connect(self.conn_str)
 
-    def obter_plantas(self):
+    def obter_producao(self):
         try:
             conn = self.conectar()
             cursor = conn.cursor()
-            query = '''
-                SELECT
-                    Producao.Nome,
-                    Materia_Prima.URL
-                FROM Producao
-                JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
-                '''
+            query = '''SELECT
+                        p.id_plantio,
+                        p.Nome,
+                        p.Quantidade,
+                        mp.URL
+                    FROM Producao p
+                    INNER JOIN Materia_Prima mp ON mp.URL = mp.id_materia'''
             cursor.execute(query)
-            plantas = cursor.fetchall()
+            producao = cursor.fetchall()
             conn.close()
-            return plantas
+            return producao
         except Exception as e:
-            print(f"Erro ao obter plantas: {e}")
+            print(f"Erro ao obter producao: {e}")
             conn.close()
             return []
     
@@ -321,6 +321,7 @@ class GerenciamentoBanco:
                     WHERE id_materia = {id_materia}'''
             cursor.execute(query)
             detalhes_materia_prima = cursor.fetchone()
+            print(detalhes_materia_prima)
             conn.close()
             return detalhes_materia_prima()
         except Exception as e:
@@ -431,6 +432,7 @@ class GerenciamentoBanco:
 
 
 
+
 class Cadastro:
     def __init__(self, page):
         """
@@ -463,6 +465,12 @@ class Cadastro:
             ],
             "materia_prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
+            ],
+            "iniciar producao": [
+                {"titulo": "Iniciar Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
+            ],
+            "finalizar producao": [
+                {"titulo": "Finalizar Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
             ]
         }
 
@@ -486,7 +494,7 @@ class Cadastro:
             campos = grupo["campos"]
 
             for campo in campos:
-                if campo == "Data":  # Verifica se o campo é "Data"
+                if campo in ("Data", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
                     date_field_flag = {"is_open": False}  # Flag para controlar a abertura
 
                     def handle_focus(e, campo=campo):
@@ -807,15 +815,11 @@ class Detalhes:
         # Organizar os detalhes em um dicionário para exibição
         dados = {
             "ID": detalhes[0],
-            "Nome": detalhes[1],
-            "CPF": detalhes[2],
-            "Sexo": detalhes[3],
-            "Cargo": detalhes[4],
-            "Senha": detalhes[5],
-            "Nascimento": detalhes[6],
-            "Email": detalhes[7],
-            "Setor": detalhes[8],
-            "Data inicial": detalhes[9]
+            "Fornecedor": detalhes[1],
+            "CNPJ Fornecedor": detalhes[2],
+            "Nome Materia Prima": detalhes[3],
+            "Quantidade": detalhes[4],
+            "Data da Compra": detalhes[5],
         }
 
         # Conteúdo do diálogo
@@ -843,14 +847,6 @@ class Detalhes:
                 )
             )
 
-        self.botoes = ft.Row(
-            controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
-            ],
-            alignment=ft.MainAxisAlignment.START
-        )
-
-        conteudo_dialog.append(self.botoes)
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
@@ -955,85 +951,85 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-    def detalhes_materia_prima(self, id_materia):
-        self.id_materia_atual = id_materia
-        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
-        banco = GerenciamentoBanco()
+    # def detalhes_materia_prima(self, id_materia):
+    #     self.id_materia_atual = id_materia
+    #     self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
+    #     banco = GerenciamentoBanco()
 
-        # Obter detalhes do fornecedor pelo ID
-        detalhes = banco.obter_detalhes_materia_prima(id_materia)
+    #     # Obter detalhes do fornecedor pelo ID
+    #     detalhes = banco.obter_detalhes_materia_prima(id_materia)
 
-        if detalhes is None:
-            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
-            self.page.overlay.append(snackbar)
-            snackbar.open = True
-            self.page.update()
-            return
+    #     if detalhes is None:
+    #         snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
+    #         self.page.overlay.append(snackbar)
+    #         snackbar.open = True
+    #         self.page.update()
+    #         return
 
 
-        # Organizar os detalhes em um dicionário para exibição
-        dados = {
-            "ID da Compra": detalhes[0],
-            "Nome Fornecedor": detalhes[1],
-            "CNPJ": detalhes[2],
-            "Data compra": detalhes[3],
-            "Materia Prima": detalhes[4],
-            "Quantidade": detalhes[5],
-            "URL": detalhes[6]
-        }
+    #     # Organizar os detalhes em um dicionário para exibição
+    #     dados = {
+    #         "ID da Compra": detalhes[0],
+    #         "Nome Fornecedor": detalhes[1],
+    #         "CNPJ": detalhes[2],
+    #         "Data compra": detalhes[3],
+    #         "Materia Prima": detalhes[4],
+    #         "Quantidade": detalhes[5],
+    #         "URL": detalhes[6]
+    #     }
 
-        # Conteúdo do diálogo
-        conteudo_dialog = [
-            ft.Row(
-                controls=[
-                    ft.Text(f"Detalhes da Materia Prima", size=18, color=ft.colors.BLACK, weight="bold"),
-                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
-                ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-            )
-        ]
+    #     # Conteúdo do diálogo
+    #     conteudo_dialog = [
+    #         ft.Row(
+    #             controls=[
+    #                 ft.Text(f"Detalhes da Materia Prima", size=18, color=ft.colors.BLACK, weight="bold"),
+    #                 ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+    #             ],
+    #             alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+    #         )
+    #     ]
 
-        # Adicionar os campos do dicionário `dados` ao diálogo
-        for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
-            self.campos[titulo] = campo
-            conteudo_dialog.append(
-                ft.Row(
-                    controls=[
-                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
-                        campo
-                    ],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                )
-            )
+    #     # Adicionar os campos do dicionário `dados` ao diálogo
+    #     for titulo, valor in dados.items():
+    #         campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+    #         self.campos[titulo] = campo
+    #         conteudo_dialog.append(
+    #             ft.Row(
+    #                 controls=[
+    #                     ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+    #                     campo
+    #                 ],
+    #                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+    #             )
+    #         )
 
-        self.botoes = ft.Row(
-            controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="materia_prima"))
-            ],
-            alignment=ft.MainAxisAlignment.START
-        )
+    #     self.botoes = ft.Row(
+    #         controls=[
+    #             ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="materia_prima"))
+    #         ],
+    #         alignment=ft.MainAxisAlignment.START
+    #     )
 
-        conteudo_dialog.append(self.botoes)
+    #     conteudo_dialog.append(self.botoes)
 
-        # Configurar o diálogo com o conteúdo
-        self.dialog = ft.AlertDialog(
-            bgcolor=ft.colors.WHITE,
-            modal=True,
-            content=ft.Container(
-                width=550,
-                padding=ft.padding.only(left=15, right=15),
-                content=ft.Column(
-                    controls=conteudo_dialog,
-                    alignment=ft.MainAxisAlignment.START,
-                    scroll=ft.ScrollMode.AUTO
-                )
-            )
-        )
+    #     # Configurar o diálogo com o conteúdo
+    #     self.dialog = ft.AlertDialog(
+    #         bgcolor=ft.colors.WHITE,
+    #         modal=True,
+    #         content=ft.Container(
+    #             width=550,
+    #             padding=ft.padding.only(left=15, right=15),
+    #             content=ft.Column(
+    #                 controls=conteudo_dialog,
+    #                 alignment=ft.MainAxisAlignment.START,
+    #                 scroll=ft.ScrollMode.AUTO
+    #             )
+    #         )
+    #     )
 
-        self.page.overlay.append(self.dialog)
-        self.dialog.open = True
-        self.page.update()
+    #     self.page.overlay.append(self.dialog)
+    #     self.dialog.open = True
+    #     self.page.update()
 
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
