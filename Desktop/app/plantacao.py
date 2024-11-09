@@ -453,9 +453,9 @@ def Plantacao(page: ft.Page):
                         height=50,
                         spacing=10,
                         controls=[
-                            ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_dialog("materia_prima")),
-                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_dialog("iniciar producao")),
-                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_dialog("finalizar producao")),
+                            ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("materia prima")),
+                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
+                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
                         ],
                     )
                 ],
