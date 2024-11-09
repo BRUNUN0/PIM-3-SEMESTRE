@@ -216,7 +216,7 @@ def AdminFornecedores(page: ft.Page):
         if fornecedores:
             lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
         else:
-            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
+            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
         cadastro = Cadastro(page)
         container = ft.Container(

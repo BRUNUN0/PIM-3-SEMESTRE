@@ -1,3 +1,4 @@
+from sqlite3 import Cursor
 import flet as ft
 import pyodbc
 
@@ -112,6 +113,42 @@ class GerenciamentoBanco:
             return pedidos
         except Exception as e:
             print(f"Erro ao obter pedidos: {e}")
+            return None
+
+    def obter_materia_prima(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT
+                        mp.id_materia,
+                        mp.Nome,
+                        mp.Quantidade,
+                        mp.URL
+                    FROM Materia_Prima mp'''
+            cursor.execute(query)
+            materias_primas = cursor.fetchall()
+            conn.close()
+            return materias_primas
+        except Exception as e:
+            print(f"Erro ao obter materias primas: {e}")
+            return None
+
+    def obter_produtos(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT
+                        p.id_produto,
+                        p.Produto,
+                        p.Quantidade,
+                        p.Data_Validade
+                    FROM Produto p'''
+            cursor.execute(query)
+            produtos = cursor.fetchall()
+            conn.close
+            return produtos
+        except Exception as e:
+            print(f"Erro ao obter produtos: {e}")
             return None
 
     def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
@@ -266,9 +303,30 @@ class GerenciamentoBanco:
             return None
 
     def obter_detalhes_materia_prima(self, id_materia):
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = ''' '''
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = f'''SELECT
+                        c.id_compra as id,
+                        f.Nome_Fantasia as fornecedor,
+                        f.CNPJ as cnpj,
+                        mp.Nome as nome,
+                        mp.Quantidade as quantidade,
+                        c.Data_compra as data_compra,
+                        mp.URL as url
+                    FROM
+                        Materia_Prima mp
+                    INNER JOIN Compra c ON c.id_compra = c.id_compra
+                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
+                    WHERE id_materia = {id_materia}'''
+            cursor.execute(query)
+            detalhes_materia_prima = cursor.fetchone()
+            conn.close()
+            return detalhes_materia_prima()
+        except Exception as e:
+            print(f"Erro ao obter detalhes da materia prima: {e}")
+            return None
+
 
     def cadastro(self, tipo_cadastro, dados):
         conn = self.conectar()
@@ -349,7 +407,7 @@ class GerenciamentoBanco:
         elif tipo_cadastro == 'materia_prima':
             print(dados)
             try:
-                cursor.execute('''CALL RegistrarCompra (?, ?, ?, ?, ?)''',
+                cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
 
                 )
@@ -370,10 +428,9 @@ class GerenciamentoBanco:
             finally:
                 cursor.close()
                 conn.close()
-                
-    
 
-        
+
+
 
 
 class Cadastro:
@@ -423,10 +480,38 @@ class Cadastro:
             )
         ]
 
+
+        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
         for grupo in grupos_campos:
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
             campos = grupo["campos"]
-            self.inputs.update({campo: ft.TextField(label=campo, width=250) for campo in campos})
+
+            for campo in campos:
+                if campo == "Data":  # Verifica se o campo é "Data"
+                    date_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,  # Apenas exibição
+                        on_focus=lambda e, campo=campo: self.page.open(
+                            ft.DatePicker(
+                                cancel_text='Cancelar',
+                                confirm_text='Confirmar',
+                                error_format_text='Data inválida',
+                                field_hint_text='MM/DD/YYYY',
+                                help_text='Selecione uma data no calendário',
+                                date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
+                                on_change=lambda e: (
+                                    setattr(date_field, 'value', e.control.value.strftime('%Y-%m-%d')),
+                                    self.page.update()
+                                )
+                            )
+                        )
+                    )
+                    self.inputs[campo] = date_field
+                else:
+                    # Cria campos normais
+                    self.inputs[campo] = ft.TextField(label=campo, width=250)
+
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
                     controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
@@ -434,9 +519,10 @@ class Cadastro:
                 )
                 conteudo_dialog.append(linha)
 
+
         botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Salvar", on_click=self._salvar_dados)
+                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
             ],
             alignment=ft.MainAxisAlignment.END
         )
@@ -781,7 +867,7 @@ class Detalhes:
         banco = GerenciamentoBanco()
 
         # Obter detalhes do fornecedor pelo ID
-        detalhes = banco.obter_detalhes_materia_prima(id_funcionario)
+        detalhes = banco.obter_detalhes_funcionario(id_funcionario)
 
         if detalhes is None:
             snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
@@ -834,6 +920,86 @@ class Detalhes:
         self.botoes = ft.Row(
             controls=[
                 ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
+            ],
+            alignment=ft.MainAxisAlignment.START
+        )
+
+        conteudo_dialog.append(self.botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def detalhes_materia_prima(self, id_materia):
+        self.id_materia_atual = id_materia
+        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
+        banco = GerenciamentoBanco()
+
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = banco.obter_detalhes_materia_prima(id_materia)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+
+
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID da Compra": detalhes[0],
+            "Nome Fornecedor": detalhes[1],
+            "CNPJ": detalhes[2],
+            "Data compra": detalhes[3],
+            "Materia Prima": detalhes[4],
+            "Quantidade": detalhes[5],
+            "URL": detalhes[6]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes da Materia Prima", size=18, color=ft.colors.BLACK, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        self.botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="materia_prima"))
             ],
             alignment=ft.MainAxisAlignment.START
         )
