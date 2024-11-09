@@ -23,7 +23,12 @@ class GerenciamentoBanco:
             'Database=PIXFARM;'
             'Trusted_Connection=yes;'
         )
-
+        #self.conn_str = (
+        #    'Driver=ODBC Driver 17 for SQL Server;'
+        #    'Server=DESKTOP-I3SMJCV\SQLEXPRESS;'
+        #    'Database=PIXFARM;'
+        #    'Trusted_Connection=yes;'
+        #)
     def conectar(self):
         # Conecta ao banco de dados
         return pyodbc.connect(self.conn_str)

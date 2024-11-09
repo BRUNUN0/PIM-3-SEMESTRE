@@ -101,6 +101,8 @@ def AdminClientes(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
+                                width=50,
+                                height=50,
                                 icon=ft.icons.PERSON,
                                 icon_size=32,
                                 on_click=lambda e: page.go('/adm/funcionarios'),
@@ -122,6 +124,8 @@ def AdminClientes(page: ft.Page):
                     content=ft.Column(
                         controls=[
                             ft.IconButton(
+                                width=50,
+                                height=50,
                                 icon=ft.icons.CONTENT_PASTE_SEARCH,
                                 icon_size=32,
                                 on_click=lambda e: page.go('/adm/fornecedores'),
