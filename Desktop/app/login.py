@@ -5,7 +5,7 @@ def Login(page: ft.Page):
     def login(e):
         print("Login Solicitado")
         page.go('/')
-
+# Enviado usuario para a pagina "/" (bruno nao sei o que seria "/")
     def logo():
         logo = ft.Container(
             bgcolor='#7FA677',
@@ -20,6 +20,8 @@ def Login(page: ft.Page):
             # alignment=ft.alignment.center,
         )
         return logo
+# colocando logo na pagina
+
 
     def background():
         background = ft.Stack(
@@ -42,7 +44,8 @@ def Login(page: ft.Page):
             )
 
         return background
-    
+
+ # Definindo background   
 
     def campos():
         campos = ft.Container(
@@ -52,7 +55,7 @@ def Login(page: ft.Page):
                         label='ID',
                         width=350,
                         height=50,
-                        border_radius=ft.border_radius.all(8),
+                        border_radius=ft.border_radius.all(8),               # Botão ID
                         color=ft.colors.BLACK,
                         text_style=ft.TextStyle(size=16),
                         label_style=ft.TextStyle(
@@ -65,7 +68,7 @@ def Login(page: ft.Page):
                         width=350,
                         height=50,
                         password=True,
-                        border_radius=ft.border_radius.all(8),
+                        border_radius=ft.border_radius.all(8),              #Botão senha
                         color=ft.colors.BLACK,
                         text_style=ft.TextStyle(size=16),
                         label_style=ft.TextStyle(
@@ -86,12 +89,12 @@ def Login(page: ft.Page):
         return campos
     
     def btn_login():
-        # Botão Entrar
+
         btn = ft.ElevatedButton(
             text="Entrar",
             width=100,
             height=40,
-            bgcolor="#13330D",
+            bgcolor="#13330D",                     # Botão Entrar
             color=ft.colors.WHITE,
             on_click=lambda e: login(e)
             )
@@ -115,7 +118,7 @@ def Login(page: ft.Page):
                             ft.Container(
                                 logo(),
                                 
-                                padding=ft.padding.only(top=-60),
+                                padding=ft.padding.only(top=-60),                            #botão de login
                             ),
                             ft.Container(
                                 campos(),
@@ -146,7 +149,7 @@ def Login(page: ft.Page):
                                 background(),
                                 expand=True
                             ),
-                            ft.Container(
+                            ft.Container(                                 # Não sei oq seria isso aqui nao
                                 caixa_login(),
                                 alignment=ft.alignment.center
                             ),
