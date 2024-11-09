@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.dialogs import DialogoSaida
+from app.components.classes import GerenciamentoBanco
 
 
 def Pedidos(page: ft.Page):
@@ -29,7 +29,7 @@ def Pedidos(page: ft.Page):
         return logo
         
     def appbar_superior():
-        dialogo_saida = DialogoSaida(page)
+        # dialogo_saida = DialogoSaida(page)
         
         app_sup = ft.Container(
             content=ft.Row(
@@ -51,7 +51,7 @@ def Pedidos(page: ft.Page):
                             ft.PopupMenuItem(
                                 icon=ft.icons.LOGOUT,
                                 text='Sair',
-                                on_click=lambda e: dialogo_saida.abrir()
+                                # on_click=lambda e: dialogo_saida.abrir()
                             )
                         ]
                     )
@@ -174,6 +174,7 @@ def Pedidos(page: ft.Page):
             bgcolor="#D9FFBA",
             width=page.window.width,
             height=175,
+            expand=True,
             
             content=ft.Column(
                 controls=[
@@ -192,19 +193,8 @@ def Pedidos(page: ft.Page):
         
         return AppBar
     
-    def lista():
-        lista = ft.ListView(
-            expand=True,
-            controls=[ft.Text(f'Item {i}') for i in range (100)],
-            first_item_prototype=False
-        )
-        
-        return lista
-
-    def container():
+    def pedidos_ativos():
         container = ft.Container(
-            width=page.window.width,
-            # height=150,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
@@ -212,6 +202,7 @@ def Pedidos(page: ft.Page):
 
             content=ft.Column(
                 controls=[
+                    ft.Text(value='Pedidos Ativos', color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
@@ -223,24 +214,53 @@ def Pedidos(page: ft.Page):
                         content=ft.Row(
                             controls=[
                                 ft.ElevatedButton(
-                                    text='Cadastrar',
+                                    text='Finalizar Pedido',
                                     color=ft.colors.WHITE,
-                                    width=120,
                                     height=40,
-                                    bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: print('Cadastrar Clicado')
+                                    bgcolor="#13330D"
+                                ),
+                                ft.ElevatedButton(
+                                    text='Registrar Pedido',
+                                    color=ft.colors.WHITE,
+                                    # width=120,
+                                    height=40,
+                                    bgcolor="#13330D",
+                                    on_click=lambda e: print('Registrar Clicado')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END
                         )
 
-                    )
-                ]
+                    ),
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
 
         )
 
         return container
+    
+    def pedidos_finalizados():
+        pedidos_finalizados = ft.Container(
+            bgcolor='#D9D9D9',
+            padding=ft.padding.only(left=15, right=15, top=15, bottom=15),
+            border_radius=20,
+            expand=True,
+
+            content=ft.Column(
+                controls=[
+                    ft.Text(value='Pedidos Finalizados', color=ft.colors.BLACK,size=20, weight=ft.FontWeight.BOLD),
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.WHITE,
+                        border_radius=12
+                    )
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+        )
+        return pedidos_finalizados
+    
             
     def conteudo():
         conteudo = ft.Container(
@@ -248,11 +268,11 @@ def Pedidos(page: ft.Page):
             expand=True,
             content=ft.ResponsiveRow(
                 controls=[
-                    ft.Column(
+                    ft.Row(
                         controls=[
-                            container()
+                            pedidos_ativos(),
+                            pedidos_finalizados()
                         ],
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER
                     ),
                 ],
                 # alignment=ft.MainAxisAlignment.CENTER,
@@ -262,9 +282,10 @@ def Pedidos(page: ft.Page):
         return conteudo
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
-        padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
+        padding=ft.padding.only(bottom=10),
+
 
         content=ft.Column(
             controls=[

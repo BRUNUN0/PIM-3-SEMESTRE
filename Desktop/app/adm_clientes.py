@@ -289,9 +289,9 @@ def AdminClientes(page: ft.Page):
         return conteudo
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
 
         content=ft.Column(
             controls=[

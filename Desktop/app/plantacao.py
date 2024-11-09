@@ -5,8 +5,8 @@ from turtle import bgcolor
 import flet as ft
 from datetime import datetime
 import pyodbc
-from app.components.dialogs import DialogoSaida, Detalhes
-from app.components.classes import GerenciamentoBanco
+from app.components.dialogs import DialogoSaida
+from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
 
 
 def Plantacao(page: ft.Page):
@@ -250,15 +250,15 @@ def Plantacao(page: ft.Page):
 
         lista_plantas = [planta(nome, imagem) for nome, imagem in plantas_data]
 
-        grafico = ft.Container(
-            width=350,
-            height=500,
+        estoque_mater_prima = ft.Container(
+            width= 350,
             bgcolor='#D6D6D6',
             border_radius=16,
+            padding=ft.padding.only(bottom=15),
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Estoque Materia Prima', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Estoque Materia Prima', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
                         lista_plantas,
@@ -269,7 +269,7 @@ def Plantacao(page: ft.Page):
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
         )
-        return grafico
+        return estoque_mater_prima
 
     def produto():
         produto = ft.Container(
@@ -281,13 +281,14 @@ def Plantacao(page: ft.Page):
         lista_produto = [produto]
         produtos = ft.Container(
             width=350,
-            height=500,
             bgcolor="#D6D6D6",
             border_radius=16,
+            padding=ft.padding.only(bottom=15),
+
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Estoque Produtos', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                     )
                 ],
@@ -298,50 +299,54 @@ def Plantacao(page: ft.Page):
         return produtos
 
     def grupo():
+        cadastro = Cadastro(page)
+        itens_plantados = []
         grupo = ft.Container(
             expand=True,
-            padding=ft.padding.only(left=15, right=15),
-            bgcolor=ft.colors.RED,
+            padding=ft.padding.only(left=15, right=15, bottom=15),
             content=ft.Column(
                 controls=[
-                    ft.Row(
-                        controls=[
-                            ft.Container(
-                                # width=300,
-                                height=200,
-                                bgcolor=ft.colors.PINK,
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(value='Valor')
-                                    ]
+                    ft.Container(
+                        expand=True,
+                        width=750,
+                        bgcolor="#D6D6D6",
+                        border_radius=16,
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='Itens Plantados', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                                ft.Column(
+                                    controls=
+                                    itens_plantados,
+                                    spacing=6,
+                                    scroll=ft.ScrollMode.AUTO
                                 )
-                            )
-                        ]
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                        )
                     ),
                     ft.Row(
+                        height=100,
                         spacing=10,
                         controls=[
                             ft.Container(
-                                width=275,
-                                height=100,
+                                expand=True,
                                 bgcolor="#D9FFBA",
                                 border_radius=16,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text(value='Valor')
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                                 )
                             ),
                             ft.Container(
-                                width=275,
-                                height=100,
+                                expand=True,
                                 bgcolor="#D9FFBA",
                                 border_radius=16,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text(value='Valor')
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -350,29 +355,28 @@ def Plantacao(page: ft.Page):
                         ]
                     ),
                     ft.Row(
+                        height=100,
                         spacing=10,
                         controls=[
                             ft.Container(
-                                width=275,
-                                height=100,
+                                expand=True,
                                 bgcolor="#D9FFBA",
                                 border_radius=16,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text(value='Valor')
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                                 )
                             ),
                             ft.Container(
-                                width=275,
-                                height=100,
+                                expand=True,
                                 bgcolor="#D9FFBA",
                                 border_radius=16,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text(value='Valor')
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -381,12 +385,13 @@ def Plantacao(page: ft.Page):
                         ]
                     ),
                     ft.Row(
+                        height=50,
                         spacing=10,
                         controls=[
-                            ft.ElevatedButton("Registrar Recebimento", height=50, bgcolor="#13330D", color=ft.colors.WHITE),
-                            ft.ElevatedButton("Iniciar Nova Produção", height=50, bgcolor="#13330D", color=ft.colors.WHITE),
-                            ft.ElevatedButton("Finalizar Produção", height=50, bgcolor="#13330D", color=ft.colors.WHITE)
-                        ]
+                            ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_dialog("materia_prima")),
+                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE),
+                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE),
+                        ],
                     )
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
@@ -416,9 +421,9 @@ def Plantacao(page: ft.Page):
         return conteudo
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
-        padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
+        padding=ft.padding.only(bottom=10),
 
         content=ft.Column(
             controls=[

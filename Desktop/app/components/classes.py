@@ -11,9 +11,15 @@ class Usuario:
 
 class GerenciamentoBanco:
     def __init__(self):
+        # self.conn_str = (
+        #     'Driver=ODBC Driver 17 for SQL Server;'
+        #     'Server=BRUNO-NOTE\\SQLEXPRESS;'
+        #     'Database=PIXFARM;'
+        #     'Trusted_Connection=yes;'
+        # )
         self.conn_str = (
             'Driver=ODBC Driver 17 for SQL Server;'
-            'Server=BRUNO-NOTE\\SQLEXPRESS;'
+            'Server=BRUNUN;'
             'Database=PIXFARM;'
             'Trusted_Connection=yes;'
         )
@@ -259,6 +265,11 @@ class GerenciamentoBanco:
             print(f"Erro ao obter detalhes do funcionario: {e}")
             return None
 
+    def obter_detalhes_materia_prima(self, id_materia):
+        conn = self.conectar()
+        cursor = conn.cursor()
+        query = ''' '''
+
     def cadastro(self, tipo_cadastro, dados):
         conn = self.conectar()
         cursor = conn.cursor()
@@ -334,6 +345,31 @@ class GerenciamentoBanco:
             finally:
                 cursor.close()
                 conn.close()
+
+        elif tipo_cadastro == 'materia_prima':
+            print(dados)
+            try:
+                cursor.execute('''CALL RegistrarCompra (?, ?, ?, ?, ?)''',
+                (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
+
+                )
+                conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                cursor.close()
+                conn.close()
                 
     
 
@@ -370,8 +406,8 @@ class Cadastro:
                 {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
                 {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data_Inicio"]}
             ],
-            "teste": [
-                {"titulo": "Informações do Produto", "campos": ["Nome", "Código", "Descrição", "Preço", "Estoque"]}
+            "materia_prima": [
+                {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
             ]
         }
 
@@ -380,7 +416,7 @@ class Cadastro:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Cadastro de {self.tipo_cadastro.capitalize()}", size=20, weight="bold"),
+                    ft.Text(f"Cadastro de {self.tipo_cadastro.capitalize()}", color=ft.colors.BLACK, size=20, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -408,6 +444,7 @@ class Cadastro:
         conteudo_dialog.append(botoes)
 
         self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
             content=ft.Container(
                 width=550,
@@ -530,12 +567,12 @@ class Detalhes:
 
         # Adicionar os campos do dicionário `dados` ao diálogo
         for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), read_only=True)
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
             self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
                     controls=[
-                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
                         campo
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -553,6 +590,7 @@ class Detalhes:
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
             content=ft.Container(
                 width=550,
@@ -605,7 +643,7 @@ class Detalhes:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Detalhes do Cliente", size=18, weight="bold"),
+                    ft.Text(f"Detalhes do Cliente", size=18, color=ft.colors.BLACK, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -614,12 +652,12 @@ class Detalhes:
 
         # Adicionar os campos do dicionário `dados` ao diálogo
         for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), read_only=True)
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
             self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
                     controls=[
-                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
                         campo
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -637,6 +675,7 @@ class Detalhes:
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
             content=ft.Container(
                 width=550,
@@ -653,13 +692,96 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-    def detalhes_funcionario(self, id_funcionario):
-        self.id_funcionario_atual = id_funcionario
-        self._alternar_modo_edicao(None, tipo_entidade="funcionario")
+    def detalhes_materia_prima(self, id_materia):
+        self.id_materia_atual = id_materia
+        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
         banco = GerenciamentoBanco()
 
         # Obter detalhes do fornecedor pelo ID
-        detalhes = banco.obter_detalhes_funcionario(id_funcionario)
+        detalhes = banco.obter_detalhes_materia_prima(id_materia)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes da materia prima."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+
+
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CPF": detalhes[2],
+            "Sexo": detalhes[3],
+            "Cargo": detalhes[4],
+            "Senha": detalhes[5],
+            "Nascimento": detalhes[6],
+            "Email": detalhes[7],
+            "Setor": detalhes[8],
+            "Data inicial": detalhes[9]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do Funcionario", size=18, color=ft.colors.BLACK, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        self.botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
+            ],
+            alignment=ft.MainAxisAlignment.START
+        )
+
+        conteudo_dialog.append(self.botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+    
+    def detalhes_funcionario(self, id_funcionario):
+        self.id_funcionario_atual = id_funcionario
+        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
+        banco = GerenciamentoBanco()
+
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = banco.obter_detalhes_materia_prima(id_funcionario)
 
         if detalhes is None:
             snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
@@ -688,7 +810,7 @@ class Detalhes:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Detalhes do Funcionario", size=18, weight="bold"),
+                    ft.Text(f"Detalhes do Funcionario", size=18, color=ft.colors.BLACK, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -697,12 +819,12 @@ class Detalhes:
 
         # Adicionar os campos do dicionário `dados` ao diálogo
         for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), read_only=True)
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
             self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
                     controls=[
-                        ft.Text(f"{titulo}:", size=14, weight="bold"),
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
                         campo
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -720,6 +842,7 @@ class Detalhes:
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
             content=ft.Container(
                 width=550,
@@ -735,7 +858,7 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-    
+
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
         self.em_edicao = not self.em_edicao

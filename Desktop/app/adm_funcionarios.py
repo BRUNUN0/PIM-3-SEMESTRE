@@ -291,6 +291,7 @@ def AdminFuncionarios(page: ft.Page):
         return conteudo
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
         padding=ft.padding.all(0),
 

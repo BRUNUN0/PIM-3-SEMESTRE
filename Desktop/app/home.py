@@ -1,5 +1,5 @@
 import flet as ft
-from datetime import datetime
+import datetime
 import pyodbc
 from app.components.dialogs import DialogoSaida, Detalhes
 from app.components.classes import GerenciamentoBanco
@@ -12,11 +12,12 @@ def Home(page: ft.Page):
 
         
     def relogio():
+        agora = datetime.datetime.now()
         relogio = ft.Container(
             content=ft.Column(
                 controls=[
-                    ft.Text(value="00:00:00", size=16),
-                    ft.Text(value="28/10/2024"),
+                    ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),
+                    ft.Text(value=agora.strftime("%d/%m/%Y"), color=ft.colors.BLACK),
                 ]
             )
         )
@@ -42,6 +43,7 @@ def Home(page: ft.Page):
                     relogio(),
                     logo(),
                     ft.PopupMenuButton(
+                        bgcolor=ft.colors.WHITE,
                         icon=ft.icons.MENU,
                         icon_color=ft.colors.BLACK,
                         icon_size=40,
@@ -256,17 +258,16 @@ def Home(page: ft.Page):
         if producoes:
             lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
         else:
-            lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção em andamento")],alignment=ft.MainAxisAlignment.CENTER) )]
+            lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção em andamento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
         producao = ft.Container(
             width=350,
-            height=500,
             bgcolor='#D6D6D6',
             border_radius=16,
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Em produção:', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Em produção:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
                         lista_producao,
@@ -323,17 +324,16 @@ def Home(page: ft.Page):
         if producoes:
             lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
         else:
-            lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento")],alignment=ft.MainAxisAlignment.CENTER) )]
+            lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
         producao = ft.Container(
             width=350,
-            height=500,
             bgcolor='#D6D6D6',
             border_radius=16,
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Pedidos:', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Pedidos:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
                         lista_producao,
@@ -367,8 +367,9 @@ def Home(page: ft.Page):
     
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
-        padding=ft.padding.all(0),
+        padding=ft.padding.only(bottom=10),
 
         content=ft.Column(
             controls=[

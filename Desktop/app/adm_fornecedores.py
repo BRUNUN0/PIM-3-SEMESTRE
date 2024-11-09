@@ -6,6 +6,7 @@ from app.components.dialogs import ConfirmationDialog
 
 
 def AdminFornecedores(page: ft.Page):
+    page.theme = ft.Theme(color_scheme_seed="white")
 
     def relogio():
         relogio = ft.Container(
@@ -286,6 +287,7 @@ def AdminFornecedores(page: ft.Page):
         return conteudo
 
     Main = ft.Container(
+        bgcolor=ft.colors.WHITE,
         expand=True,
         padding=ft.padding.all(0),
 
