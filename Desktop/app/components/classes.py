@@ -444,7 +444,7 @@ class Cadastro:
         self.inputs = {}
         self.dados_salvos = None  # Armazena temporariamente os dados salvos para possível reversão
 
-    def abrir_dialog(self, tipo_cadastro):
+    def abrir_cadastro(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
         :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
@@ -463,14 +463,8 @@ class Cadastro:
                 {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
                 {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data_Inicio"]}
             ],
-            "materia_prima": [
+            "materia prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
-            ],
-            "iniciar producao": [
-                {"titulo": "Iniciar Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
-            ],
-            "finalizar producao": [
-                {"titulo": "Finalizar Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
             ]
         }
 
@@ -558,6 +552,104 @@ class Cadastro:
                     scroll=ft.ScrollMode.AUTO
                 )
             )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def abrir_registro(self, tipo_cadastro):
+        """
+        Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
+        :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
+        """
+        self.tipo_cadastro = tipo_cadastro
+        campos_por_tipo = {
+            "iniciar producao": [
+                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
+            ],
+            "finalizar producao": [
+                {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
+            ],
+            "pedido": [
+                {"titulo": "Dados do Pedido", "campos": ["CNPJ do Cliente", "Data Pedido"]},
+                {"titulo": "Itens do Pedido", "campos": ["Produto", "Quantidade"]}
+            ]
+        }
+
+        grupos_campos = campos_por_tipo.get(self.tipo_cadastro, [])
+
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"{self.tipo_cadastro.capitalize()}", color=ft.colors.BLACK, size=20, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+
+        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
+        for grupo in grupos_campos:
+            conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
+            campos = grupo["campos"]
+
+            for campo in campos:
+                if campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
+                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
+
+                    def pegar_data(e, campo=campo):
+                        if not date_field_flag["is_open"]:
+                            date_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.DatePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_format_text='Data inválida',
+                                    field_hint_text='MM/DD/YYYY',
+                                    help_text='Selecione uma data no calendário',
+                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
+                                        self.dialog.update(),
+                                    ),
+                                )
+                            )
+
+                    date_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,  # Apenas exibição
+                        on_focus=pegar_data
+                    )
+                    self.inputs[campo] = date_field
+                else:
+                    # Cria campos normais
+                    self.inputs[campo] = ft.TextField(label=campo, width=250)
+
+            for i in range(0, len(campos), 2):
+                linha = ft.Row(
+                    controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+                conteudo_dialog.append(linha)
+
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            ),
+            actions=[
+                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
+
+            ]
         )
 
         self.page.overlay.append(self.dialog)
@@ -951,85 +1043,6 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-    # def detalhes_materia_prima(self, id_materia):
-    #     self.id_materia_atual = id_materia
-    #     self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
-    #     banco = GerenciamentoBanco()
-
-    #     # Obter detalhes do fornecedor pelo ID
-    #     detalhes = banco.obter_detalhes_materia_prima(id_materia)
-
-    #     if detalhes is None:
-    #         snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
-    #         self.page.overlay.append(snackbar)
-    #         snackbar.open = True
-    #         self.page.update()
-    #         return
-
-
-    #     # Organizar os detalhes em um dicionário para exibição
-    #     dados = {
-    #         "ID da Compra": detalhes[0],
-    #         "Nome Fornecedor": detalhes[1],
-    #         "CNPJ": detalhes[2],
-    #         "Data compra": detalhes[3],
-    #         "Materia Prima": detalhes[4],
-    #         "Quantidade": detalhes[5],
-    #         "URL": detalhes[6]
-    #     }
-
-    #     # Conteúdo do diálogo
-    #     conteudo_dialog = [
-    #         ft.Row(
-    #             controls=[
-    #                 ft.Text(f"Detalhes da Materia Prima", size=18, color=ft.colors.BLACK, weight="bold"),
-    #                 ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
-    #             ],
-    #             alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-    #         )
-    #     ]
-
-    #     # Adicionar os campos do dicionário `dados` ao diálogo
-    #     for titulo, valor in dados.items():
-    #         campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
-    #         self.campos[titulo] = campo
-    #         conteudo_dialog.append(
-    #             ft.Row(
-    #                 controls=[
-    #                     ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
-    #                     campo
-    #                 ],
-    #                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-    #             )
-    #         )
-
-    #     self.botoes = ft.Row(
-    #         controls=[
-    #             ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="materia_prima"))
-    #         ],
-    #         alignment=ft.MainAxisAlignment.START
-    #     )
-
-    #     conteudo_dialog.append(self.botoes)
-
-    #     # Configurar o diálogo com o conteúdo
-    #     self.dialog = ft.AlertDialog(
-    #         bgcolor=ft.colors.WHITE,
-    #         modal=True,
-    #         content=ft.Container(
-    #             width=550,
-    #             padding=ft.padding.only(left=15, right=15),
-    #             content=ft.Column(
-    #                 controls=conteudo_dialog,
-    #                 alignment=ft.MainAxisAlignment.START,
-    #                 scroll=ft.ScrollMode.AUTO
-    #             )
-    #         )
-    #     )
-
-    #     self.page.overlay.append(self.dialog)
-    #     self.dialog.open = True
-    #     self.page.update()
 
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
