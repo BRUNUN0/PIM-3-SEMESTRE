@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import GerenciamentoBanco
+from app.components.classes import GerenciamentoBanco, Cadastro
 
 
 def Pedidos(page: ft.Page):
@@ -194,6 +194,7 @@ def Pedidos(page: ft.Page):
         return AppBar
     
     def pedidos_ativos():
+        cadastro = Cadastro(page)
         container = ft.Container(
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
@@ -225,7 +226,7 @@ def Pedidos(page: ft.Page):
                                     # width=120,
                                     height=40,
                                     bgcolor="#13330D",
-                                    on_click=lambda e: print('Registrar Clicado')
+                                    on_click=lambda e: cadastro.abrir_registro('pedido')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

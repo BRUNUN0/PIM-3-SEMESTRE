@@ -29,7 +29,7 @@ END;
 
 
 
-CREATE PROCEDURE RegistrarCompra
+CREATE PROCEDURE [dbo].[RegistrarCompra]
     @CNPJFornecedor CHAR(14),
     @DataCompra DATE,
     @NomeMateriaPrima NVARCHAR(100),
@@ -41,8 +41,10 @@ BEGIN
     DECLARE @id_materia INT;
     DECLARE @id_compra INT;
 
-    -- Verificar se o fornecedor já existe
-    SELECT @id_fornecedor = id_fornecedor FROM Fornecedor WHERE CNPJ = @CNPJFornecedor;
+    -- Verificar se o fornecedor existe
+    SELECT @id_fornecedor = id_fornecedor 
+    FROM Fornecedor 
+    WHERE CNPJ = @CNPJFornecedor;
 
     IF @id_fornecedor IS NULL
     BEGIN
@@ -50,33 +52,48 @@ BEGIN
         RETURN;
     END
 
-    -- Inserir a compra
-    INSERT INTO Compra (fk_id_fornecedor, Data_compra)
-    VALUES (@id_fornecedor, @DataCompra);
+    -- Verificar se a compra já existe para o fornecedor e data especificada
+    SELECT @id_compra = id_compra 
+    FROM Compra 
+    WHERE fk_id_fornecedor = @id_fornecedor AND Data_compra = @DataCompra;
 
-    SET @id_compra = SCOPE_IDENTITY(); -- Captura o ID da compra recém-inserida
+    IF @id_compra IS NULL
+    BEGIN
+        -- Inserir a nova compra
+        INSERT INTO Compra (fk_id_fornecedor, Data_compra)
+        VALUES (@id_fornecedor, @DataCompra);
+
+        SET @id_compra = SCOPE_IDENTITY();
+    END
 
     -- Inserir ou atualizar a matéria-prima
-    IF NOT EXISTS (SELECT 1 FROM Materia_Prima WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor)
-    BEGIN
-        INSERT INTO Materia_Prima (fk_id_fornecedor, Nome, Quantidade, URL) -- Incluindo a coluna URL
-        VALUES (@id_fornecedor, @NomeMateriaPrima, @QuantidadeMateriaPrima, @UrlImagem); -- Armazenando a URL
-    END
-    ELSE
-    BEGIN
-        UPDATE Materia_Prima
-        SET Quantidade = Quantidade + @QuantidadeMateriaPrima,
-            URL = @UrlImagem -- Atualizando a URL, se necessário
-        WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor;
-    END
+    MERGE INTO Materia_Prima AS Target
+    USING (VALUES (@NomeMateriaPrima, @QuantidadeMateriaPrima, @UrlImagem)) AS Source (Nome, Quantidade, URL)
+    ON Target.Nome = Source.Nome
+    WHEN MATCHED THEN
+        UPDATE SET Quantidade = Target.Quantidade + Source.Quantidade, URL = Source.URL
+    WHEN NOT MATCHED THEN
+        INSERT (Nome, Quantidade, URL)
+        VALUES (Source.Nome, Source.Quantidade, Source.URL);
 
     -- Obter o ID da matéria-prima
-    SELECT @id_materia = id_materia FROM Materia_Prima WHERE Nome = @NomeMateriaPrima AND fk_id_fornecedor = @id_fornecedor;
+    SELECT @id_materia = id_materia 
+    FROM Materia_Prima 
+    WHERE Nome = @NomeMateriaPrima;
 
-    -- Inserir o item da compra
-    INSERT INTO Item_Compra (fk_id_compra, fk_id_fornecedor, fk_id_materia, Quantidade)
-    VALUES (@id_compra, @id_fornecedor, @id_materia, @QuantidadeMateriaPrima);
+    -- Verificar se o item da compra já existe para evitar duplicatas
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM Item_Compra 
+        WHERE fk_id_compra = @id_compra AND fk_id_fornecedor = @id_fornecedor AND fk_id_materia = @id_materia
+    )
+    BEGIN
+        -- Inserir o item da compra
+        INSERT INTO Item_Compra (fk_id_compra, fk_id_fornecedor, fk_id_materia, Quantidade)
+        VALUES (@id_compra, @id_fornecedor, @id_materia, @QuantidadeMateriaPrima);
+    END
 END;
+
 
 
 

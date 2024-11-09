@@ -1,6 +1,5 @@
 import flet as ft
 import datetime
-import pyodbc
 from app.components.dialogs import DialogoSaida, Detalhes
 from app.components.classes import GerenciamentoBanco
 
@@ -206,8 +205,6 @@ def Home(page: ft.Page):
         
         return AppBar
 
-
-    
     def producao(nome, imagem):
 
         def on_click_container(e):
@@ -254,7 +251,7 @@ def Home(page: ft.Page):
     def em_producao ():
 
         banco = GerenciamentoBanco()
-        producoes = banco.obter_plantas()
+        producoes = banco.obter_producao()
         if producoes:
             lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
         else:
@@ -290,7 +287,7 @@ def Home(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=print("Grita socorro"),
+            on_click=print("Grita socorro"), 
             
             content=ft.Row(
                 controls=[
@@ -385,7 +382,5 @@ def Home(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
         )
     )
-    
-    # page.on_resized = page.update()
 
     return Main

@@ -1,3 +1,4 @@
+from sqlite3 import Cursor
 import flet as ft
 import pyodbc
 
@@ -33,23 +34,23 @@ class GerenciamentoBanco:
         # Conecta ao banco de dados
         return pyodbc.connect(self.conn_str)
 
-    def obter_plantas(self):
+    def obter_producao(self):
         try:
             conn = self.conectar()
             cursor = conn.cursor()
-            query = '''
-                SELECT
-                    Producao.Nome,
-                    Materia_Prima.URL
-                FROM Producao
-                JOIN Materia_Prima ON Producao.fk_id_materia = Materia_Prima.id_materia
-                '''
+            query = '''SELECT
+                        p.id_plantio,
+                        p.Nome,
+                        p.Quantidade,
+                        mp.URL
+                    FROM Producao p
+                    INNER JOIN Materia_Prima mp ON mp.URL = mp.id_materia'''
             cursor.execute(query)
-            plantas = cursor.fetchall()
+            producao = cursor.fetchall()
             conn.close()
-            return plantas
+            return producao
         except Exception as e:
-            print(f"Erro ao obter plantas: {e}")
+            print(f"Erro ao obter producao: {e}")
             conn.close()
             return []
     
@@ -117,6 +118,42 @@ class GerenciamentoBanco:
             return pedidos
         except Exception as e:
             print(f"Erro ao obter pedidos: {e}")
+            return None
+
+    def obter_materia_prima(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT
+                        mp.id_materia,
+                        mp.Nome,
+                        mp.Quantidade,
+                        mp.URL
+                    FROM Materia_Prima mp'''
+            cursor.execute(query)
+            materias_primas = cursor.fetchall()
+            conn.close()
+            return materias_primas
+        except Exception as e:
+            print(f"Erro ao obter materias primas: {e}")
+            return None
+
+    def obter_produtos(self):
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = '''SELECT
+                        p.id_produto,
+                        p.Produto,
+                        p.Quantidade,
+                        p.Data_Validade
+                    FROM Produto p'''
+            cursor.execute(query)
+            produtos = cursor.fetchall()
+            conn.close
+            return produtos
+        except Exception as e:
+            print(f"Erro ao obter produtos: {e}")
             return None
 
     def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
@@ -271,9 +308,31 @@ class GerenciamentoBanco:
             return None
 
     def obter_detalhes_materia_prima(self, id_materia):
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = ''' '''
+        try:
+            conn = self.conectar()
+            cursor = conn.cursor()
+            query = f'''SELECT
+                        c.id_compra as id,
+                        f.Nome_Fantasia as fornecedor,
+                        f.CNPJ as cnpj,
+                        mp.Nome as nome,
+                        mp.Quantidade as quantidade,
+                        c.Data_compra as data_compra,
+                        mp.URL as url
+                    FROM
+                        Materia_Prima mp
+                    INNER JOIN Compra c ON c.id_compra = c.id_compra
+                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
+                    WHERE id_materia = {id_materia}'''
+            cursor.execute(query)
+            detalhes_materia_prima = cursor.fetchone()
+            print(detalhes_materia_prima)
+            conn.close()
+            return detalhes_materia_prima()
+        except Exception as e:
+            print(f"Erro ao obter detalhes da materia prima: {e}")
+            return None
+
 
     def cadastro(self, tipo_cadastro, dados):
         conn = self.conectar()
@@ -352,11 +411,9 @@ class GerenciamentoBanco:
                 conn.close()
 
         elif tipo_cadastro == 'materia_prima':
-            print(dados)
             try:
-                cursor.execute('''CALL RegistrarCompra (?, ?, ?, ?, ?)''',
+                cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
-
                 )
                 conn.commit()
                 return True, None
@@ -375,10 +432,10 @@ class GerenciamentoBanco:
             finally:
                 cursor.close()
                 conn.close()
-                
-    
 
-        
+
+
+
 
 
 class Cadastro:
@@ -392,7 +449,7 @@ class Cadastro:
         self.inputs = {}
         self.dados_salvos = None  # Armazena temporariamente os dados salvos para possível reversão
 
-    def abrir_dialog(self, tipo_cadastro):
+    def abrir_cadastro(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
         :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
@@ -411,7 +468,7 @@ class Cadastro:
                 {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
                 {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data_Inicio"]}
             ],
-            "materia_prima": [
+            "materia prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
             ]
         }
@@ -428,10 +485,48 @@ class Cadastro:
             )
         ]
 
+        self.datepicker_control = None
+
+        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
         for grupo in grupos_campos:
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
             campos = grupo["campos"]
-            self.inputs.update({campo: ft.TextField(label=campo, width=250) for campo in campos})
+
+            for campo in campos:
+                if campo in ("Data", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
+                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
+
+                    def handle_focus(e, campo=campo):
+                        if not date_field_flag["is_open"]:
+                            date_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.DatePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_format_text='Data inválida',
+                                    field_hint_text='MM/DD/YYYY',
+                                    help_text='Selecione uma data no calendário',
+                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
+                                        self.page.update(),
+                                        setattr(date_field_flag, 'is_open', False)  # Reseta a flag após seleção
+                                    ),
+                                    on_dismiss=lambda e: setattr(date_field_flag, 'is_open', False)  # Reseta a flag após cancelamento
+                                )
+                            )
+
+                    date_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,  # Apenas exibição
+                        on_focus=handle_focus
+                    )
+                    self.inputs[campo] = date_field
+                else:
+                    # Cria campos normais
+                    self.inputs[campo] = ft.TextField(label=campo, width=250)
+
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
                     controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
@@ -439,9 +534,12 @@ class Cadastro:
                 )
                 conteudo_dialog.append(linha)
 
+
+
+
         botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Salvar", on_click=self._salvar_dados)
+                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
             ],
             alignment=ft.MainAxisAlignment.END
         )
@@ -459,6 +557,104 @@ class Cadastro:
                     scroll=ft.ScrollMode.AUTO
                 )
             )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def abrir_registro(self, tipo_cadastro):
+        """
+        Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
+        :param tipo_cadastro: String representando o tipo de cadastro (ex.: "fornecedor", "cliente", "produto").
+        """
+        self.tipo_cadastro = tipo_cadastro
+        campos_por_tipo = {
+            "iniciar producao": [
+                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
+            ],
+            "finalizar producao": [
+                {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
+            ],
+            "pedido": [
+                {"titulo": "Dados do Pedido", "campos": ["CNPJ do Cliente", "Data Pedido"]},
+                {"titulo": "Itens do Pedido", "campos": ["Produto", "Quantidade"]}
+            ]
+        }
+
+        grupos_campos = campos_por_tipo.get(self.tipo_cadastro, [])
+
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"{self.tipo_cadastro.capitalize()}", color=ft.colors.BLACK, size=20, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+
+        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
+        for grupo in grupos_campos:
+            conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
+            campos = grupo["campos"]
+
+            for campo in campos:
+                if campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
+                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
+
+                    def pegar_data(e, campo=campo):
+                        if not date_field_flag["is_open"]:
+                            date_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.DatePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_format_text='Data inválida',
+                                    field_hint_text='MM/DD/YYYY',
+                                    help_text='Selecione uma data no calendário',
+                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
+                                        self.dialog.update(),
+                                    ),
+                                )
+                            )
+
+                    date_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,  # Apenas exibição
+                        on_focus=pegar_data
+                    )
+                    self.inputs[campo] = date_field
+                else:
+                    # Cria campos normais
+                    self.inputs[campo] = ft.TextField(label=campo, width=250)
+
+            for i in range(0, len(campos), 2):
+                linha = ft.Row(
+                    controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+                conteudo_dialog.append(linha)
+
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            ),
+            actions=[
+                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
+
+            ]
         )
 
         self.page.overlay.append(self.dialog)
@@ -716,15 +912,11 @@ class Detalhes:
         # Organizar os detalhes em um dicionário para exibição
         dados = {
             "ID": detalhes[0],
-            "Nome": detalhes[1],
-            "CPF": detalhes[2],
-            "Sexo": detalhes[3],
-            "Cargo": detalhes[4],
-            "Senha": detalhes[5],
-            "Nascimento": detalhes[6],
-            "Email": detalhes[7],
-            "Setor": detalhes[8],
-            "Data inicial": detalhes[9]
+            "Fornecedor": detalhes[1],
+            "CNPJ Fornecedor": detalhes[2],
+            "Nome Materia Prima": detalhes[3],
+            "Quantidade": detalhes[4],
+            "Data da Compra": detalhes[5],
         }
 
         # Conteúdo do diálogo
@@ -752,14 +944,6 @@ class Detalhes:
                 )
             )
 
-        self.botoes = ft.Row(
-            controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
-            ],
-            alignment=ft.MainAxisAlignment.START
-        )
-
-        conteudo_dialog.append(self.botoes)
 
         # Configurar o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
@@ -786,7 +970,7 @@ class Detalhes:
         banco = GerenciamentoBanco()
 
         # Obter detalhes do fornecedor pelo ID
-        detalhes = banco.obter_detalhes_materia_prima(id_funcionario)
+        detalhes = banco.obter_detalhes_funcionario(id_funcionario)
 
         if detalhes is None:
             snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
@@ -863,6 +1047,7 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
+
 
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""

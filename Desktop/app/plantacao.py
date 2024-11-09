@@ -1,7 +1,3 @@
-from ctypes import alignment
-from enum import auto
-from operator import truediv
-from turtle import bgcolor
 import flet as ft
 from datetime import datetime
 import pyodbc
@@ -201,12 +197,8 @@ def Plantacao(page: ft.Page):
         
         return AppBar
 
-    def planta(nome, imagem):
-
-        def on_click_container(e):
-            print(f"Clicado: {nome}")  
-            
-        planta = ft.Container(
+    def materia(id, nome, quantidade, url):       
+        materia_prima = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
                 color=ft.colors.BLACK
@@ -215,24 +207,26 @@ def Plantacao(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
             
             content=ft.Row(
                 controls=[
-                    ft.Icon(
-                        name=ft.icons.FOREST,
-                        color=ft.colors.GREEN_900,
-                        size=30
-                        ),
                     ft.Text(
-                        value=nome
-                        ),
-                    
+                        value=f"ID: {id}",
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=nome,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=quantidade,
+                        color=ft.colors.BLACK
+                    ),
                     ft.Container(
                         alignment=ft.alignment.center_right,
                         
                         content=ft.Image(
-                            src=imagem,
+                            src=url,
                             width=30,
                         )
                     )
@@ -241,15 +235,16 @@ def Plantacao(page: ft.Page):
             )
         )
         
-        return planta
+        return materia_prima
     
-    def plantacao ():
+    def materias_primas ():
 
         banco = GerenciamentoBanco()
-        plantas_data = banco.obter_plantas()
-
-        lista_plantas = [planta(nome, imagem) for nome, imagem in plantas_data]
-
+        materia_prima_data = banco.obter_materia_prima()
+        if materia_prima_data:
+            lista_materias_primas = [materia(id, nome, quantidade, url) for id, nome, quantidade, url in materia_prima_data]
+        else:
+            lista_materias_primas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma materia prima encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
         estoque_mater_prima = ft.Container(
             width= 350,
             bgcolor='#D6D6D6',
@@ -261,7 +256,7 @@ def Plantacao(page: ft.Page):
                     ft.Text(value='Estoque Materia Prima', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
-                        lista_plantas,
+                        lista_materias_primas,
                         spacing=6,
                         scroll=ft.ScrollMode.AUTO
                     )
@@ -271,14 +266,45 @@ def Plantacao(page: ft.Page):
         )
         return estoque_mater_prima
 
-    def produto():
+    def produto(id, nome, quantidade, validade):
         produto = ft.Container(
-            bgcolor="#99C2A2"
+            bgcolor="#99C2A2",
+            border=ft.border.all(color=ft.colors.BLACK),
+            width=340,
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=12, right=12),
+            content=ft.Row(
+                controls=[
+                    ft.Text(
+                        value=f"ID: {id}",
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=nome,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=quantidade,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=validade,
+                        color=ft.colors.BLACK
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
         )
         return produto
 
     def produtos():
-        lista_produto = [produto]
+        banco = GerenciamentoBanco()
+        produtos_data = banco.obter_produtos()
+        if produtos_data:
+            lista_produtos = [produto(id, nome, quantidade, validade) for id, nome, quantidade, validade in produtos_data]
+        else:
+            lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrato", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
         produtos = ft.Container(
             width=350,
             bgcolor="#D6D6D6",
@@ -290,6 +316,10 @@ def Plantacao(page: ft.Page):
                 controls=[
                     ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
+                        controls=
+                        lista_produtos,
+                        spacing=6,
+                        scroll=ft.ScrollMode.AUTO
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -299,8 +329,43 @@ def Plantacao(page: ft.Page):
         return produtos
 
     def grupo():
+
+        def plantados(id, nome, quantidade):
+            plantados = ft.Container(
+                bgcolor="#99C2A2",
+                border=ft.border.all(color=ft.colors.BLACK),
+                width=340,
+                height=50,
+                border_radius=9,
+                padding=ft.padding.only(left=12, right=12),
+                content=ft.Row(
+                    controls=[
+                        ft.Text(
+                            value=f"ID: {id}",
+                            color=ft.colors.BLACK
+                        ),
+                        ft.Text(
+                            value=nome,
+                            color=ft.colors.BLACK
+                        ),
+                        ft.Text(
+                            value=quantidade,
+                            color=ft.colors.BLACK
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+            return plantados
+
         cadastro = Cadastro(page)
-        itens_plantados = []
+        banco = GerenciamentoBanco()
+        plantados_data = banco.obter_producao()
+        if plantados_data:
+            items_plantados = [plantados(id, nome, quantidade) for id, nome, quantidade in plantados_data]
+        else:
+            items_plantados = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+
         grupo = ft.Container(
             expand=True,
             padding=ft.padding.only(left=15, right=15, bottom=15),
@@ -316,7 +381,7 @@ def Plantacao(page: ft.Page):
                                 ft.Text(value='Itens Plantados', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                                 ft.Column(
                                     controls=
-                                    itens_plantados,
+                                    items_plantados,
                                     spacing=6,
                                     scroll=ft.ScrollMode.AUTO
                                 )
@@ -388,9 +453,9 @@ def Plantacao(page: ft.Page):
                         height=50,
                         spacing=10,
                         controls=[
-                            ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_dialog("materia_prima")),
-                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE),
-                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE),
+                            ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("materia prima")),
+                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
+                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
                         ],
                     )
                 ],
@@ -408,7 +473,7 @@ def Plantacao(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
-                            plantacao(),
+                            materias_primas(),
                             produtos(),
                             grupo()
                         ]
