@@ -13,31 +13,44 @@ class Usuario:
 class GerenciamentoBanco:
     def __init__(self):
         # self.conn_str = (
+        #      #BRUNO NOTE
         #     'Driver=ODBC Driver 17 for SQL Server;'
         #     'Server=BRUNO-NOTE\\SQLEXPRESS;'
         #     'Database=PIXFARM;'
         #     'Trusted_Connection=yes;'
         # )
         self.conn_str = (
+            # BRUNO PC
             'Driver=ODBC Driver 17 for SQL Server;'
             'Server=BRUNUN;'
             'Database=PIXFARM;'
             'Trusted_Connection=yes;'
         )
         #self.conn_str = (
+        #    # Nelson PC
         #    'Driver=ODBC Driver 17 for SQL Server;'
         #    'Server=DESKTOP-I3SMJCV\SQLEXPRESS;'
         #    'Database=PIXFARM;'
         #    'Trusted_Connection=yes;'
         #)
+        self.conn = None
+        self.cursor = None
+
     def conectar(self):
         # Conecta ao banco de dados
-        return pyodbc.connect(self.conn_str)
+        if self.conn is None:
+            self.conn = pyodbc.connect(self.conn_str)
+            self.cursor = self.conn.cursor()
+
+    def fechar_conexao(self):
+        if self.conn:
+            self.conn.close()
+            self.conn = None
+            self.cursor = None
 
     def obter_producao(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT
                         p.id_plantio,
                         p.Nome,
@@ -45,46 +58,42 @@ class GerenciamentoBanco:
                         mp.URL
                     FROM Producao p
                     INNER JOIN Materia_Prima mp ON mp.URL = mp.id_materia'''
-            cursor.execute(query)
-            producao = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            producao = self.cursor.fetchall()
             return producao
         except Exception as e:
             print(f"Erro ao obter producao: {e}")
-            conn.close()
+            self.fechar_conexao()
             return []
     
     def obter_fornecedores(self):
         try:
             # Obtém os dados dos fornecedores
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT id_fornecedor, Nome_Fantasia, CNPJ FROM Fornecedor'''
-            cursor.execute(query)
-            fornecedores = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            fornecedores = self.cursor.fetchall()
             return fornecedores
         except Exception as e:
             print(f"Erro ao obter fornecedores: {e}")
+            self.fechar_conexao()
             return None
         
     def obter_clientes(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT id_cliente, Nome, CNPJ FROM Cliente'''
-            cursor.execute(query)
-            clientes = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            clientes = self.cursor.fetchall()
             return clientes
         except Exception as e:
             print(f"Erro ao obter clientes: {e}")
+            self.fechar_conexao()
             return None
 
     def obter_funcionarios(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT 
                             f.id_funcionario AS id,
                             f.nome AS nome,
@@ -92,18 +101,17 @@ class GerenciamentoBanco:
                     FROM 
                         Funcionario f
                     INNER JOIN Cargo c ON c.Cargo = c.Cargo'''
-            cursor.execute(query)
-            clientes = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            clientes = self.cursor.fetchall()
             return clientes
         except Exception as e:
             print(f"Erro ao obter clientes: {e}")
+            self.fechar_conexao()
             return None
         
     def obter_pedidos(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT
 	                        pe.id_pedido,
 	                        pd.Produto,
@@ -112,54 +120,51 @@ class GerenciamentoBanco:
                             pedido pe
                         INNER JOIN Produto pd ON pd.Produto = pd.Produto
                         INNER JOIN Item_Pedido i ON i.Quantidade = i.Quantidade'''
-            cursor.execute(query)
-            pedidos = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            pedidos = self.cursor.fetchall()
             return pedidos
         except Exception as e:
             print(f"Erro ao obter pedidos: {e}")
+            self.fechar_conexao()
             return None
 
     def obter_materia_prima(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT
                         mp.id_materia,
                         mp.Nome,
                         mp.Quantidade,
                         mp.URL
                     FROM Materia_Prima mp'''
-            cursor.execute(query)
-            materias_primas = cursor.fetchall()
-            conn.close()
+            self.cursor.execute(query)
+            materias_primas = self.cursor.fetchall()
             return materias_primas
         except Exception as e:
             print(f"Erro ao obter materias primas: {e}")
+            self.fechar_conexao()
             return None
 
     def obter_produtos(self):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''SELECT
                         p.id_produto,
                         p.Produto,
                         p.Quantidade,
                         p.Data_Validade
                     FROM Produto p'''
-            cursor.execute(query)
-            produtos = cursor.fetchall()
-            conn.close
+            self.cursor.execute(query)
+            produtos = self.cursor.fetchall()
             return produtos
         except Exception as e:
             print(f"Erro ao obter produtos: {e}")
+            self.fechar_conexao()
             return None
 
     def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''UPDATE Fornecedor SET Nome_Fantasia = ?, Email = ?, Telefone = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_fornecedor = ?'''
             parametros = (
             dados_atualizados["Nome Fantasia"],
@@ -173,20 +178,18 @@ class GerenciamentoBanco:
             dados_atualizados["Estado"],
             id_fornecedor  # Aqui é onde o ID do fornecedor é passado
             )
-            cursor.execute(query, parametros)
-            conn.commit()
-            conn.close()
+            self.cursor.execute(query, parametros)
+            self.conn.commit()
             return True
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor: {e}")
-            conn.close()
+            self.fechar_conexao()
             return str(e)
 
     def atualizar_cliente(self, dados_atualizados, id_cliente):
         print(dados_atualizados)
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''UPDATE Funcionario SET  Nome_Fantasia = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
             parametros = (
             dados_atualizados["Nome Fantasia"],
@@ -199,19 +202,17 @@ class GerenciamentoBanco:
             dados_atualizados["Estado"],
             id_cliente  # Aqui é onde o ID do fornecedor é passado
         )
-            cursor.execute(query, parametros)
-            conn.commit()
-            conn.close()
+            self.cursor.execute(query, parametros)
+            self.conn.commit()
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor {e}")
-            conn.close()
+            self.fechar_conexao()
             return str(e)
 
     def atualizar_funcionario(self, dados_atualizados, id_funcionario):
         print(dados_atualizados)
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = '''UPDATE Funcionario SET  Nome = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
             parametros = (
             dados_atualizados["Nome"],
@@ -224,65 +225,64 @@ class GerenciamentoBanco:
             dados_atualizados["Data_inicial"],
             id_funcionario
             )
-            cursor.execute(query, parametros)
-            conn.commit()
-            conn.close()
+            self.cursor.execute(query, parametros)
+            self. conn.commit()
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor {e}")
-            conn.close()
+            self.fechar_conexao()
             return str(e)
 
     def obter_detalhes_plantio(self):
-        conn = self.conectar()
-        cursor = conn.cursor()
-        query = '''
-            SELECT
-                id_plantio,
-                Plantio,
-                Data_Inicio,
-                Nome,
-                Quantidade
-            FROM 
-                Producao
-        '''
-        cursor.execute(query)
-        detalhes = cursor.fetchall()
-        conn.close()
-        return detalhes
+        try:
+            self.conectar()
+            query = '''
+                SELECT
+                    id_plantio,
+                    Plantio,
+                    Data_Inicio,
+                    Nome,
+                    Quantidade
+                FROM 
+                    Producao
+            '''
+            self.cursor.execute(query)
+            detalhes = self.cursor.fetchall()
+            return detalhes
+        except Exception as e:
+            print(f"Erro ao obter fornecedores: {e}")
+            self.fechar_conexao()
+            return None
 
     def obter_detalhes_fornecedores(self, id_fornecedor):
         try:
             # Obter os detalhes do fornecedor
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = f'''SELECT * from Fornecedor WHERE id_fornecedor = {id_fornecedor}'''
-            cursor.execute(query)
-            detalhes_fornecedor = cursor.fetchone()
-            conn.close()
+            self.cursor.execute(query)
+            detalhes_fornecedor = self.cursor.fetchone()
             return detalhes_fornecedor
         except Exception as e:
             print(f"Erro ao obter detalhes do fornecedor: {e}")
+            self.fechar_conexao()
             return None
         
     def obter_detalhes_clientes(self, id_cliente):
         try:
             # Obter os detalhes do cliente
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = f'''SELECT * from Cliente WHERE id_cliente = {id_cliente}'''
-            cursor.execute(query)
-            detalhes_cliente = cursor.fetchone()
-            conn.close()
+            self.cursor.execute(query)
+            detalhes_cliente = self.cursor.fetchone()
             return detalhes_cliente
         except Exception as e:
             print(f"Erro ao obter detalhes do cliente: {e}")
+            self.fechar_conexao()
             return None
 
     def obter_detalhes_funcionario(self, id_funcionario):
         try:
             # Obter detalhes do funcionario
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = f'''SELECT
                             f.id_funcionario as id,
                             f.nome as nome,
@@ -299,18 +299,17 @@ class GerenciamentoBanco:
                         INNER JOIN Cargo c ON c.Cargo = c.Cargo
                         INNER JOIN Historico_Cargo hc ON hc.Data_Inicio = hc.Data_Inicio
                         WHERE id_funcionario = {id_funcionario}'''
-            cursor.execute(query)
-            detalhes_funcionario = cursor.fetchone()
-            conn.close()
+            self.cursor.execute(query)
+            detalhes_funcionario = self.cursor.fetchone()
             return detalhes_funcionario
         except Exception as e:
             print(f"Erro ao obter detalhes do funcionario: {e}")
+            self.fechar_conexao()
             return None
 
     def obter_detalhes_materia_prima(self, id_materia):
         try:
-            conn = self.conectar()
-            cursor = conn.cursor()
+            self.conectar()
             query = f'''SELECT
                         c.id_compra as id,
                         f.Nome_Fantasia as fornecedor,
@@ -324,26 +323,25 @@ class GerenciamentoBanco:
                     INNER JOIN Compra c ON c.id_compra = c.id_compra
                     INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
                     WHERE id_materia = {id_materia}'''
-            cursor.execute(query)
-            detalhes_materia_prima = cursor.fetchone()
+            self.cursor.execute(query)
+            detalhes_materia_prima = self.cursor.fetchone()
             print(detalhes_materia_prima)
-            conn.close()
             return detalhes_materia_prima()
         except Exception as e:
             print(f"Erro ao obter detalhes da materia prima: {e}")
+            self.fechar_conexao()
             return None
 
 
     def cadastro(self, tipo_cadastro, dados):
-        conn = self.conectar()
-        cursor = conn.cursor()
+        self.conectar()
         if tipo_cadastro == 'fornecedor':
             try:
-                cursor.execute(
+                self.cursor.execute(
                     '''{CALL InserirFornecedor (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''', 
                         (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Telefone'], dados['Rua'], dados['Número'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
                         )
-                conn.commit()
+                self.conn.commit()
                 print("Fornecedor inserido com sucesso.")
                 return True, None
             except pyodbc.IntegrityError as e:
@@ -359,16 +357,15 @@ class GerenciamentoBanco:
                 print("Erro ao inserir fornecedor:", e)
                 return False, error_message
             finally:
-                cursor.close()
-                conn.close()
+                self.fechar_conexao()
             
         elif tipo_cadastro == 'cliente':
             try:
-                cursor.execute(
+                self.cursor.execute(
                     '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
                     (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
                     )
-                conn.commit()
+                self.conn.commit()
                 return True, None
             except pyodbc.IntegrityError as e:
                 error_message = str(e).split('(')[1].split(')')[0]
@@ -383,16 +380,15 @@ class GerenciamentoBanco:
                 print("Erro ao inserir fornecedor:", e)
                 return False, error_message
             finally:
-                cursor.close()
-                conn.close()
+                self.fechar_conexao()
         
         elif tipo_cadastro == 'funcionario':
             try:
-                cursor.execute(
+                self.cursor.execute(
                     '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
                     (dados['Nome'], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
                 )
-                conn.commit()
+                self.conn.commit()
                 return True, None
             except pyodbc.IntegrityError as e:
                 error_message = str(e).split('(')[1].split(')')[0]
@@ -407,15 +403,14 @@ class GerenciamentoBanco:
                 print("Erro ao inserir fornecedor:", e)
                 return False, error_message
             finally:
-                cursor.close()
-                conn.close()
+                self.fechar_conexao()
 
         elif tipo_cadastro == 'materia_prima':
             try:
-                cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
+                self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
                 )
-                conn.commit()
+                self.conn.commit()
                 return True, None
             except pyodbc.IntegrityError as e:
                 error_message = str(e).split('(')[1].split(')')[0]
@@ -430,8 +425,7 @@ class GerenciamentoBanco:
                 print("Erro ao inserir fornecedor:", e)
                 return False, error_message
             finally:
-                cursor.close()
-                conn.close()
+                self.fechar_conexao()
 
 
 
