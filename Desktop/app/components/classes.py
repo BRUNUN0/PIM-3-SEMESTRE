@@ -539,13 +539,27 @@ class GerenciamentoBanco:
                 self.fechar_conexao()
 
     def obter_funcionario_login(self, cpf):
-        self.conectar()
-        print(cpf)
-        self.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
-        dados_login = self.cursor.fetchone()
-        print(dados_login)
-        return dados_login
-
+        try:
+            self.conectar()
+            print(cpf)
+            self.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+            dados_login = self.cursor.fetchone()
+            print(dados_login)
+            return dados_login
+        except pyodbc.IntegrityError as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro de integridade:", error_message)
+            return False, error_message
+        except pyodbc.ProgrammingError as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro de programação:", e)
+            return False, error_message
+        except pyodbc.Error as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro ao inserir fornecedor:", e)
+            return False, error_message
+        finally:
+            self.fechar_conexao()
 
 
 

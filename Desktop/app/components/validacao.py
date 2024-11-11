@@ -6,7 +6,10 @@ class Validacao:
 
 
     def valid_Login(self, cpf, senha):
-        dados = gbd.obter_funcionario_login() # Recebe os seguintes dados na seguinte ordem === Senha | CPF | ID
+
+        cpfv = cpf
+
+        dados = gbd.obter_funcionario_login(gbd, cpfv) # Recebe os seguintes dados na seguinte ordem === Senha | CPF | ID
         
         # quando utilizado dois anderlaine o escopo de utilização é fechado apenas para esta funcão.
         __senha = dados[0]
