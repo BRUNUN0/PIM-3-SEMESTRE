@@ -21,7 +21,7 @@ class GerenciamentoBanco:
         #     'Trusted_Connection=yes;'
         # )
         self.conn_str = r'Driver=ODBC Driver 17 for SQL Server;Server=facu-pixfarm.czwmyguc4vet.sa-east-1.rds.amazonaws.com;Database=PIXFARM;UID=admin;PWD=pixfarm2024;'
-        try:#testa para ver se o banco esta conectando ou não 
+        try:# testa para ver se o banco esta conectando ou não 
             conn = pyodbc.connect(self.conn_str)
             # ... (seu código para executar consultas)
         except pyodbc.Error as err:
@@ -540,7 +540,7 @@ class GerenciamentoBanco:
     def obter_funcionario_login(self, cpf):
         self.conectar()
         print(cpf)
-        self.cursor.execute( '''SELECT senha, cpf, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+        self.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
         dados_login = self.cursor.fetchone()
         print(dados_login)
         return dados_login
