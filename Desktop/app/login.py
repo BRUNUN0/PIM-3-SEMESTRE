@@ -1,11 +1,11 @@
 import flet as ft
-from components.validacao import Validacao 
+from app.components.validacao import Validacao 
 
 def Login(page: ft.Page):
     
     def login(e):
         print("Login Solicitado")
-        Validacao.valid_Login(senha_value)
+        # Validacao.valid_Login(senha_value)
         page.go('/')
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
     def logo():
@@ -45,36 +45,52 @@ def Login(page: ft.Page):
 
         return background
     
+    campo_cpf = ft.TextField(
+        label='CPF',
+        width=350,
+        height=50,
+        border_radius=ft.border_radius.all(8),
+        color=ft.colors.BLACK,
+        text_style=ft.TextStyle(size=16),
+        label_style=ft.TextStyle(
+            color=ft.colors.BLACK,
+            size=14
+        )
+    )
+    campo_senha = ft.TextField(
+        label='Senha',
+        width=350,
+        height=50,
+        password=True,
+        border_radius=ft.border_radius.all(8),
+        color=ft.colors.BLACK,
+        text_style=ft.TextStyle(size=16),
+        label_style=ft.TextStyle(
+            color=ft.colors.BLACK,
+            size=14
+        )
+    )
+    # btn_login = ft.ElevatedButton(
+    #     text="Entrar",
+    #     width=100,
+    #     height=40,
+    #     bgcolor="#13330D",                 #botão entrar
+    #     color=ft.colors.WHITE,
+    #     on_click=lambda e: login(e)
+    # )
+
+    def login(e):
+        cpf_valor = campo_cpf.value
+        senha_valor = campo_senha.value
+        print(f"CPF: {cpf_valor}, Senha: {senha_valor}")
+    
 # Definindo background
     def campos():
         campos = ft.Container(
             content=ft.Column(
                 controls=[
-                    ft.TextField(
-                        label='CPF',
-                        width=350,
-                        height=50,
-                        border_radius=ft.border_radius.all(8),     # caixa CPF
-                        color=ft.colors.BLACK,
-                        text_style=ft.TextStyle(size=16),
-                        label_style=ft.TextStyle(
-                            color=ft.colors.BLACK,
-                            size=14
-                        )
-                    ),
-                    ft.TextField(
-                        label='Senha', # Não tenho como encontrar o valor que foi inseriro pelo usuario, por isso estou parando por aqui hoje, deixei só a função que valida isso, pra não quebrar o resto das coisas, se você conseguir arrumar isso aqui eu agradeço muito :)
-                        width=350,
-                        height=50,
-                        password=True,
-                        border_radius=ft.border_radius.all(8),     # caixa Senha
-                        color=ft.colors.BLACK,
-                        text_style=ft.TextStyle(size=16),
-                        label_style=ft.TextStyle(
-                            color=ft.colors.BLACK,
-                            size=14
-                        )
-                    ),
+                    campo_cpf,
+                    campo_senha,
                     ft.Container(
                         btn_login(),
                         padding=ft.padding.only(left=250),
