@@ -13,26 +13,21 @@ class Usuario:
 class GerenciamentoBanco:
     def __init__(self):
         # self.conn_str = (
-        #      #BRUNO NOTE
+        #     # BRUNO PC
         #     'Driver=ODBC Driver 17 for SQL Server;'
-        #     'Server=BRUNO-NOTE\\SQLEXPRESS;'
+        #     'Server=BRUNUN;'
         #     'Database=PIXFARM;'
         #     'Trusted_Connection=yes;'
         # )
-        self.conn_str = (
-            # BRUNO PC
-            'Driver=ODBC Driver 17 for SQL Server;'
-            'Server=BRUNUN;'
-            'Database=PIXFARM;'
-            'Trusted_Connection=yes;'
-        )
-        #self.conn_str = (
-        #    # Nelson PC
-        #    'Driver=ODBC Driver 17 for SQL Server;'
-        #    'Server=DESKTOP-I3SMJCV\SQLEXPRESS;'
-        #    'Database=PIXFARM;'
-        #    'Trusted_Connection=yes;'
-        #)
+        self.conn_str = r'Driver=ODBC Driver 17 for SQL Server;Server=facu-pixfarm.czwmyguc4vet.sa-east-1.rds.amazonaws.com;Database=PIXFARM;UID=admin;PWD=pixfarm2024;'
+        try:
+            conn = pyodbc.connect(self.conn_str)
+            # ... (seu código para executar consultas)
+        except pyodbc.Error as err:
+            print("Error: ", err)
+        finally:
+            if conn:
+                conn.close()
         self.conn = None
         self.cursor = None
 
