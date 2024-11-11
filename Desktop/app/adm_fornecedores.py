@@ -266,7 +266,7 @@ def AdminFornecedores(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: cadastro.abrir_dialog("fornecedor")
+                                    on_click=lambda e: cadastro.abrir_cadastro("fornecedor")
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

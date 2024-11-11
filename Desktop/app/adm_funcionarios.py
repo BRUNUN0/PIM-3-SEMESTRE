@@ -269,7 +269,7 @@ def AdminFuncionarios(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: cadastro.abrir_dialog("funcionario")
+                                    on_click=lambda e: cadastro.abrir_cadastro("funcionario")
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

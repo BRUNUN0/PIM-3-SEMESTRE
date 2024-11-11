@@ -381,7 +381,6 @@ def AdminHome(page: ft.Page):
         )
         return grafico
 
-    # Cria um contêiner principal para o conteúdo
     def conteudo():
         conteudo = ft.Container(
             padding=ft.padding.only(left=25,),
@@ -389,9 +388,7 @@ def AdminHome(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
-                            # Chama a função grafico_plantas para gerar o gráfico de plantas
                             grafico_plantas(),
-                            # Chama a função pedidos para gerar o gráfico de pedidos
                             pedidos()
                         ]
                     ),
@@ -401,8 +398,7 @@ def AdminHome(page: ft.Page):
         )
 
         return conteudo
-
-    # Criação do contêiner principal da página
+    
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),

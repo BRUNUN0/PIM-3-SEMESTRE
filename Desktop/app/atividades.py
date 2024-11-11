@@ -1,6 +1,7 @@
 import flet as ft
 import time
 import pyodbc
+from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import DialogoSaida
 
 
@@ -192,19 +193,52 @@ def Atividades(page: ft.Page):
         
         return AppBar
     
-    def lista():
-        lista = ft.ListView(
-            expand=True,
-            controls=[ft.Text(f'Item {i}') for i in range (100)],
-            first_item_prototype=False
+    def atividade(id_atividade, nome, data):
+        detalhes = Detalhes(page)
+            
+        atividade = ft.Container(
+            bgcolor="#99C2A2",
+            border=ft.border.all(color=ft.colors.BLACK),
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=12, right=12),
+            on_click=lambda e: detalhes.detalhes_atividade(id_atividade),
+            
+            content=ft.Row(
+                controls=[
+                    ft.Icon(
+                        name=ft.icons.FOREST,
+                        color=ft.colors.BLACK,
+                        size=30
+                        ),
+                    ft.Text(
+                        value=f"ID: {id_atividade}"
+                        ),
+                    
+                    ft.Text(
+                        value=nome
+                        ),
+                    ft.Text(
+                        value=data
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            )
         )
         
-        return lista
-
+        return atividade
+    
     def container():
+        banco = GerenciamentoBanco()
+        atividades = banco.obter_atividades()
+        if atividades:
+            lista_atividades = [atividade(id_atividade, nome, data) for id_atividade, nome, data in atividades]
+        else:
+            lista_atividades = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma atividade encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+
+        cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
-            # height=150,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
@@ -215,7 +249,14 @@ def Atividades(page: ft.Page):
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
-                        border_radius=12
+                        border_radius=12,
+                        padding=ft.padding.all(20),
+                        content=ft.Column(
+                            controls=
+                            lista_atividades,
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        )
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),
@@ -228,7 +269,7 @@ def Atividades(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: print('Cadastrar Clicado')
+                                    on_click=lambda e: cadastro.abrir_registro('atividade')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

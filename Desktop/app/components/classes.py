@@ -1,4 +1,5 @@
 from sqlite3 import Cursor
+from tkinter import Widget
 import flet as ft
 import pyodbc
 
@@ -20,7 +21,7 @@ class GerenciamentoBanco:
         #     'Trusted_Connection=yes;'
         # )
         self.conn_str = r'Driver=ODBC Driver 17 for SQL Server;Server=facu-pixfarm.czwmyguc4vet.sa-east-1.rds.amazonaws.com;Database=PIXFARM;UID=admin;PWD=pixfarm2024;'
-        try:
+        try:#testa para ver se o banco esta conectando ou não 
             conn = pyodbc.connect(self.conn_str)
             # ... (seu código para executar consultas)
         except pyodbc.Error as err:
@@ -48,11 +49,12 @@ class GerenciamentoBanco:
             self.conectar()
             query = '''SELECT
                         p.id_plantio,
+                        p.Plantio,
                         p.Nome,
                         p.Quantidade,
                         mp.URL
                     FROM Producao p
-                    INNER JOIN Materia_Prima mp ON mp.URL = mp.id_materia'''
+                    JOIN Materia_Prima mp ON p.fk_id_materia = mp.id_materia;'''
             self.cursor.execute(query)
             producao = self.cursor.fetchall()
             return producao
@@ -60,7 +62,7 @@ class GerenciamentoBanco:
             print(f"Erro ao obter producao: {e}")
             self.fechar_conexao()
             return []
-    
+
     def obter_fornecedores(self):
         try:
             # Obtém os dados dos fornecedores
@@ -157,6 +159,27 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
 
+    def obter_atividades(self):
+        try:
+            self.conectar()
+            query = '''SELECT 
+                        a.id_atividade,
+                        p.Plantio AS nome_plantio,
+                        a.Data
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio;'''
+            self.cursor.execute(query)
+            atividades = self.cursor.fetchone()
+            return atividades
+        except Exception as e:
+            print(f"Erro ao obter atividades: {e}")
+            self.fechar_conexao()
+            return None
+
     def atualizar_fornecedor(self, dados_atualizados, id_fornecedor):
         try:
             self.conectar()
@@ -208,20 +231,19 @@ class GerenciamentoBanco:
         print(dados_atualizados)
         try:
             self.conectar()
-            query = '''UPDATE Funcionario SET  Nome = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
+            query = f'''UPDATE Funcionario SET  Nome = ?, Sexo = ?, Senha = ?, Nascimento = ?, Email = ?, Setor = ? WHERE id_funcionario = ?'''
             parametros = (
             dados_atualizados["Nome"],
             dados_atualizados["Sexo"],
-            dados_atualizados["Cargo"],
             dados_atualizados["Senha"],
             dados_atualizados["Nascimento"],
             dados_atualizados["Email"],
             dados_atualizados["Setor"],
-            dados_atualizados["Data_inicial"],
             id_funcionario
             )
             self.cursor.execute(query, parametros)
             self. conn.commit()
+            return True
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor {e}")
             self.fechar_conexao()
@@ -327,6 +349,32 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
 
+    def obter_detalhes_atividade(self, id_atividade):
+        try:
+            self.conectar()
+            query = f'''SELECT 
+                        a.id_atividade,
+                        f.nome AS nome_funcionario,
+                        p.Plantio AS nome_plantio,
+                        a.Descricao,
+                        a.Prioridade,
+                        a.Duracao,
+                        p.Fase_Atual
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio
+                    WHERE id_atividade = {id_atividade}'''
+            self.cursor.execute(query)
+            detalhes_atividade = self.cursor.fetchone()
+            print(detalhes_atividade)
+            return detalhes_atividade
+        except Exception as e:
+            print(f"Erro ao obter detalhes da atividade: {e}")
+            self.fechar_conexao()
+            return None
 
     def cadastro(self, tipo_cadastro, dados):
         self.conectar()
@@ -400,7 +448,7 @@ class GerenciamentoBanco:
             finally:
                 self.fechar_conexao()
 
-        elif tipo_cadastro == 'materia_prima':
+        elif tipo_cadastro == 'materia prima':
             try:
                 self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
@@ -421,6 +469,81 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
+
+        elif tipo_cadastro == 'iniciar producao':
+            try:
+                print(dados)
+                self.cursor.execute('''{CALL IniciarProducao (?, ?, ?, ?, ?, ?)}''',
+                (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+                
+        elif tipo_cadastro == 'atividade':
+            try:
+                print(dados)
+                self.cursor.execute('''{CALL RegistrarAtividade (?, ?, ?, ?, ?, ?, ?)}''',
+                (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Data"], dados["Duração"], dados["Fase Atual"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
+        elif tipo_cadastro == "novo produto":
+            try:
+                self.cursor.execute('''INSERT INTO Produto (Produto) VALUES (?)''', (dados["Novo produto"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
+    def obter_funcionario_login(self, cpf):
+        self.conectar()
+        print(cpf)
+        self.cursor.execute( '''SELECT senha, cpf, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+        dados_login = self.cursor.fetchone()
+        print(dados_login)
+        return dados_login
 
 
 
@@ -459,6 +582,9 @@ class Cadastro:
             ],
             "materia prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
+            ],
+            "novo produto": [
+                {"titulo": "Informações do Produto", "campos": ["Novo produto"]}
             ]
         }
 
@@ -560,7 +686,7 @@ class Cadastro:
         self.tipo_cadastro = tipo_cadastro
         campos_por_tipo = {
             "iniciar producao": [
-                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
+                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio", "Fase Atual"]}
             ],
             "finalizar producao": [
                 {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
@@ -568,6 +694,10 @@ class Cadastro:
             "pedido": [
                 {"titulo": "Dados do Pedido", "campos": ["CNPJ do Cliente", "Data Pedido"]},
                 {"titulo": "Itens do Pedido", "campos": ["Produto", "Quantidade"]}
+            ],
+            "atividade": [
+                {"titulo": "Responsável da Atividade", "campos": ["Nome do Funcionario", "Nome Plantio"]},
+                {"titulo": "Detalhes da Atividade", "campos": ["Descrição", "Prioridade(1 a 3)", "Data", "Duração", "Fase Atual"]}
             ]
         }
 
@@ -582,6 +712,39 @@ class Cadastro:
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
         ]
+
+        self.itens_pedido = []
+
+        def adicionar_item(e):
+            novo_item = {
+                "produto":ft.TextField(label="Produto", width=200),
+                "quantidade":ft.TextField(label="Quantidade", width=200)
+            }
+            self.itens_pedido.append(novo_item)
+            atualizar_interface_itens()
+
+        def atualizar_interface_itens():
+            print("Conteudo de conteudo_itens antes de limpar: ", conteudo_itens)
+            print("Itens no pedido:", self.itens_pedido)
+            conteudo_itens.clear()
+            conteudo_dialog.clear()
+            for item in self.itens_pedido:
+                print("Valor do produto:", item["produto"].value)
+                print("Valor da quantidade:", item["quantidade"].value)
+                conteudo_itens.append(
+                    ft.Row(
+                        controls=[
+                            ft.Text(item["produto"].value if item["produto"].value else "Sem valor"),
+                            ft.Text(item["quantidade"].value if item["quantidade"].value else "Sem valor")
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                    )
+                )
+                conteudo_dialog.extend(conteudo_itens)
+                print("Conteudo atualizado do código:", conteudo_dialog)
+                self.dialog.update()
+                self.page.update()
+        conteudo_itens = []
 
 
         # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
@@ -618,9 +781,44 @@ class Cadastro:
                         on_focus=pegar_data
                     )
                     self.inputs[campo] = date_field
+                elif campo == "Duração":
+                    time_field_flag = {"is_open": False}
+
+                    def pegar_hora(e, campo=campo):
+                        if not time_field_flag["is_open"]:
+                            time_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.TimePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_invalid_text='Hora inválida',
+                                    hour_label_text='Hora',
+                                    minute_label_text='Minutos',
+                                    help_text='Selecione o tempo de duração da atividade',
+                                    # value=0,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%H:%M:%S')),
+                                        self.dialog.update()
+                                    )
+
+                                )
+                            )
+                    time_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,
+                        on_focus=pegar_hora
+                    )
+                    self.inputs[campo] = time_field
                 else:
                     # Cria campos normais
                     self.inputs[campo] = ft.TextField(label=campo, width=250)
+
+            if grupo["titulo"] == "Itens do Pedido":
+                conteudo_dialog.append(
+                    ft.ElevatedButton("Adicionar Item", color=ft.colors.WHITE, bgcolor="#13330D", icon=ft.icons.ADD, on_click=adicionar_item)
+                )
+                conteudo_dialog.extend(self.itens_pedido)
 
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
@@ -651,6 +849,7 @@ class Cadastro:
         self.page.update()
 
     def _salvar_dados(self, e):
+        print(self.dados_salvos)
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
         # print("Dados coletados:", self.dados_salvos)
@@ -707,7 +906,7 @@ class Detalhes:
         self.em_edicao = False
         self.botoes = None
         self.campos = {}
-        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF"]
+        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF", "Cargo", "Data inicial"]
 
     def detalhes_fornecedor(self, id_fornecedor):
         self.id_fornecedor_atual = id_fornecedor
@@ -955,7 +1154,7 @@ class Detalhes:
     
     def detalhes_funcionario(self, id_funcionario):
         self.id_funcionario_atual = id_funcionario
-        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
+        self._alternar_modo_edicao(None, tipo_entidade='funcionario')
         banco = GerenciamentoBanco()
 
         # Obter detalhes do fornecedor pelo ID
@@ -1036,6 +1235,35 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
+
+    def detalhes_atividade(self, id_atividade):
+        self.id_atividade_atual = id_atividade
+        self._alternar_modo_edicao(None, tipo_entidade='atividade')
+        banco = GerenciamentoBanco()
+
+        detalhes = banco.obter_detalhes_atividade(id_atividade)
+        print(detalhes)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes da atividade."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+        
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CPF": detalhes[2],
+            "Sexo": detalhes[3],
+            "Cargo": detalhes[4],
+            "Senha": detalhes[5],
+            "Nascimento": detalhes[6],
+            "Email": detalhes[7],
+            "Setor": detalhes[8],
+            "Data inicial": detalhes[9]
+        }
+        print(dados)
 
 
     def _alternar_modo_edicao(self, e, tipo_entidade):

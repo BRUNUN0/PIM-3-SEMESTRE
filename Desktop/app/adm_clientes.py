@@ -274,7 +274,7 @@ def AdminClientes(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: cadastro.abrir_dialog('cliente')
+                                    on_click=lambda e: cadastro.abrir_cadastro('cliente')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END
