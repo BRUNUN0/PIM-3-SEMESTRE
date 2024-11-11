@@ -1,13 +1,16 @@
 import flet as ft
+<<<<<<< HEAD
 from app.components.validacao import Validacao 
+
 
 def Login(page: ft.Page):
     
     def login(e):
-        print("Login Solicitado")
-        # Validacao.valid_Login(senha_value)
-        page.go('/')
+        cpf_valor = campo_cpf.value
+        senha_valor = campo_senha.value
+        print(f"CPF: {cpf_valor}, Senha: {senha_valor}")
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
+
     def logo():
         logo = ft.Container(
             bgcolor='#7FA677',
@@ -79,10 +82,7 @@ def Login(page: ft.Page):
     #     on_click=lambda e: login(e)
     # )
 
-    def login(e):
-        cpf_valor = campo_cpf.value
-        senha_valor = campo_senha.value
-        print(f"CPF: {cpf_valor}, Senha: {senha_valor}")
+
     
 # Definindo background
     def campos():
