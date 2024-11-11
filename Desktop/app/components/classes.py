@@ -49,11 +49,12 @@ class GerenciamentoBanco:
             self.conectar()
             query = '''SELECT
                         p.id_plantio,
+                        p.Plantio,
                         p.Nome,
                         p.Quantidade,
                         mp.URL
                     FROM Producao p
-                    INNER JOIN Materia_Prima mp ON mp.URL = mp.id_materia'''
+                    JOIN Materia_Prima mp ON p.fk_id_materia = mp.id_materia;'''
             self.cursor.execute(query)
             producao = self.cursor.fetchall()
             return producao
@@ -61,7 +62,7 @@ class GerenciamentoBanco:
             print(f"Erro ao obter producao: {e}")
             self.fechar_conexao()
             return []
-    
+
     def obter_fornecedores(self):
         try:
             # Obtém os dados dos fornecedores
@@ -155,6 +156,27 @@ class GerenciamentoBanco:
             return produtos
         except Exception as e:
             print(f"Erro ao obter produtos: {e}")
+            self.fechar_conexao()
+            return None
+
+    def obter_atividades(self):
+        try:
+            self.conectar()
+            query = '''SELECT 
+                        a.id_atividade,
+                        p.Plantio AS nome_plantio,
+                        a.Data
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio;'''
+            self.cursor.execute(query)
+            atividades = self.cursor.fetchone()
+            return atividades
+        except Exception as e:
+            print(f"Erro ao obter atividades: {e}")
             self.fechar_conexao()
             return None
 
@@ -327,6 +349,32 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
 
+    def obter_detalhes_atividade(self, id_atividade):
+        try:
+            self.conectar()
+            query = f'''SELECT 
+                        a.id_atividade,
+                        f.nome AS nome_funcionario,
+                        p.Plantio AS nome_plantio,
+                        a.Descricao,
+                        a.Prioridade,
+                        a.Duracao,
+                        p.Fase_Atual
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio
+                    WHERE id_atividade = {id_atividade}'''
+            self.cursor.execute(query)
+            detalhes_atividade = self.cursor.fetchone()
+            print(detalhes_atividade)
+            return detalhes_atividade
+        except Exception as e:
+            print(f"Erro ao obter detalhes da atividade: {e}")
+            self.fechar_conexao()
+            return None
 
     def cadastro(self, tipo_cadastro, dados):
         self.conectar()
@@ -447,8 +495,30 @@ class GerenciamentoBanco:
                 
         elif tipo_cadastro == 'atividade':
             try:
-                self.cursor.execute('''{CALL RegistrarAtividade (?, ?, ?, ?, ?, ?)}''',
-                (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Duração"], dados["Fase Atual"])
+                print(dados)
+                self.cursor.execute('''{CALL RegistrarAtividade (?, ?, ?, ?, ?, ?, ?)}''',
+                (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Data"], dados["Duração"], dados["Fase Atual"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
+        elif tipo_cadastro == "novo produto":
+            try:
+                self.cursor.execute('''INSERT INTO Produto (Produto) VALUES (?)''', (dados["Novo produto"])
                 )
                 self.conn.commit()
                 return True, None
@@ -512,6 +582,9 @@ class Cadastro:
             ],
             "materia prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
+            ],
+            "novo produto": [
+                {"titulo": "Informações do Produto", "campos": ["Novo produto"]}
             ]
         }
 
@@ -624,7 +697,7 @@ class Cadastro:
             ],
             "atividade": [
                 {"titulo": "Responsável da Atividade", "campos": ["Nome do Funcionario", "Nome Plantio"]},
-                {"titulo": "Detalhes da Atividade", "campos": ["Descrição", "Prioridade(1 a 3)", "Duração", "Fase Atual"]}
+                {"titulo": "Detalhes da Atividade", "campos": ["Descrição", "Prioridade(1 a 3)", "Data", "Duração", "Fase Atual"]}
             ]
         }
 
@@ -1081,7 +1154,7 @@ class Detalhes:
     
     def detalhes_funcionario(self, id_funcionario):
         self.id_funcionario_atual = id_funcionario
-        self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
+        self._alternar_modo_edicao(None, tipo_entidade='funcionario')
         banco = GerenciamentoBanco()
 
         # Obter detalhes do fornecedor pelo ID
@@ -1162,6 +1235,35 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
+
+    def detalhes_atividade(self, id_atividade):
+        self.id_atividade_atual = id_atividade
+        self._alternar_modo_edicao(None, tipo_entidade='atividade')
+        banco = GerenciamentoBanco()
+
+        detalhes = banco.obter_detalhes_atividade(id_atividade)
+        print(detalhes)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes da atividade."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+        
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CPF": detalhes[2],
+            "Sexo": detalhes[3],
+            "Cargo": detalhes[4],
+            "Senha": detalhes[5],
+            "Nascimento": detalhes[6],
+            "Email": detalhes[7],
+            "Setor": detalhes[8],
+            "Data inicial": detalhes[9]
+        }
+        print(dados)
 
 
     def _alternar_modo_edicao(self, e, tipo_entidade):

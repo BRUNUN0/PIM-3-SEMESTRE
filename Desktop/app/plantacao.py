@@ -266,7 +266,7 @@ def Plantacao(page: ft.Page):
         )
         return estoque_mater_prima
 
-    def produto(id, nome, quantidade, validade):
+    def plantacao(id, plantio, nome, quantidade):
         produto = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
@@ -281,15 +281,15 @@ def Plantacao(page: ft.Page):
                         color=ft.colors.BLACK
                     ),
                     ft.Text(
+                        value=plantio,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
                         value=nome,
                         color=ft.colors.BLACK
                     ),
                     ft.Text(
                         value=quantidade,
-                        color=ft.colors.BLACK
-                    ),
-                    ft.Text(
-                        value=validade,
                         color=ft.colors.BLACK
                     )
                 ],
@@ -298,14 +298,15 @@ def Plantacao(page: ft.Page):
         )
         return produto
 
-    def produtos():
+    def plantacoes():
         banco = GerenciamentoBanco()
-        produtos_data = banco.obter_produtos()
-        if produtos_data:
-            lista_produtos = [produto(id, nome, quantidade, validade) for id, nome, quantidade, validade in produtos_data]
+        producoes = banco.obter_producao()
+        if producoes:
+            lista_plantacao = [plantacao(id, plantio, nome, quantidade) for id, plantio, nome, quantidade, *rest in producoes]
         else:
-            lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrato", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
-        produtos = ft.Container(
+            lista_plantacao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma plantaçao encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+            
+        plantacoes = ft.Container(
             width=350,
             bgcolor="#D6D6D6",
             border_radius=16,
@@ -314,10 +315,10 @@ def Plantacao(page: ft.Page):
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='Itens Plantados', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
-                        lista_produtos,
+                        lista_plantacao,
                         spacing=6,
                         scroll=ft.ScrollMode.AUTO
                     )
@@ -326,11 +327,11 @@ def Plantacao(page: ft.Page):
             )
         )
 
-        return produtos
+        return plantacoes
 
     def grupo():
 
-        def plantados(id, nome, quantidade):
+        def produto(id, nome, quantidade):
             plantados = ft.Container(
                 bgcolor="#99C2A2",
                 border=ft.border.all(color=ft.colors.BLACK),
@@ -360,11 +361,11 @@ def Plantacao(page: ft.Page):
 
         cadastro = Cadastro(page)
         banco = GerenciamentoBanco()
-        plantados_data = banco.obter_producao()
-        if plantados_data:
-            items_plantados = [plantados(id, nome, quantidade) for id, nome, quantidade in plantados_data]
+        produtos = banco.obter_produtos()
+        if produtos:
+            lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade in produtos]
         else:
-            items_plantados = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+            lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
 
         grupo = ft.Container(
             expand=True,
@@ -378,10 +379,10 @@ def Plantacao(page: ft.Page):
                         border_radius=16,
                         content=ft.Column(
                             controls=[
-                                ft.Text(value='Itens Plantados', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                                ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                                 ft.Column(
                                     controls=
-                                    items_plantados,
+                                    lista_produtos,
                                     spacing=6,
                                     scroll=ft.ScrollMode.AUTO
                                 )
@@ -474,7 +475,7 @@ def Plantacao(page: ft.Page):
                     ft.Row(
                         controls=[
                             materias_primas(),
-                            produtos(),
+                            plantacoes(),
                             grupo()
                         ]
                     )

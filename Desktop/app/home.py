@@ -205,7 +205,7 @@ def Home(page: ft.Page):
         
         return AppBar
 
-    def producao(nome, imagem):
+    def pproducao(nome, imagem):
 
         def on_click_container(e):
             print(f"Clicado: {nome}")
@@ -253,7 +253,7 @@ def Home(page: ft.Page):
         banco = GerenciamentoBanco()
         producoes = banco.obter_producao()
         if producoes:
-            lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
+            lista_producao = [pproducao(nome, imagem) for  _, _, nome, _, imagem in producoes]
         else:
             lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção em andamento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
@@ -319,7 +319,7 @@ def Home(page: ft.Page):
         banco = GerenciamentoBanco()
         producoes = banco.obter_pedidos()
         if producoes:
-            lista_producao = [producao(nome, imagem) for  nome, imagem in producoes]
+            lista_producao = [pedido(nome, imagem) for  nome, imagem in producoes]
         else:
             lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 

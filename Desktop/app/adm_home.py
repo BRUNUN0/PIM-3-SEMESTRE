@@ -2,7 +2,7 @@ import flet as ft
 import time
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.classes import GerenciamentoBanco
+from app.components.classes import GerenciamentoBanco, Cadastro
 
 
 
@@ -364,6 +364,144 @@ def AdminHome(page: ft.Page):
             )
         )
         return grafico
+    
+    def grupo():
+
+        def produto(id, nome, quantidade):
+            plantados = ft.Container(
+                bgcolor="#99C2A2",
+                border=ft.border.all(color=ft.colors.BLACK),
+                width=340,
+                height=50,
+                border_radius=9,
+                padding=ft.padding.only(left=12, right=12),
+                content=ft.Row(
+                    controls=[
+                        ft.Text(
+                            value=f"ID: {id}",
+                            color=ft.colors.BLACK
+                        ),
+                        ft.Text(
+                            value=nome,
+                            color=ft.colors.BLACK
+                        ),
+                        ft.Text(
+                            value=quantidade,
+                            color=ft.colors.BLACK
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+            return plantados
+
+        cadastro = Cadastro(page)
+        banco = GerenciamentoBanco()
+        produtos = banco.obter_produtos()
+        if produtos:
+            lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade in produtos]
+        else:
+            lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+
+        grupo = ft.Container(
+            expand=True,
+            padding=ft.padding.only(left=15, right=15, bottom=15),
+            content=ft.Column(
+                controls=[
+                    ft.Container(
+                        expand=True,
+                        width=750,
+                        bgcolor="#D6D6D6",
+                        border_radius=16,
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                                ft.Column(
+                                    controls=
+                                    lista_produtos,
+                                    spacing=6,
+                                    scroll=ft.ScrollMode.AUTO
+                                )
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                        )
+                    ),
+                    ft.Row(
+                        height=100,
+                        spacing=10,
+                        controls=[
+                            ft.Container(
+                                expand=True,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            ),
+                            ft.Container(
+                                expand=True,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        height=100,
+                        spacing=10,
+                        controls=[
+                            ft.Container(
+                                expand=True,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            ),
+                            ft.Container(
+                                expand=True,
+                                bgcolor="#D9FFBA",
+                                border_radius=16,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(value='Valor', color=ft.colors.BLACK)
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                )
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        height=50,
+                        spacing=10,
+                        controls=[
+                            ft.ElevatedButton("Novo Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("novo produto")),
+                            # ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
+                            # ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
+                        ],
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+        )
+        return grupo
 
     def conteudo():
         conteudo = ft.Container(
@@ -373,7 +511,8 @@ def AdminHome(page: ft.Page):
                     ft.Row(
                         controls=[
                             grafico_plantas(),
-                            pedidos()
+                            pedidos(),
+                            grupo()
                         ]
                     ),
                 ],
