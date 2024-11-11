@@ -1,11 +1,9 @@
 import flet as ft
-from components.validacao import Validacao 
 
 def Login(page: ft.Page):
     
     def login(e):
         print("Login Solicitado")
-        Validacao.valid_Login(senha_value)
         page.go('/')
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
     def logo():
