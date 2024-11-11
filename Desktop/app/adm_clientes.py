@@ -4,9 +4,10 @@ import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
-
+# Função principal que configura a interface da página de administração de clientes.
 def AdminClientes(page: ft.Page):
 
+    # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
         relogio = ft.Container(
             content=ft.Column(
@@ -18,6 +19,7 @@ def AdminClientes(page: ft.Page):
         )
         return relogio
     
+    # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -28,7 +30,8 @@ def AdminClientes(page: ft.Page):
             alignment=ft.alignment.top_center,
         )
         return logo
-        
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.    
     def appbar_superior():
         def go_home(e):
             page.go('/')
@@ -63,7 +66,8 @@ def AdminClientes(page: ft.Page):
         )
         
         return app_sup
-        
+
+    # Função que cria uma barra de botões para navegação na aplicação.    
     def botoes():
         botoes = ft.Container(
             expand=True,
@@ -74,6 +78,7 @@ def AdminClientes(page: ft.Page):
     controls=[
         ft.Row(
             controls=[
+                # Primeiro botão (Clientes).
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -97,6 +102,7 @@ def AdminClientes(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,  # Ajuste o espaçamento entre os botões
                 ),
+                # Segundo botão (Funcionários).
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -120,6 +126,7 @@ def AdminClientes(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,
                 ),
+                # Terceiro botão (Fornecedores).
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -154,6 +161,7 @@ def AdminClientes(page: ft.Page):
         
         return botoes
     
+    # Função que cria a barra de navegação superior (AppBar) da aplicação.
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
@@ -162,6 +170,7 @@ def AdminClientes(page: ft.Page):
             
             content=ft.Column(
                 controls=[
+                    # Contêiner interno que organiza a barra superior e os botões de navegação.
                     ft.Container(
                         content=ft.Column(
                             controls=[
@@ -177,7 +186,7 @@ def AdminClientes(page: ft.Page):
         
         return AppBar
     
-    
+    # Função que cria um contêiner para exibir informações de um cliente específico.
     def cliente(id_cliente, nome, cnpj):
         detalhes = Detalhes(page)
 
@@ -218,15 +227,18 @@ def AdminClientes(page: ft.Page):
         
         return fornecedor
 
+    # Função que cria um contêiner principal para exibir a lista de clientes e um botão de cadastro.
     def container():
         banco = GerenciamentoBanco()
         clientes = banco.obter_clientes()
         if clientes:
+            # Se existem clientes, cria uma lista de contêineres com informações de cada cliente.
             lista_clientes = [cliente(id_cliente, nome, cnpj) for id_cliente, nome, cnpj in clientes]
         else:
+            # Caso não haja clientes, exibe uma mensagem informando que nenhum cliente foi encontrado.
             lista_clientes = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum cliente encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
 
-
+        # Instância de Cadastro para gerenciar o diálogo de cadastro.
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
@@ -238,6 +250,7 @@ def AdminClientes(page: ft.Page):
             content=ft.Column(
                 controls=[
                     ft.Text(value="Clientes"),
+                    # Contêiner para a lista de clientes.
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
@@ -249,6 +262,7 @@ def AdminClientes(page: ft.Page):
                             scroll=ft.ScrollMode.AUTO
                         )
                     ),
+                    # Contêiner com botão para cadastrar novos clientes.
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),
 
@@ -273,7 +287,8 @@ def AdminClientes(page: ft.Page):
         )
 
         return container
-            
+
+    # Função que cria o contêiner principal de conteúdo para a exibição da página.        
     def conteudo():
         conteudo = ft.Container(
             padding=ft.padding.only(left=25, right=25, top=0, bottom=0),
@@ -292,6 +307,7 @@ def AdminClientes(page: ft.Page):
 
         return conteudo
 
+    # Contêiner principal que define a estrutura e o layout da página.
     Main = ft.Container(
         bgcolor=ft.colors.WHITE,
         expand=True,

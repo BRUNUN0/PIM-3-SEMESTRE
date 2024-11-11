@@ -4,9 +4,10 @@ import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
-
+# Função principal que configura a interface da página de administração de fornecedores.
 def AdminFuncionarios(page: ft.Page):
 
+    # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
         relogio = ft.Container(
             content=ft.Column(
@@ -18,6 +19,7 @@ def AdminFuncionarios(page: ft.Page):
         )
         return relogio
     
+    # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -28,7 +30,8 @@ def AdminFuncionarios(page: ft.Page):
             alignment=ft.alignment.top_center,
         )
         return logo
-        
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.  
     def appbar_superior():
         def go_home(e):
             page.go('/')
@@ -63,7 +66,8 @@ def AdminFuncionarios(page: ft.Page):
         )
         
         return app_sup
-        
+
+    # Função para criar os botões de navegação na tela do administrador.  
     def botoes():
         botoes = ft.Container(
             # expand=True,
@@ -74,6 +78,7 @@ def AdminFuncionarios(page: ft.Page):
     controls=[
         ft.Row(
             controls=[
+                # Primeiro botão: Clientes
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -97,6 +102,7 @@ def AdminFuncionarios(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,  # Ajuste o espaçamento entre os botões
                 ),
+                # Segundo botão: Funcionários
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -118,6 +124,7 @@ def AdminFuncionarios(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,
                 ),
+                # Terceiro botão: Fornecedores
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -150,6 +157,7 @@ def AdminFuncionarios(page: ft.Page):
         
         return botoes
     
+    # Função para criar a barra superior (AppBar) da página.
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
@@ -176,7 +184,7 @@ def AdminFuncionarios(page: ft.Page):
         
         return AppBar
     
-    
+    # Cria uma instância de Detalhes que gerencia o detalhamento do funcionário
     def funcionario(id_funcionario, nome, cargo):
         detalhes = Detalhes(page)
             
@@ -215,14 +223,18 @@ def AdminFuncionarios(page: ft.Page):
         
         return fornecedor
 
+    # Cria uma instância de GerenciamentoBanco para acessar os dados do banco de dados
     def container():
         banco = GerenciamentoBanco()
         funcionarios = banco.obter_funcionarios()
         if funcionarios:
+            # Se existem funcionários, cria a lista de containers para exibir cada funcionário
             lista_funcionarios = [funcionario(id_funcionario, nome, cargo) for id_funcionario, nome, cargo in funcionarios]
         else:
+            # Se não houver funcionários, exibe uma mensagem informando que nenhum foi encontrado
             lista_funcionarios = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum funcionario encontrado")],alignment=ft.MainAxisAlignment.CENTER) )]
 
+        # Instância para o cadastro de novos funcionários
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
@@ -270,7 +282,8 @@ def AdminFuncionarios(page: ft.Page):
         )
 
         return container
-            
+
+    # Cria o contêiner principal que vai armazenar o conteúdo da página       
     def conteudo():
         conteudo = ft.Container(
             padding=ft.padding.only(left=25, right=25, top=0, bottom=0),
@@ -279,6 +292,7 @@ def AdminFuncionarios(page: ft.Page):
                 controls=[
                     ft.Column(
                         controls=[
+                            # Chama a função 'container()', que retorna a lista de funcionários
                             container()
                         ],
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -290,6 +304,7 @@ def AdminFuncionarios(page: ft.Page):
 
         return conteudo
 
+    # Criação do contêiner principal da página
     Main = ft.Container(
         bgcolor=ft.colors.WHITE,
         expand=True,

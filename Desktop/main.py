@@ -8,6 +8,7 @@ def main(page: ft.Page):
     rotas(page)
     print(page.route)
 
+
     page.go("/login")
     page.update()
 

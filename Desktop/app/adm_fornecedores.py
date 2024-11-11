@@ -4,10 +4,11 @@ import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
-
+# Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
     page.theme = ft.Theme(color_scheme_seed="white")
 
+    # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
         relogio = ft.Container(
             content=ft.Column(
@@ -19,6 +20,7 @@ def AdminFornecedores(page: ft.Page):
         )
         return relogio
     
+    # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -29,7 +31,8 @@ def AdminFornecedores(page: ft.Page):
             alignment=ft.alignment.top_center,
         )
         return logo
-        
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.   
     def appbar_superior():
         def go_home(e):
             page.go('/')
@@ -64,7 +67,8 @@ def AdminFornecedores(page: ft.Page):
         )
         
         return app_sup
-        
+
+    # Função para criar os botões de navegação na tela do administrador.     
     def botoes():
         botoes = ft.Container(
             bgcolor="#D9FFBA",
@@ -73,6 +77,7 @@ def AdminFornecedores(page: ft.Page):
     controls=[
         ft.Row(
             controls=[
+                # Primeiro botão: Clientes
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -96,6 +101,7 @@ def AdminFornecedores(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,  # Ajuste o espaçamento entre os botões
                 ),
+                # Segundo botão: Funcionários
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -117,6 +123,7 @@ def AdminFornecedores(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,
                 ),
+                # Terceiro botão: Fornecedores
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -158,6 +165,7 @@ def AdminFornecedores(page: ft.Page):
             
             content=ft.Column(
                 controls=[
+                    # Define os controles (conteúdos) dentro da AppBar.
                     ft.Container(
                         expand=True,
                         content=ft.Column(
@@ -176,8 +184,10 @@ def AdminFornecedores(page: ft.Page):
 
     
     def fornecedor(id_fornecedor, nome, cnpj):
+        # Cria um objeto de detalhes (presumivelmente, para exibir mais informações sobre o fornecedor)
         detalhes = Detalhes(page)
-            
+
+        # Cria o contêiner que vai representar o fornecedor.    
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
@@ -210,14 +220,18 @@ def AdminFornecedores(page: ft.Page):
         
         return fornecedor
 
+    # Instancia o objeto de gerenciamento de banco de dados
     def container():
         banco = GerenciamentoBanco()
         fornecedores = banco.obter_fornecedores()
+        # Verifica se há fornecedores. Se houver, cria a lista de fornecedores com base nas informações do banco
         if fornecedores:
             lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
         else:
+            # Caso não haja fornecedores, cria um contêiner informando que não há fornecedores
             lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
+        # Cria o objeto de cadastro (presumivelmente, para adicionar novos fornecedores)
         cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
@@ -267,7 +281,8 @@ def AdminFornecedores(page: ft.Page):
         )
 
         return container
-            
+
+    # Cria o contêiner principal da página, com padding e expansão       
     def conteudo():
         conteudo = ft.Container(
             padding=ft.padding.only(left=25, right=25, top=0, bottom=0),
@@ -286,6 +301,7 @@ def AdminFornecedores(page: ft.Page):
 
         return conteudo
 
+    # Criação do contêiner principal da página
     Main = ft.Container(
         bgcolor=ft.colors.WHITE,
         expand=True,

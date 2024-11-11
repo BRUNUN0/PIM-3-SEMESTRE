@@ -266,7 +266,8 @@ def Plantacao(page: ft.Page):
         )
         return estoque_mater_prima
 
-    def plantacao(id, plantio, nome, quantidade):
+    def plantacao(id_plantio, plantio, nome, quantidade):
+        detalhes = Detalhes(page)
         produto = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
@@ -274,10 +275,11 @@ def Plantacao(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
+            on_click=lambda e: detalhes.detalhes_producao(id_plantio),
             content=ft.Row(
                 controls=[
                     ft.Text(
-                        value=f"ID: {id}",
+                        value=f"ID: {id_plantio}",
                         color=ft.colors.BLACK
                     ),
                     ft.Text(
@@ -302,7 +304,7 @@ def Plantacao(page: ft.Page):
         banco = GerenciamentoBanco()
         producoes = banco.obter_producao()
         if producoes:
-            lista_plantacao = [plantacao(id, plantio, nome, quantidade) for id, plantio, nome, quantidade, *rest in producoes]
+            lista_plantacao = [plantacao(id_plantio, plantio, nome, quantidade) for id_plantio, plantio, nome, quantidade, *rest in producoes]
         else:
             lista_plantacao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma plantaçao encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
             
