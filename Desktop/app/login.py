@@ -81,14 +81,14 @@ def Login(page: ft.Page):
             size=14
         )
     )
-    # btn_login = ft.ElevatedButton(
-    #     text="Entrar",
-    #     width=100,
-    #     height=40,
-    #     bgcolor="#13330D",                 #botão entrar
-    #     color=ft.colors.WHITE,
-    #     on_click=lambda e: login(e)
-    # )
+    btn_login = ft.ElevatedButton(
+        text="Entrar",
+        width=100,
+        height=40,
+        bgcolor="#13330D",                 #botão entrar
+        color=ft.colors.WHITE,
+        on_click=lambda e: login(e)
+    )
 
 
     
@@ -100,7 +100,7 @@ def Login(page: ft.Page):
                     campo_cpf,
                     campo_senha,
                     ft.Container(
-                        btn_login(),
+                        btn_login,
                         padding=ft.padding.only(left=250),
                     )
                 ],
@@ -110,19 +110,6 @@ def Login(page: ft.Page):
         )
 
         return campos
-    
-    def btn_login():
-        # Botão Entrar
-        btn = ft.ElevatedButton(
-            text="Entrar",
-            width=100,
-            height=40,
-            bgcolor="#13330D",                 #botão entrar
-            color=ft.colors.WHITE,
-            on_click=lambda e: login(e)
-            )
-        
-        return btn
         
     def caixa_login():
         caixa_login = ft.Container(

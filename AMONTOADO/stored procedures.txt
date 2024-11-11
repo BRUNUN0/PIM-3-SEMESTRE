@@ -264,17 +264,23 @@ END;
 
 
 
-CREATE PROCEDURE IniciarProducao
+ALTER PROCEDURE [dbo].[IniciarProducao]
     @Plantio NVARCHAR(100),
-    @fk_id_pedido INT,
     @fk_id_materia INT,
-    @fk_id_produto INT,
+    @Nome VARCHAR(100),
     @Quantidade INT,
     @DataInicio DATE,
     @FaseAtual NVARCHAR(100)
 AS
 BEGIN
     DECLARE @QuantidadeDisponivel INT;
+
+    -- Verificar se o id_materia existe
+    IF NOT EXISTS (SELECT 1 FROM Materia_Prima WHERE id_materia = @fk_id_materia)
+    BEGIN
+        RAISERROR('Matéria-prima com o ID especificado não existe.', 16, 1);
+        RETURN;
+    END
 
     -- Verificar se a quantidade de matéria-prima está disponível
     SELECT @QuantidadeDisponivel = Quantidade
@@ -287,9 +293,9 @@ BEGIN
         RETURN;
     END
 
-    -- Inserir nova produção na tabela Item_Producao
-    INSERT INTO Item_Producao (Plantio, fk_id_pedido, fk_id_materia, fk_id_produto, Quantidade, Data_Inicio, Fase_Atual)
-    VALUES (@Plantio, @fk_id_pedido, @fk_id_materia, @fk_id_produto, @Quantidade, @DataInicio, @FaseAtual);
+    -- Inserir nova produção na tabela Producao
+    INSERT INTO Producao (Plantio, fk_id_materia, Nome, Quantidade, Data_Inicio, Fase_Atual)
+    VALUES (@Plantio, @fk_id_materia, @Nome, @Quantidade, @DataInicio, @FaseAtual);
 
     -- Subtrair a quantidade utilizada da tabela Materia_Prima
     UPDATE Materia_Prima
@@ -298,6 +304,7 @@ BEGIN
 
     PRINT 'Produção iniciada com sucesso!';
 END;
+
 
 
 

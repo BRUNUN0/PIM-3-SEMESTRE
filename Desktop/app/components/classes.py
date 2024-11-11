@@ -1,4 +1,5 @@
 from sqlite3 import Cursor
+from tkinter import Widget
 import flet as ft
 import pyodbc
 
@@ -208,20 +209,19 @@ class GerenciamentoBanco:
         print(dados_atualizados)
         try:
             self.conectar()
-            query = '''UPDATE Funcionario SET  Nome = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
+            query = f'''UPDATE Funcionario SET  Nome = ?, Sexo = ?, Senha = ?, Nascimento = ?, Email = ?, Setor = ? WHERE id_funcionario = ?'''
             parametros = (
             dados_atualizados["Nome"],
             dados_atualizados["Sexo"],
-            dados_atualizados["Cargo"],
             dados_atualizados["Senha"],
             dados_atualizados["Nascimento"],
             dados_atualizados["Email"],
             dados_atualizados["Setor"],
-            dados_atualizados["Data_inicial"],
             id_funcionario
             )
             self.cursor.execute(query, parametros)
             self. conn.commit()
+            return True
         except Exception as e:
             print(f"Erro ao atualizar dados do fornecedor {e}")
             self.fechar_conexao()
@@ -400,7 +400,7 @@ class GerenciamentoBanco:
             finally:
                 self.fechar_conexao()
 
-        elif tipo_cadastro == 'materia_prima':
+        elif tipo_cadastro == 'materia prima':
             try:
                 self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
                 (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
@@ -422,9 +422,33 @@ class GerenciamentoBanco:
             finally:
                 self.fechar_conexao()
 
-    def obter_funcionario_login(self,cpf):
+        elif tipo_cadastro == 'iniciar producao':
+            try:
+                print(dados)
+                self.cursor.execute('''{CALL IniciarProducao (?, ?, ?, ?, ?, ?)}''',
+                (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
+    def obter_funcionario_login(self, cpf):
         self.conectar()
-        self.cursor.execute( "SELECT senha, cpf, id_funcionario FROM funcionarios WHERE cpf = ?", cpf)
+        print(cpf)
+        self.cursor.execute( '''SELECT senha, cpf, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
         dados_login = self.cursor.fetchone()
         print(dados_login)
         return dados_login
@@ -567,7 +591,7 @@ class Cadastro:
         self.tipo_cadastro = tipo_cadastro
         campos_por_tipo = {
             "iniciar producao": [
-                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio"]}
+                {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio", "Fase Atual"]}
             ],
             "finalizar producao": [
                 {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
@@ -589,6 +613,39 @@ class Cadastro:
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
         ]
+
+        self.itens_pedido = []
+
+        def adicionar_item(e):
+            novo_item = {
+                "produto":ft.TextField(label="Produto", width=200),
+                "quantidade":ft.TextField(label="Quantidade", width=200)
+            }
+            self.itens_pedido.append(novo_item)
+            atualizar_interface_itens()
+
+        def atualizar_interface_itens():
+            print("Conteudo de conteudo_itens antes de limpar: ", conteudo_itens)
+            print("Itens no pedido:", self.itens_pedido)
+            conteudo_itens.clear()
+            conteudo_dialog.clear()
+            for item in self.itens_pedido:
+                print("Valor do produto:", item["produto"].value)
+                print("Valor da quantidade:", item["quantidade"].value)
+                conteudo_itens.append(
+                    ft.Row(
+                        controls=[
+                            ft.Text(item["produto"].value if item["produto"].value else "Sem valor"),
+                            ft.Text(item["quantidade"].value if item["quantidade"].value else "Sem valor")
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                    )
+                )
+                conteudo_dialog.extend(conteudo_itens)
+                print("Conteudo atualizado do código:", conteudo_dialog)
+                self.dialog.update()
+                self.page.update()
+        conteudo_itens = []
 
 
         # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
@@ -629,6 +686,12 @@ class Cadastro:
                     # Cria campos normais
                     self.inputs[campo] = ft.TextField(label=campo, width=250)
 
+            if grupo["titulo"] == "Itens do Pedido":
+                conteudo_dialog.append(
+                    ft.ElevatedButton("Adicionar Item", color=ft.colors.WHITE, bgcolor="#13330D", icon=ft.icons.ADD, on_click=adicionar_item)
+                )
+                conteudo_dialog.extend(self.itens_pedido)
+
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
                     controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
@@ -658,6 +721,7 @@ class Cadastro:
         self.page.update()
 
     def _salvar_dados(self, e):
+        print(self.dados_salvos)
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
         # print("Dados coletados:", self.dados_salvos)
@@ -714,7 +778,7 @@ class Detalhes:
         self.em_edicao = False
         self.botoes = None
         self.campos = {}
-        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF"]
+        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF", "Cargo", "Data inicial"]
 
     def detalhes_fornecedor(self, id_fornecedor):
         self.id_fornecedor_atual = id_fornecedor
