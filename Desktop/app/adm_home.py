@@ -338,7 +338,7 @@ def AdminHome(page: ft.Page):
     
     def pedidos ():
         banco = GerenciamentoBanco()
-        plantas = banco.obter_plantas()
+        plantas = banco.obter_pedidos()
         if plantas:
             lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
         else:
@@ -352,7 +352,7 @@ def AdminHome(page: ft.Page):
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value='COLUMN', size=20, weight=ft.FontWeight.BOLD),
+                    ft.Text(value='COLUMN', color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),
                     ft.Column(
                         controls=
                         lista_plantas,
@@ -386,7 +386,7 @@ def AdminHome(page: ft.Page):
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
+        bgcolor=ft.colors.WHITE,
 
         content=ft.Column(
             controls=[
