@@ -1,14 +1,22 @@
 import flet as ft
-<<<<<<< HEAD
 from app.components.validacao import Validacao 
 
+vl = Validacao()
 
 def Login(page: ft.Page):
     
     def login(e):
         cpf_valor = campo_cpf.value
         senha_valor = campo_senha.value
-        print(f"CPF: {cpf_valor}, Senha: {senha_valor}")
+        print(f"CPF:{cpf_valor}, Senha:{senha_valor}")
+
+        r = vl.valid_Login(cpf_valor, senha_valor)
+        
+        if(r):
+            page.go("/")
+            page.update()
+        else: print("Erro no login")
+
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
 
     def logo():
