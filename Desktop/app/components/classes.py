@@ -444,6 +444,28 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
+                
+        elif tipo_cadastro == 'atividade':
+            try:
+                self.cursor.execute('''{CALL RegistrarAtividade (?, ?, ?, ?, ?, ?)}''',
+                (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Duração"], dados["Fase Atual"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
 
     def obter_funcionario_login(self, cpf):
         self.conectar()
@@ -599,6 +621,10 @@ class Cadastro:
             "pedido": [
                 {"titulo": "Dados do Pedido", "campos": ["CNPJ do Cliente", "Data Pedido"]},
                 {"titulo": "Itens do Pedido", "campos": ["Produto", "Quantidade"]}
+            ],
+            "atividade": [
+                {"titulo": "Responsável da Atividade", "campos": ["Nome do Funcionario", "Nome Plantio"]},
+                {"titulo": "Detalhes da Atividade", "campos": ["Descrição", "Prioridade(1 a 3)", "Duração", "Fase Atual"]}
             ]
         }
 
@@ -682,6 +708,35 @@ class Cadastro:
                         on_focus=pegar_data
                     )
                     self.inputs[campo] = date_field
+                elif campo == "Duração":
+                    time_field_flag = {"is_open": False}
+
+                    def pegar_hora(e, campo=campo):
+                        if not time_field_flag["is_open"]:
+                            time_field_flag["is_open"] = True
+                            self.page.open(
+                                ft.TimePicker(
+                                    cancel_text='Cancelar',
+                                    confirm_text='Confirmar',
+                                    error_invalid_text='Hora inválida',
+                                    hour_label_text='Hora',
+                                    minute_label_text='Minutos',
+                                    help_text='Selecione o tempo de duração da atividade',
+                                    # value=0,
+                                    on_change=lambda e: (
+                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%H:%M:%S')),
+                                        self.dialog.update()
+                                    )
+
+                                )
+                            )
+                    time_field = ft.TextField(
+                        label=campo,
+                        width=250,
+                        read_only=True,
+                        on_focus=pegar_hora
+                    )
+                    self.inputs[campo] = time_field
                 else:
                     # Cria campos normais
                     self.inputs[campo] = ft.TextField(label=campo, width=250)

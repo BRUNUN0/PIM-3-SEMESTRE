@@ -1,6 +1,7 @@
 import flet as ft
 import time
 import pyodbc
+from app.components.classes import Cadastro
 from app.components.dialogs import DialogoSaida
 
 
@@ -202,6 +203,7 @@ def Atividades(page: ft.Page):
         return lista
 
     def container():
+        cadastro = Cadastro(page)
         container = ft.Container(
             width=page.window.width,
             # height=150,
@@ -228,7 +230,7 @@ def Atividades(page: ft.Page):
                                     width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
-                                    on_click=lambda e: print('Cadastrar Clicado')
+                                    on_click=lambda e: cadastro.abrir_registro('atividade')
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END

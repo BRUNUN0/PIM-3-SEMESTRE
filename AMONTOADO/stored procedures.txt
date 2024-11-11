@@ -264,7 +264,7 @@ END;
 
 
 
-ALTER PROCEDURE [dbo].[IniciarProducao]
+CREATE PROCEDURE [dbo].[IniciarProducao]
     @Plantio NVARCHAR(100),
     @fk_id_materia INT,
     @Nome VARCHAR(100),
@@ -380,17 +380,44 @@ END
 
 
 CREATE PROCEDURE RegistrarAtividade
-    @fk_id_funcionario INT,
-    @fk_id_plantio INT,
+    @nome_funcionario NVARCHAR(100),
+    @nome_plantio NVARCHAR(100),
     @descricao NVARCHAR(MAX),
     @prioridade INT,
     @duracao TIME,
     @fase_atual NVARCHAR(100) -- Novo parâmetro para Fase_Atual
 AS
 BEGIN
+    DECLARE @fk_id_funcionario INT;
+    DECLARE @fk_id_plantio INT;
+
     BEGIN TRY
         -- Iniciar uma transação
         BEGIN TRANSACTION;
+
+        -- Obter o ID do funcionário com base no nome
+        SELECT @fk_id_funcionario = id_funcionario
+        FROM Funcionario
+        WHERE nome = @nome_funcionario;
+
+        IF @fk_id_funcionario IS NULL
+        BEGIN
+            RAISERROR('Funcionário não encontrado.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Obter o ID do plantio com base no nome do plantio
+        SELECT @fk_id_plantio = id_plantio
+        FROM Producao
+        WHERE Plantio = @nome_plantio;
+
+        IF @fk_id_plantio IS NULL
+        BEGIN
+            RAISERROR('Plantio não encontrado.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
         -- Inserir a nova atividade
         INSERT INTO Atividade (fk_id_funcionario, fk_id_Plantio, Descricao, Prioridade, Duracao)
@@ -399,7 +426,7 @@ BEGIN
         -- Atualizar a fase atual da tabela Producao
         UPDATE Producao
         SET Fase_Atual = @fase_atual
-        WHERE id_plantio = @fk_id_plantio; -- Usar o ID do plantio
+        WHERE id_plantio = @fk_id_plantio;
 
         -- Commitar as mudanças
         COMMIT TRANSACTION;
