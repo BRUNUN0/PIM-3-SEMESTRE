@@ -9,7 +9,8 @@ from app.components.classes import GerenciamentoBanco
 def AdminHome(page: ft.Page):
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
-        
+
+    # Função que cria um contêiner para exibir o horário e a data.     
     def relogio():
         relogio = ft.Container(
             content=ft.Column(
@@ -21,6 +22,7 @@ def AdminHome(page: ft.Page):
         )
         return relogio
     
+    # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
             content=ft.Image(
@@ -31,7 +33,8 @@ def AdminHome(page: ft.Page):
             alignment=ft.alignment.top_center,
         )
         return logo
-        
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.   
     def appbar_superior():
         def go_home(e):
             page.go('/')
@@ -66,7 +69,8 @@ def AdminHome(page: ft.Page):
         )
         
         return app_sup
-        
+
+    # Função para criar os botões de navegação na tela do administrador.   
     def botoes():
         botoes = ft.Container(
             expand=True,
@@ -77,6 +81,7 @@ def AdminHome(page: ft.Page):
     controls=[
         ft.Row(
             controls=[
+                # Primeiro botão: Clientes
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -100,6 +105,7 @@ def AdminHome(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,  # Ajuste o espaçamento entre os botões
                 ),
+                # Segundo botão: Funcionários
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -121,6 +127,7 @@ def AdminHome(page: ft.Page):
                     alignment=ft.alignment.center,
                     padding=10,
                 ),
+                # Terceiro botão: Fornecedores
                 ft.Container(
                     content=ft.Column(
                         controls=[
@@ -153,6 +160,7 @@ def AdminHome(page: ft.Page):
         
         return botoes
     
+    # Cria um contêiner para a barra de navegação (AppBar)
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
@@ -176,6 +184,7 @@ def AdminHome(page: ft.Page):
         
         return AppBar
 
+    # Dados para o gráfico, incluindo mês, valor e cor de cada barra
     def grafico_plantas():
         dados = [
             ("Dez", 100, ft.colors.YELLOW),
@@ -192,6 +201,7 @@ def AdminHome(page: ft.Page):
             ("Jan", 10, ft.colors.RED)
         ]
 
+        # Criação das barras do gráfico com base nos dados.
         barras = ft.Column(
             controls=[
                 ft.Row(
@@ -212,6 +222,7 @@ def AdminHome(page: ft.Page):
             spacing=5
         )
 
+        # Criação do contêiner do gráfico que vai conter as barras
         grafico = ft.Container(
             width=350,
             height=500,
@@ -230,6 +241,7 @@ def AdminHome(page: ft.Page):
         )
         return grafico
     
+    # Função chamada quando o contêiner é clicado.
     def planta(nome, imagem):
         def on_click_container(e):
             
@@ -337,11 +349,15 @@ def AdminHome(page: ft.Page):
         return planta
     
     def pedidos ():
+        # Instancia o objeto de gerenciamento de banco para acessar dados
         banco = GerenciamentoBanco()
         plantas = banco.obter_pedidos()
+        # Verifica se existem plantas no banco de dados
         if plantas:
+            # Se houver plantas, cria uma lista de contêineres para cada planta
             lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
         else:
+            # Se não houver plantas, exibe uma mensagem dizendo que nenhum pedido foi encontrado
             lista_plantas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado")], alignment=ft.MainAxisAlignment.CENTER))]
 
         grafico = ft.Container(
@@ -365,6 +381,7 @@ def AdminHome(page: ft.Page):
         )
         return grafico
 
+    # Cria um contêiner principal para o conteúdo
     def conteudo():
         conteudo = ft.Container(
             padding=ft.padding.only(left=25,),
@@ -372,7 +389,9 @@ def AdminHome(page: ft.Page):
                 controls=[
                     ft.Row(
                         controls=[
+                            # Chama a função grafico_plantas para gerar o gráfico de plantas
                             grafico_plantas(),
+                            # Chama a função pedidos para gerar o gráfico de pedidos
                             pedidos()
                         ]
                     ),
@@ -383,6 +402,7 @@ def AdminHome(page: ft.Page):
 
         return conteudo
 
+    # Criação do contêiner principal da página
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
