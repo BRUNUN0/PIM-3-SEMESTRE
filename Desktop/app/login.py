@@ -1,9 +1,11 @@
 import flet as ft
+from components.validacao import Validacao 
 
 def Login(page: ft.Page):
     
     def login(e):
         print("Login Solicitado")
+        Validacao.valid_Login(senha_value)
         page.go('/')
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
     def logo():
@@ -49,10 +51,10 @@ def Login(page: ft.Page):
             content=ft.Column(
                 controls=[
                     ft.TextField(
-                        label='ID',
+                        label='CPF',
                         width=350,
                         height=50,
-                        border_radius=ft.border_radius.all(8),     # caixa ID
+                        border_radius=ft.border_radius.all(8),     # caixa CPF
                         color=ft.colors.BLACK,
                         text_style=ft.TextStyle(size=16),
                         label_style=ft.TextStyle(
@@ -61,7 +63,7 @@ def Login(page: ft.Page):
                         )
                     ),
                     ft.TextField(
-                        label='Senha',
+                        label='Senha', # Não tenho como encontrar o valor que foi inseriro pelo usuario, por isso estou parando por aqui hoje, deixei só a função que valida isso, pra não quebrar o resto das coisas, se você conseguir arrumar isso aqui eu agradeço muito :)
                         width=350,
                         height=50,
                         password=True,
@@ -148,7 +150,7 @@ def Login(page: ft.Page):
                             ),
                             ft.Container(
                                 caixa_login(),
-                                alignment=ft.alignment.center        # isso aqui eu nao sei o que é
+                                alignment=ft.alignment.center        # isso aqui eu nao sei o que é | Isaque: faz as coisas dantro do Container sempre ficar no centro da "Caixa"
                             ),
                         ],
                         alignment=ft.alignment.center,
