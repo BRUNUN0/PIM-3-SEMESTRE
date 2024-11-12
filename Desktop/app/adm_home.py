@@ -528,8 +528,7 @@ def AdminHome(page: ft.Page):
                     ft.Row(
                         controls=[
                             grafico_plantas(),
-                            pedidos(),
-                            grupo()
+                            pedidos()
                         ]
                     ),
                 ],
