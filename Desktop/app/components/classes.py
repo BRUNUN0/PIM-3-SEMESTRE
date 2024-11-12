@@ -2,6 +2,7 @@ from sqlite3 import Cursor
 from tkinter import Widget
 import flet as ft
 import pyodbc
+from hashlib import sha256 
 
 class Usuario:
     def __init__(self, id, nome):

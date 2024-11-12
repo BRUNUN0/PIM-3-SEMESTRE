@@ -1,19 +1,24 @@
 import pydoc as dbc
 from app.components.classes import GerenciamentoBanco as gbd
 from app.components.funcionario import Funcionario as f
+from hashlib import sha256
 
 class Validacao:
     def __init__(self):
         self.gbd = gbd()  # Instancia o GerenciamentoBanco
 
     def valid_Login(self, cpf, senha):
+
+        senha_cripto = sha256(senha.encode()).digest()
+
         dados = self.gbd.obter_funcionario_login(cpf)  # Agora usa a instância do banco
         if dados:  # Verifica se dados foram encontrados
             __senha = dados[0]
+            print(__senha)
             __cpf = dados[1]
             _id = dados[2]
 
-            if senha == __senha and cpf == __cpf:
+            if senha_cripto == __senha and cpf == __cpf:
                 dados_funcionario = self.gbd.obter_detalhes_funcionario(_id)
                 if dados_funcionario:
                     nome = dados_funcionario[1]
