@@ -1,3 +1,4 @@
+from turtle import color
 import flet as ft
 from app.components.validacao import Validacao 
 
@@ -15,7 +16,10 @@ def Login(page: ft.Page):
         if(r):
             page.go("/")
             page.update()
-        else: print("Erro no login")
+        else: 
+            print("Erro de login")
+            mostrar_erro_login(page)
+            page.update() 
 
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
 
@@ -175,3 +179,12 @@ def Login(page: ft.Page):
     # page.on_resized = page.update()
 
     return Main
+
+def mostrar_erro_login(page):
+    dialog = ft.AlertDialog(
+        "Erro de Login",
+        content=ft.Text("CPF ou Senha incorretos!"),
+        actions=[ft.TextButton("OK")]
+    )
+    page.dialog = dialog
+    page.update()
