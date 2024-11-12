@@ -249,7 +249,7 @@ def Plantacao(page: ft.Page):
             width= 350,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.all(15),
+            padding=ft.padding.only(bottom=15),
 
             content=ft.Column(
                 controls=[
@@ -312,7 +312,7 @@ def Plantacao(page: ft.Page):
             width=350,
             bgcolor="#D6D6D6",
             border_radius=16,
-            padding=ft.padding.all(15),
+            padding=ft.padding.only(bottom=15),
 
 
             content=ft.Column(
