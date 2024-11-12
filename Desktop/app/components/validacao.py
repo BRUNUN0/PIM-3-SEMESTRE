@@ -7,11 +7,19 @@ class Validacao:
         self.gbd = gbd()  # Instancia o GerenciamentoBanco
 
     def valid_Login(self, cpf, senha):
+        cpfv = cpf
+        dados = gbd.obter_funcionario_login(gbd, cpfv) # Recebe os seguintes dados na seguinte ordem === Senha | CPF | ID
+        # quando utilizado dois anderlaine o escopo de utilização é fechado apenas para esta funcão.
+        __senha = dados[0]
+        __cpf = dados[1]
+        _id = dados[2]
+
         dados = self.gbd.obter_funcionario_login(cpf)  # Agora usa a instância do banco
         if dados:  # Verifica se dados foram encontrados
             __senha = dados[0]
             __cpf = dados[1]
             _id = dados[2]
+
 
             if senha == __senha and cpf == __cpf:
                 dados_funcionario = self.gbd.obter_detalhes_funcionario(_id)
