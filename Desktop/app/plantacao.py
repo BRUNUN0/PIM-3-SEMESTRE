@@ -337,8 +337,7 @@ def Plantacao(page: ft.Page):
             plantados = ft.Container(
                 bgcolor="#99C2A2",
                 border=ft.border.all(color=ft.colors.BLACK),
-                width=340,
-                height=50,
+                height=30,
                 border_radius=9,
                 padding=ft.padding.only(left=12, right=12),
                 content=ft.Row(
@@ -365,7 +364,7 @@ def Plantacao(page: ft.Page):
         banco = GerenciamentoBanco()
         produtos = banco.obter_produtos()
         if produtos:
-            lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade in produtos]
+            lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade, _ in produtos]
         else:
             lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
 
@@ -379,6 +378,7 @@ def Plantacao(page: ft.Page):
                         width=750,
                         bgcolor="#D6D6D6",
                         border_radius=16,
+                        padding=ft.padding.all(15),
                         content=ft.Column(
                             controls=[
                                 ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
@@ -457,8 +457,7 @@ def Plantacao(page: ft.Page):
                         spacing=10,
                         controls=[
                             ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("materia prima")),
-                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
-                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
+                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
                         ],
                     )
                 ],

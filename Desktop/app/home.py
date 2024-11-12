@@ -317,11 +317,11 @@ def Home(page: ft.Page):
 
     def pedidos():
         banco = GerenciamentoBanco()
-        producoes = banco.obter_pedidos()
-        if producoes:
-            lista_producao = [pedido(nome, imagem) for  nome, imagem in producoes]
-        else:
-            lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
+        # producoes = banco.obter_pedidos_abertos()
+        # if producoes:
+        #     lista_producao = [pedido(nome, imagem) for  nome, imagem in producoes]
+        # else:
+        #     lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
         producao = ft.Container(
             width=350,
@@ -331,12 +331,12 @@ def Home(page: ft.Page):
             content=ft.Column(
                 controls=[
                     ft.Text(value='Pedidos:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                    ft.Column(
-                        controls=
-                        lista_producao,
-                        spacing=6,
-                        scroll=ft.ScrollMode.AUTO
-                    )
+                    # ft.Column(
+                    #     controls=
+                    #     lista_producao,
+                    #     spacing=6,
+                    #     scroll=ft.ScrollMode.AUTO
+                    # )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )

@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import GerenciamentoBanco, Cadastro
+from app.components.classes import GerenciamentoBanco, Cadastro, Detalhes
 
 
 def Pedidos(page: ft.Page):
@@ -193,7 +193,55 @@ def Pedidos(page: ft.Page):
         
         return AppBar
     
+    def pedido(id_pedido, cliente, nome, produto):
+        # Cria um objeto de detalhes (presumivelmente, para exibir mais informações sobre o fornecedor)
+        detalhes = Detalhes(page)
+
+        # Cria o contêiner que vai representar o fornecedor.    
+        pedido = ft.Container(
+            bgcolor="#99C2A2",
+            border=ft.border.all(color=ft.colors.BLACK),
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=12, right=12),
+            on_click=lambda e: detalhes.detalhes_pedido(id_pedido),
+            
+            content=ft.Row(
+                controls=[
+                    ft.Icon(
+                        name=ft.icons.FOREST,
+                        color=ft.colors.BLACK,
+                        size=30
+                        ),
+                    ft.Text(
+                        value=f"ID: {id_pedido}",
+                        color=ft.colors.BLACK
+                        ),
+                    
+                    ft.Text(
+                        value=nome,
+                        color=ft.colors.BLACK
+                        ),
+                    ft.Text(
+                        value=produto,
+                        color=ft.colors.BLACK
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            )
+        )
+        
+        return pedido
+
     def pedidos_ativos():
+        banco = GerenciamentoBanco()
+        pedidos = banco.obter_pedidos_abertos()
+        if pedidos:
+            lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]
+        else:
+            lista_pedidos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
+
+
         cadastro = Cadastro(page)
         container = ft.Container(
             bgcolor='#D9D9D9',
@@ -207,7 +255,14 @@ def Pedidos(page: ft.Page):
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
-                        border_radius=12
+                        border_radius=12,
+                        padding=ft.padding.all(15),
+                        content=ft.Column(
+                            controls=
+                            lista_pedidos,
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        )
                     ),
                     ft.Container(
                         padding=ft.padding.only(left=50, right=50),
@@ -218,7 +273,8 @@ def Pedidos(page: ft.Page):
                                     text='Finalizar Pedido',
                                     color=ft.colors.WHITE,
                                     height=40,
-                                    bgcolor="#13330D"
+                                    bgcolor="#13330D",
+                                    on_click=lambda e: print("fazer")
                                 ),
                                 ft.ElevatedButton(
                                     text='Registrar Pedido',
@@ -229,7 +285,7 @@ def Pedidos(page: ft.Page):
                                     on_click=lambda e: cadastro.abrir_registro('pedido')
                                 )
                             ],
-                            alignment=ft.MainAxisAlignment.END
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                         )
 
                     ),
@@ -242,6 +298,13 @@ def Pedidos(page: ft.Page):
         return container
     
     def pedidos_finalizados():
+        banco = GerenciamentoBanco()
+        pedidos = banco.obter_pedidos_finalizados()
+        if pedidos:
+            lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]
+        else:
+            lista_pedidos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
+
         pedidos_finalizados = ft.Container(
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=15),
@@ -254,7 +317,14 @@ def Pedidos(page: ft.Page):
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
-                        border_radius=12
+                        border_radius=12,
+                        padding=ft.padding.all(15),
+                        content=ft.Column(
+                            controls=
+                            lista_pedidos,
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        )
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
