@@ -1,15 +1,6 @@
-from sqlite3 import Cursor
-from tkinter import Widget
 import flet as ft
 import pyodbc
-
-class Usuario:
-    def __init__(self, id, nome):
-        self.id = id
-        self.nome = nome
-
-
-
+import bcrypt
 
 class GerenciamentoBanco:
     def __init__(self):
@@ -85,39 +76,9 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
     
-    def obter_materia_prima(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        mp.id_materia,
-                        mp.Nome,
-                        mp.Quantidade,
-                        mp.URL
-                    FROM Materia_Prima mp'''
-            self.cursor.execute(query)
-            materias_primas = self.cursor.fetchall()
-            return materias_primas
-        except Exception as e:
-            print(f"Erro ao obter materias primas: {e}")
-            self.fechar_conexao()
-            return None
 
-    def obter_produtos(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        p.id_produto,
-                        p.Produto,
-                        p.Quantidade,
-                        p.Previsao
-                    FROM Produto p'''
-            self.cursor.execute(query)
-            produtos = self.cursor.fetchall()
-            return produtos
-        except Exception as e:
-            print(f"Erro ao obter produtos: {e}")
-            self.fechar_conexao()
-            return None
+
+
 
     def obter_atividades(self):
         try:
@@ -504,6 +465,7 @@ class Cadastro:
         self.page = page
         self.dialog = None
         self.inputs = {}
+        self.senha_input = None
         self.dados_salvos = None  # Armazena temporariamente os dados salvos para possível reversão
 
     def abrir_cadastro(self, tipo_cadastro):
@@ -586,6 +548,13 @@ class Cadastro:
                 else:
                     # Cria campos normais
                     self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
+
+            for campo in campos:
+                if campo == "Senha":
+                    self.senha_input = ft.TextField(label="Senha", password=True)  # Cria um campo de senha
+                    conteudo_dialog.append(self.senha_input)
+                else:
+                    conteudo_dialog.append(ft.TextField(label=campo))
 
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
@@ -756,9 +725,15 @@ class Cadastro:
         self.dialog.open = True
         self.page.update()
 
+
+
     def _salvar_dados(self, e):
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
+
+        # Verificação do campo "Senha" e aplica hash
+        if "Senha" in self.dados_salvos and self.dados_salvos["Senha"]:
+            self.dados_salvos["Senha"] = self.hash_password(self.dados_salvos["Senha"])
 
         # Fecha o diálogo
         self.dialog.open = False
@@ -797,6 +772,15 @@ class Cadastro:
         self.dialog.open = False
         self.page.update()
 
+    def hash_password(self, password):
+        """
+        Recebe uma senha e retorna o hash com um salt.
+        :param password: String com a senha em texto puro.
+        :return: String com o hash da senha.
+        """
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
 
 
 
@@ -813,7 +797,7 @@ class Detalhes:
         self.botoes = None
         self.campos = {}
         self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF", "Cargo", "Data inicial"]
-
+#
     def detalhes_fornecedor(self, id_fornecedor):
         self.id_fornecedor_atual = id_fornecedor
         self._alternar_modo_edicao(None, tipo_entidade="fornecedor")
@@ -902,7 +886,7 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-
+#
     def detalhes_cliente(self, id_cliente):
         self.id_cliente_atual = id_cliente
         self._alternar_modo_edicao(None, tipo_entidade="cliente")
@@ -1657,5 +1641,44 @@ class Producao(GerenciamentoBanco):
             print(f"Erro ao obter fornecedores: {e}")
             self.fechar_conexao()
             return None
+
+class Estoque(GerenciamentoBanco):
+    def __init__(self):
+        super().__init__()
+
+    def obter_produtos(self):
+        try:
+            self.conectar()
+            query = '''SELECT
+                        p.id_produto,
+                        p.Produto,
+                        p.Quantidade,
+                        p.Previsao
+                    FROM Produto p'''
+            self.cursor.execute(query)
+            produtos = self.cursor.fetchall()
+            return produtos
+        except Exception as e:
+            print(f"Erro ao obter produtos: {e}")
+            self.fechar_conexao()
+            return None
+
+    def obter_materia_prima(self):
+        try:
+            self.conectar()
+            query = '''SELECT
+                        mp.id_materia,
+                        mp.Nome,
+                        mp.Quantidade,
+                        mp.URL
+                    FROM Materia_Prima mp'''
+            self.cursor.execute(query)
+            materias_primas = self.cursor.fetchall()
+            return materias_primas
+        except Exception as e:
+            print(f"Erro ao obter materias primas: {e}")
+            self.fechar_conexao()
+            return None
+
 
 

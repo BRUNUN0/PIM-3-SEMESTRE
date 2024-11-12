@@ -25,6 +25,7 @@ def Home(page: ft.Page):
     
     def logo():
         logo = ft.Container(
+            width=200,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,
@@ -79,104 +80,102 @@ def Home(page: ft.Page):
             expand=True,
             # height=100,
             bgcolor="#D9FFBA",
-            
             content = ft.Column(
-    controls=[
-        ft.Row(
-            controls=[
-                ft.Container(
-                    on_hover=hover_btn,
-                    content=ft.Column(
+                controls=[
+                    ft.Row(
                         controls=[
-                            ft.IconButton(
-                                width=50,
-                                height=50,
-                                icon=ft.icons.HOME,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            width=50,
+                                            height=50,
+                                            icon=ft.icons.HOME,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                        ),
+                                        ft.Text(
+                                            value='Home',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                                alignment=ft.alignment.center,
+                                padding=10,
                             ),
-                            ft.Text(
-                                value='Home',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.ECO,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/plantacao'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Plantação',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                                alignment=ft.alignment.center,
+                                padding=10,
+                            ),
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.BOOKMARK_ADD_SHARP,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/pedidos'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Pedidos',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                                alignment=ft.alignment.center,
+                                padding=10,
+                            ),
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.CHECKLIST,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/atividades'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Atividades',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                                alignment=ft.alignment.center,
+                                padding=10,
                             )
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.ECO,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/plantacao'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Plantação',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.BOOKMARK_ADD_SHARP,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/pedidos'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Pedidos',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.CHECKLIST,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/atividades'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Atividades',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                )
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=20,
-        )
-    ]
-)
+                        spacing=20,
+                    )
+                ]
+            )
 
         )
         
@@ -331,7 +330,7 @@ def Home(page: ft.Page):
                             height=20,
                             bgcolor=ft.colors.BLUE if total_producao >= 50 else ft.colors.RED,
                         ),
-                        ft.Text(f"{total_producao} unidades", width=80)
+                        ft.Text(f"{total_producao} unidades", color=ft.colors.BLACK, width=80)
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     spacing=10
