@@ -13,6 +13,7 @@ def Home(page: ft.Page):
     def relogio():
         agora = datetime.datetime.now()
         relogio = ft.Container(
+            width=200,
             content=ft.Column(
                 controls=[
                     ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),

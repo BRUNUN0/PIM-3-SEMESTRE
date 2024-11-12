@@ -243,7 +243,7 @@ def AdminClientes(page: ft.Page):
         container = ft.Container(
             width=page.window.width,
             bgcolor='#D9D9D9',
-            padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
+            padding=ft.padding.all(15),
             border_radius=20,
             expand=True,
 
@@ -255,6 +255,7 @@ def AdminClientes(page: ft.Page):
                         expand=True,
                         bgcolor=ft.colors.WHITE,
                         border_radius=12,
+                        padding=ft.padding.all(15),
                         content=ft.Column(
                             controls=
                             lista_clientes,
@@ -279,9 +280,10 @@ def AdminClientes(page: ft.Page):
                             ],
                             alignment=ft.MainAxisAlignment.END
                         )
-
                     )
-                ]
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
 
         )

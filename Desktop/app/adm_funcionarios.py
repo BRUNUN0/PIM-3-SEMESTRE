@@ -1,5 +1,7 @@
+from ctypes import alignment
+from turtle import width
 import flet as ft
-import time
+import datetime
 import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
@@ -9,11 +11,13 @@ def AdminFuncionarios(page: ft.Page):
 
     # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
+        agora = datetime.datetime.now()
         relogio = ft.Container(
+            width=200,
             content=ft.Column(
                 controls=[
-                    ft.Text(value="00:00:00", size=16),
-                    ft.Text(value="28/10/2024"),
+                    ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),
+                    ft.Text(value=agora.strftime("%d/%m/%Y"), color=ft.colors.BLACK),
                 ]
             )
         )
@@ -22,17 +26,18 @@ def AdminFuncionarios(page: ft.Page):
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
+            width=200,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,
                 height=50,
             ),
             alignment=ft.alignment.top_center,
+            on_click= lambda e: page.go('/adm')
         )
         return logo
-
-    # Função que cria a barra superior da aplicação com opções de navegação e logout.  
-    def appbar_superior():
+    
+    def icon():
         def go_home(e):
             page.go('/')
             confirmation_dialog.close_dialog()
@@ -49,17 +54,32 @@ def AdminFuncionarios(page: ft.Page):
             ],
             page
         )
+        icon = ft.Container(
+            width=200,
+            content=ft.Row(
+                controls=[
+                    ft.IconButton(
+                        icon=ft.icons.LOGOUT,
+                        icon_color=ft.colors.BLACK,
+                        on_click=sair,
+                        # alignment=ft.alignment.center_right
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+        return icon
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.  
+    def appbar_superior():
+        
 
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[
                     relogio(),
                     logo(),
-                    ft.IconButton(
-                        icon=ft.icons.LOGOUT,
-                        icon_color=ft.colors.BLACK,
-                        on_click=sair
-                    )
+                    icon(),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -70,89 +90,82 @@ def AdminFuncionarios(page: ft.Page):
     # Função para criar os botões de navegação na tela do administrador.  
     def botoes():
         botoes = ft.Container(
-            # expand=True,
-            # height=100,
             bgcolor="#D9FFBA",
+            padding=ft.padding.only(top=10),
             
             content = ft.Column(
-    controls=[
-        ft.Row(
-            controls=[
-                # Primeiro botão: Clientes
-                ft.Container(
-                    content=ft.Column(
+                controls=[
+                    ft.Row(
                         controls=[
-                            ft.IconButton(
-                                width=50,
-                                height=50,
-                                icon=ft.icons.HOME,
-                                icon_size=32,
-                                on_click=lambda e: page.go("/adm/clientes"),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                            # Primeiro botão: Clientes
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.BUSINESS_CENTER,
+                                            icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go("/adm/clientes"),
+                                        ),
+                                        ft.Text(
+                                            value='Clientes',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
                             ),
-                            ft.Text(
-                                value='Clientes',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
+                            # Segundo botão: Funcionários
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.PERSON,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/adm/funcionarios'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Funcionários',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                            ),
+                            # Terceiro botão: Fornecedores
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.FACTORY,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/adm/fornecedores'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Fornecedores',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
                             )
                         ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,  # Ajuste o espaçamento entre os botões
-                ),
-                # Segundo botão: Funcionários
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.PERSON,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/adm/funcionarios'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Funcionários',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                # Terceiro botão: Fornecedores
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.CONTENT_PASTE_SEARCH,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/adm/fornecedores'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Fornecedores',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                )
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
-            spacing=20,  # Ajusta o espaçamento entre os botões na linha
-        )
-    ]
-)
-
+                        alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
+                        spacing=20,  # Ajusta o espaçamento entre os botões na linha
+                    )
+                ]
+            )
         )
         
         return botoes
@@ -201,22 +214,24 @@ def AdminFuncionarios(page: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.Icon(
-                        name=ft.icons.FOREST,
+                        name=ft.icons.PERSON,
                         color=ft.colors.BLACK,
                         size=30
                         ),
                     ft.Text(
-                        value=id_funcionario
+                        value=f'ID: {id_funcionario}',
+                        width=200,
                         ),
                     
                     ft.Text(
-                        value=nome
+                        value=nome,
+                        width=250,
                         ),
                     ft.Text(
-                        value=cargo
+                        value=cargo,
+                        width=200,
                     )
                 ],
-                # scroll='auto',
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
         )
@@ -250,6 +265,7 @@ def AdminFuncionarios(page: ft.Page):
                         expand=True,
                         bgcolor=ft.colors.WHITE,
                         border_radius=12,
+                        padding=ft.padding.all(15),
                         content=ft.Column(
                             controls=
                             lista_funcionarios,
@@ -276,7 +292,9 @@ def AdminFuncionarios(page: ft.Page):
                         )
 
                     )
-                ]
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
 
         )

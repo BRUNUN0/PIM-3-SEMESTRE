@@ -8,7 +8,7 @@ def main(page: ft.Page):
     rotas(page)
     print(page.route)
 
-    page.go("/login")
+    page.go("/adm/funcionarios")
     page.update()
 
 if __name__ == "__main__":

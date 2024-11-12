@@ -236,7 +236,7 @@ def AdminFornecedores(page: ft.Page):
         container = ft.Container(
             width=page.window.width,
             bgcolor='#D9D9D9',
-            padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
+            padding=ft.padding.all(15),
             border_radius=20,
             expand=True,
 
