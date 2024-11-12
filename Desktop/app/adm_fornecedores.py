@@ -6,7 +6,7 @@ from app.components.dialogs import ConfirmationDialog
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
-    page.theme = ft.Theme(color_scheme_seed="white")
+    # page.theme = ft.Theme(color_scheme_seed="white")
 
     # Função que cria um contêiner para exibir o horário e a data.
     def relogio():

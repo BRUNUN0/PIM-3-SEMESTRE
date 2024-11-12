@@ -104,7 +104,7 @@ CREATE TABLE Produto (
     id_produto INT IDENTITY(1,1) PRIMARY KEY,
     Produto NVARCHAR(100),
     Quantidade INT,
-    Data_Validade DATE,
+    Previsao INT,
 
 );
 

@@ -305,7 +305,7 @@ def Atividades(page: ft.Page):
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
+        bgcolor=ft.colors.WHITE,
 
         content=ft.Column(
             controls=[

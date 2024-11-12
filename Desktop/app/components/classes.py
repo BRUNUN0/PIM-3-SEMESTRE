@@ -38,6 +38,17 @@ class GerenciamentoBanco:
             self.conn = pyodbc.connect(self.conn_str)
             self.cursor = self.conn.cursor()
 
+    def teste(self):
+        query = '''SELECT 
+                        FORMAT(Data_Inicio, 'MMM') AS Mes, 
+                        SUM(Quantidade) AS Total_Quantidade
+                    FROM 
+                        Producao
+                    GROUP BY 
+                        FORMAT(Data_Inicio, 'MMM'), DATEPART(MONTH, Data_Inicio)
+                    ORDER BY 
+                        DATEPART(MONTH, Data_Inicio);'''
+
     def fechar_conexao(self):
         if self.conn:
             self.conn.close()
@@ -54,7 +65,8 @@ class GerenciamentoBanco:
                         p.Quantidade,
                         mp.URL
                     FROM Producao p
-                    JOIN Materia_Prima mp ON p.fk_id_materia = mp.id_materia;'''
+                    JOIN Materia_Prima mp ON p.fk_id_materia = mp.id_materia
+                    WHERE p.Data_Fim IS NULL;'''
             self.cursor.execute(query)
             producao = self.cursor.fetchall()
             return producao
@@ -92,12 +104,12 @@ class GerenciamentoBanco:
         try:
             self.conectar()
             query = '''SELECT 
-                            f.id_funcionario AS id,
-                            f.nome AS nome,
-                            c.cargo AS cargo
+                        f.id_funcionario AS id,
+                        f.nome AS nome,
+                        c.cargo AS cargo
                     FROM 
                         Funcionario f
-                    INNER JOIN Cargo c ON c.Cargo = c.Cargo'''
+                    INNER JOIN Cargo c ON f.fk_id_cargo = c.id_cargo;'''
             self.cursor.execute(query)
             clientes = self.cursor.fetchall()
             return clientes
@@ -106,17 +118,44 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
         
-    def obter_pedidos(self):
+    def obter_pedidos_abertos(self):
         try:
             self.conectar()
             query = '''SELECT
-	                        pe.id_pedido,
-	                        pd.Produto,
-	                        i.Quantidade
-                        FROM
-                            pedido pe
-                        INNER JOIN Produto pd ON pd.Produto = pd.Produto
-                        INNER JOIN Item_Pedido i ON i.Quantidade = i.Quantidade'''
+                        pe.id_pedido,
+                        c.Nome AS Nome_Cliente,
+                        pd.Produto,
+                        i.Quantidade
+                    FROM
+                        Pedido pe
+                    INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
+                    INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
+                    INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
+                    WHERE
+                        pe.Status = 'Em andamento';'''
+            self.cursor.execute(query)
+            pedidos = self.cursor.fetchall()
+            return pedidos
+        except Exception as e:
+            print(f"Erro ao obter pedidos: {e}")
+            self.fechar_conexao()
+            return None
+        
+    def obter_pedidos_finalizados(self):
+        try:
+            self.conectar()
+            query = '''SELECT
+                        pe.id_pedido,
+                        c.Nome AS Nome_Cliente,
+                        pd.Produto,
+                        i.Quantidade
+                    FROM
+                        Pedido pe
+                    INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
+                    INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
+                    INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
+                    WHERE
+                        pe.Status = 'Finalizado';'''
             self.cursor.execute(query)
             pedidos = self.cursor.fetchall()
             return pedidos
@@ -149,7 +188,7 @@ class GerenciamentoBanco:
                         p.id_produto,
                         p.Produto,
                         p.Quantidade,
-                        p.Data_Validade
+                        p.Previsao
                     FROM Produto p'''
             self.cursor.execute(query)
             produtos = self.cursor.fetchall()
@@ -370,10 +409,35 @@ class GerenciamentoBanco:
                     WHERE id_atividade = {id_atividade}'''
             self.cursor.execute(query)
             detalhes_atividade = self.cursor.fetchone()
-            print(detalhes_atividade)
             return detalhes_atividade
         except Exception as e:
             print(f"Erro ao obter detalhes da atividade: {e}")
+            self.fechar_conexao()
+            return None
+
+    def obter_detalhes_pedido(self, id_pedido):
+        try:
+            self.conectar()
+            query = '''SELECT
+                            pe.id_pedido,
+                            c.Nome AS Nome_Cliente,
+                            pe.Data_Pedido,
+                            pd.Produto,
+                            i.Quantidade AS Quantidade_Produto,
+                            pd.Previsao AS Previsao_Entrega,
+                            pe.Status AS Status_Pedido
+                        FROM
+                            Pedido pe
+                        INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
+                        INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
+                        INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
+                        WHERE
+                            pe.id_pedido = ?;'''
+            self.cursor.execute(query,(id_pedido))
+            detalhes_pedido = self.cursor.fetchone()
+            return detalhes_pedido
+        except Exception as e:
+            print(f"Erro ao obter detalhes do pedido: {e}")
             self.fechar_conexao()
             return None
 
@@ -473,7 +537,6 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == 'iniciar producao':
             try:
-                print(dados)
                 self.cursor.execute('''{CALL IniciarProducao (?, ?, ?, ?, ?, ?)}''',
                 (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"])
                 )
@@ -493,6 +556,29 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
+
+        elif tipo_cadastro == 'finalizar producao':
+            try:
+                self.cursor.execute('''{CALL Finaliza_Producao (?, ?)}''',
+                (dados["ID Plantio"], dados["Data Fim"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
                 
         elif tipo_cadastro == 'atividade':
             try:
@@ -519,7 +605,30 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == "novo produto":
             try:
-                self.cursor.execute('''INSERT INTO Produto (Produto) VALUES (?)''', (dados["Novo produto"])
+                self.cursor.execute('''INSERT INTO Produto (Produto, Previsao) VALUES (?, ?)''',
+                (dados["Novo produto"], dados["Previsao de entrega"])
+                )
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
+
+        elif tipo_cadastro == "pedido":
+            try:
+                self.cursor.execute('''{CALL RegistrarPedido (?, ?, ?, ?)}''',
+                (dados["CNPJ do Cliente"], dados["Data Pedido"], dados["Produto"], dados["Quantidade"])
                 )
                 self.conn.commit()
                 return True, None
@@ -539,6 +648,7 @@ class GerenciamentoBanco:
                 self.fechar_conexao()
 
     def obter_funcionario_login(self, cpf):
+
         try:
             self.conectar()
             print(cpf)
@@ -560,6 +670,14 @@ class GerenciamentoBanco:
             return False, error_message
         finally:
             self.fechar_conexao()
+
+        self.conectar()
+        self.cursor.execute( '''SELECT senha, cpf, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+        dados_login = self.cursor.fetchone()
+        if dados_login:
+            return dados_login
+        return None  # Caso não encontre o CPF
+
 
 
 
@@ -593,13 +711,13 @@ class Cadastro:
             ],
             "funcionario": [
                 {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
-                {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data_Inicio"]}
+                {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data Inicio"]}
             ],
             "materia prima": [
                 {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
             ],
             "novo produto": [
-                {"titulo": "Informações do Produto", "campos": ["Novo produto"]}
+                {"titulo": "Informações do Produto", "campos": ["Novo produto", "Previsao de entrega(dias)"]}
             ]
         }
 
@@ -623,7 +741,7 @@ class Cadastro:
             campos = grupo["campos"]
 
             for campo in campos:
-                if campo in ("Data", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
+                if campo in ("Data", "Data Inicio", "Data Fim", "Nascimento"):  # Verifica se o campo é "Data"
                     date_field_flag = {"is_open": False}  # Flag para controlar a abertura
 
                     def handle_focus(e, campo=campo):
@@ -655,7 +773,7 @@ class Cadastro:
                     self.inputs[campo] = date_field
                 else:
                     # Cria campos normais
-                    self.inputs[campo] = ft.TextField(label=campo, width=250)
+                    self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
 
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
@@ -704,7 +822,7 @@ class Cadastro:
                 {"titulo": "Dados da Produção", "campos": ["Nome Produção", "ID Matéria Prima", "Produto Final", "Quantidade", "Data Inicio", "Fase Atual"]}
             ],
             "finalizar producao": [
-                {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim", "Validade (dias)"]}
+                {"titulo": "Dados da Produção", "campos": ["ID Plantio", "Data Fim"]}
             ],
             "pedido": [
                 {"titulo": "Dados do Pedido", "campos": ["CNPJ do Cliente", "Data Pedido"]},
@@ -730,37 +848,6 @@ class Cadastro:
 
         self.itens_pedido = []
 
-        def adicionar_item(e):
-            novo_item = {
-                "produto":ft.TextField(label="Produto", width=200),
-                "quantidade":ft.TextField(label="Quantidade", width=200)
-            }
-            self.itens_pedido.append(novo_item)
-            atualizar_interface_itens()
-
-        def atualizar_interface_itens():
-            print("Conteudo de conteudo_itens antes de limpar: ", conteudo_itens)
-            print("Itens no pedido:", self.itens_pedido)
-            conteudo_itens.clear()
-            conteudo_dialog.clear()
-            for item in self.itens_pedido:
-                print("Valor do produto:", item["produto"].value)
-                print("Valor da quantidade:", item["quantidade"].value)
-                conteudo_itens.append(
-                    ft.Row(
-                        controls=[
-                            ft.Text(item["produto"].value if item["produto"].value else "Sem valor"),
-                            ft.Text(item["quantidade"].value if item["quantidade"].value else "Sem valor")
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                    )
-                )
-                conteudo_dialog.extend(conteudo_itens)
-                print("Conteudo atualizado do código:", conteudo_dialog)
-                self.dialog.update()
-                self.page.update()
-        conteudo_itens = []
-
 
         # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
         for grupo in grupos_campos:
@@ -768,7 +855,7 @@ class Cadastro:
             campos = grupo["campos"]
 
             for campo in campos:
-                if campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim"):  # Verifica se o campo é "Data"
+                if campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim", "Nascimento"):  # Verifica se o campo é "Data"
                     date_field_flag = {"is_open": False}  # Flag para controlar a abertura
 
                     def pegar_data(e, campo=campo):
@@ -827,13 +914,7 @@ class Cadastro:
                     self.inputs[campo] = time_field
                 else:
                     # Cria campos normais
-                    self.inputs[campo] = ft.TextField(label=campo, width=250)
-
-            if grupo["titulo"] == "Itens do Pedido":
-                conteudo_dialog.append(
-                    ft.ElevatedButton("Adicionar Item", color=ft.colors.WHITE, bgcolor="#13330D", icon=ft.icons.ADD, on_click=adicionar_item)
-                )
-                conteudo_dialog.extend(self.itens_pedido)
+                    self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
 
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
@@ -1300,6 +1381,76 @@ class Detalhes:
             "Data de Inicio": detalhes[2],
             "Produto": detalhes[3],
             "Quantidade": detalhes[4]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes da Produçao", color=ft.colors.BLACK, size=18, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                # padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        # Exibe o dialog
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def detalhes_pedido(self, id_pedido):
+        self.id_pedido_atual = id_pedido
+        self._alternar_modo_edicao(None, tipo_entidade='pedido')
+        banco = GerenciamentoBanco()
+
+        detalhes = banco.obter_detalhes_pedido(id_pedido)
+        print(detalhes)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do pedido."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+        
+        dados = {
+            "ID": detalhes[0],
+            "Cliente": detalhes[1],
+            "Data do Pedido": detalhes[2],
+            "Produto": detalhes[3],
+            "Quantidade": detalhes[4],
+            "Previsão de Entrega (dias)": detalhes[5],
+            "Status": detalhes[6]
         }
 
         # Conteúdo do diálogo
