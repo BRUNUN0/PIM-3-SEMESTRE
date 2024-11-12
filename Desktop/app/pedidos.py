@@ -1,17 +1,18 @@
 import flet as ft
-import time
-import pyodbc
-from app.components.classes import GerenciamentoBanco, Cadastro, Detalhes
+import datetime
+from app.components.classes import GerenciamentoBanco, Cadastro, Detalhes, Pedido
 
 
 def Pedidos(page: ft.Page):
 
     def relogio():
+        agora = datetime.datetime.now()
         relogio = ft.Container(
+            width=200,
             content=ft.Column(
                 controls=[
-                    ft.Text(value="00:00:00", size=16),
-                    ft.Text(value="28/10/2024"),
+                    ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),
+                    ft.Text(value=agora.strftime("%d/%m/%Y"), color=ft.colors.BLACK),
                 ]
             )
         )
@@ -19,23 +20,22 @@ def Pedidos(page: ft.Page):
     
     def logo():
         logo = ft.Container(
+            width=200,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,
                 height=50,
             ),
             alignment=ft.alignment.top_center,
+            on_click= lambda e: page.go('/adm')
         )
         return logo
-        
-    def appbar_superior():
-        # dialogo_saida = DialogoSaida(page)
-        
-        app_sup = ft.Container(
+    
+    def menu():
+        menu = ft.Container(
+            width=200,
             content=ft.Row(
                 controls=[
-                    relogio(),
-                    logo(),
                     ft.PopupMenuButton(
                         icon=ft.icons.MENU,
                         icon_color=ft.colors.BLACK,
@@ -55,6 +55,19 @@ def Pedidos(page: ft.Page):
                             )
                         ]
                     )
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+        return menu
+        
+    def appbar_superior():
+        app_sup = ft.Container(
+            content=ft.Row(
+                controls=[
+                    relogio(),
+                    logo(),
+                    menu()
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -208,16 +221,19 @@ def Pedidos(page: ft.Page):
             
             content=ft.Row(
                 controls=[
-                    ft.Icon(
-                        name=ft.icons.FOREST,
-                        color=ft.colors.BLACK,
-                        size=30
-                        ),
+                    # ft.Icon(
+                    #     name=ft.icons.FOREST,
+                    #     color=ft.colors.BLACK,
+                    #     size=30
+                    #     ),
                     ft.Text(
                         value=f"ID: {id_pedido}",
                         color=ft.colors.BLACK
                         ),
-                    
+                    ft.Text(
+                        value=cliente,
+                        color=ft.colors.BLACK
+                    ),
                     ft.Text(
                         value=nome,
                         color=ft.colors.BLACK
@@ -234,8 +250,8 @@ def Pedidos(page: ft.Page):
         return pedido
 
     def pedidos_ativos():
-        banco = GerenciamentoBanco()
-        pedidos = banco.obter_pedidos_abertos()
+        banco_pedidos = Pedido()
+        pedidos = banco_pedidos.obter_pedidos_abertos()
         if pedidos:
             lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]
         else:
@@ -298,7 +314,7 @@ def Pedidos(page: ft.Page):
         return container
     
     def pedidos_finalizados():
-        banco = GerenciamentoBanco()
+        banco = Pedido()
         pedidos = banco.obter_pedidos_finalizados()
         if pedidos:
             lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]

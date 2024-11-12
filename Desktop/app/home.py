@@ -1,7 +1,7 @@
 import flet as ft
 import datetime
 from app.components.dialogs import DialogoSaida, Detalhes
-from app.components.classes import GerenciamentoBanco
+from app.components.classes import GerenciamentoBanco, Producao
 
 
 def Home(page: ft.Page):
@@ -251,7 +251,7 @@ def Home(page: ft.Page):
     
     def em_producao ():
 
-        banco = GerenciamentoBanco()
+        banco = Producao()
         producoes = banco.obter_producao()
         if producoes:
             lista_producao = [pproducao(nome, imagem) for  _, _, nome, _, imagem in producoes]
@@ -278,8 +278,8 @@ def Home(page: ft.Page):
         )
         return producao
     
-    def pedido(nome, imagem):
-        planta = ft.Container(
+    def grafico():
+        grafico = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
                 color=ft.colors.BLACK
@@ -298,14 +298,14 @@ def Home(page: ft.Page):
                         size=30
                         ),
                     ft.Text(
-                        value=nome
+                        # value=nome
                         ),
                     
                     ft.Container(
                         alignment=ft.alignment.center_right,
                         
                         content=ft.Image(
-                            src=imagem,
+                            # src=imagem,
                             width=30,
                         )
                     )
@@ -314,35 +314,60 @@ def Home(page: ft.Page):
             )
         )
         
-        return planta
+        return grafico
 
-    def pedidos():
+    def grafico_pedidos():
         banco = GerenciamentoBanco()
-        # producoes = banco.obter_pedidos_abertos()
-        # if producoes:
-        #     lista_producao = [pedido(nome, imagem) for  nome, imagem in producoes]
-        # else:
-        #     lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido no momento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
+        dados_grafico = banco.grafico()  # Retorna dados como [(mes, total_producao), ...]
 
-        producao = ft.Container(
+        if dados_grafico:
+            # Criar gráficos com base nos dados retornados
+            lista_producao = [
+                ft.Row(
+                    controls=[
+                        ft.Text(mes, width=50),
+                        ft.Container(
+                            width=total_producao * 2,  # Ajuste o multiplicador para escalar a largura da barra
+                            height=20,
+                            bgcolor=ft.colors.BLUE if total_producao >= 50 else ft.colors.RED,
+                        ),
+                        ft.Text(f"{total_producao} unidades", width=80)
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                    spacing=10
+                )
+                for mes, total_producao in dados_grafico
+            ]
+        else:
+            lista_producao = [
+                ft.Container(
+                    expand=True,
+                    content=ft.Row(
+                        controls=[ft.Text(value="Nenhuma produção em andamento", color=ft.colors.BLACK)],
+                        alignment=ft.MainAxisAlignment.CENTER
+                    )
+                )
+            ]
+
+        grafico_container = ft.Container(
             width=350,
             bgcolor='#D6D6D6',
             border_radius=16,
-
+            padding=ft.padding.all(15),
             content=ft.Column(
                 controls=[
-                    ft.Text(value='Pedidos:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                    # ft.Column(
-                    #     controls=
-                    #     lista_producao,
-                    #     spacing=6,
-                    #     scroll=ft.ScrollMode.AUTO
-                    # )
+                    ft.Text(value='Produção por Mês:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                    ft.Column(
+                        controls=lista_producao,
+                        spacing=6,
+                        scroll=ft.ScrollMode.AUTO
+                    )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
         )
-        return producao
+        return grafico_container
+
 
 
     def conteudo():
@@ -353,7 +378,7 @@ def Home(page: ft.Page):
                     ft.Row(
                         controls=[
                             em_producao(),
-                            pedidos()
+                            grafico_pedidos()
                         ]
                     ),
                 ],

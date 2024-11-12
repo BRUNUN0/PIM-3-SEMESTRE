@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
+from app.components.classes import Cadastro, Cliente, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
 # Função principal que configura a interface da página de administração de clientes.
@@ -229,7 +229,7 @@ def AdminClientes(page: ft.Page):
 
     # Função que cria um contêiner principal para exibir a lista de clientes e um botão de cadastro.
     def container():
-        banco = GerenciamentoBanco()
+        banco = Cliente()
         clientes = banco.obter_clientes()
         if clientes:
             # Se existem clientes, cria uma lista de contêineres com informações de cada cliente.

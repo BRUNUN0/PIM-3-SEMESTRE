@@ -1,7 +1,7 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
+from app.components.classes import Cadastro, Fornecedor, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 
 # Função principal que configura a interface da página de administração de fornecedores.
@@ -222,7 +222,7 @@ def AdminFornecedores(page: ft.Page):
 
     # Instancia o objeto de gerenciamento de banco de dados
     def container():
-        banco = GerenciamentoBanco()
+        banco = Fornecedor()
         fornecedores = banco.obter_fornecedores()
         # Verifica se há fornecedores. Se houver, cria a lista de fornecedores com base nas informações do banco
         if fornecedores:
