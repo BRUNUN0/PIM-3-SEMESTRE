@@ -72,8 +72,6 @@ def AdminFuncionarios(page: ft.Page):
 
     # Função que cria a barra superior da aplicação com opções de navegação e logout.  
     def appbar_superior():
-        
-
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[

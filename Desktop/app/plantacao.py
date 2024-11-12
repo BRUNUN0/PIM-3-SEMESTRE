@@ -2,7 +2,7 @@ import flet as ft
 from datetime import datetime
 import pyodbc
 from app.components.dialogs import DialogoSaida
-from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
+from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro, Producao
 
 
 def Plantacao(page: ft.Page):
@@ -301,7 +301,7 @@ def Plantacao(page: ft.Page):
         return produto
 
     def plantacoes():
-        banco = GerenciamentoBanco()
+        banco = Producao()
         producoes = banco.obter_producao()
         if producoes:
             lista_plantacao = [plantacao(id_plantio, plantio, nome, quantidade) for id_plantio, plantio, nome, quantidade, *rest in producoes]
