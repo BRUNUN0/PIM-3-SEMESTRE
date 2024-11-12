@@ -5,11 +5,11 @@ from app.components.classes import GerenciamentoBanco, Producao
 
 
 def Home(page: ft.Page):
+    page.theme = ft.Theme(color_scheme_seed="blue")
     page.title = "Home"
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
-
-        
+    
     def relogio():
         agora = datetime.datetime.now()
         relogio = ft.Container(

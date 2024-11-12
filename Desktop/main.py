@@ -2,6 +2,7 @@ import flet as ft
 from app.routes import rotas
 
 def main(page: ft.Page):
+    page.theme = ft.Theme(color_scheme_seed="blue")
     page.title = "PIXFARM"
     page.window.maximized = False
     page.window.resizable = False
@@ -14,3 +15,4 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
+

@@ -54,7 +54,8 @@ class Detalhes:
         page.update()
 
 
-    
+
+
 
 # CLASSE PARA CRIAÇÃO DE DIALOGS DE SAIDA
 class ConfirmationDialog:

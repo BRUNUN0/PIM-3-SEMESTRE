@@ -1,6 +1,7 @@
+import hashlib
 import flet as ft
 import pyodbc
-import bcrypt
+from hashlib import sha256
 
 class GerenciamentoBanco:
     def __init__(self):
@@ -778,9 +779,8 @@ class Cadastro:
         :param password: String com a senha em texto puro.
         :return: String com o hash da senha.
         """
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed.decode('utf-8')
+        hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        return hashed
 
 
 
