@@ -3,13 +3,13 @@ from app.routes import rotas
 
 def main(page: ft.Page):
     page.title = "PIXFARM"
-    page.window.maximized = True
+    page.window.maximized = False
     page.window.resizable = False
     rotas(page)
     print(page.route)
 
     # page.go("/adm/funcionarios")
-    page.go('/')
+    page.go('/login')
     page.update()
 
 if __name__ == "__main__":
