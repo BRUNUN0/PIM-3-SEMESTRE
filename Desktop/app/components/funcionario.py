@@ -1,5 +1,3 @@
-
-
 class Funcionario:   
     def __init__(self, id_funcionario, nome, cpf, sexo, fk_id_cargo, senha, nascimento, email, setor, fk_data_inicio):
         self.id = id_funcionario
@@ -16,4 +14,3 @@ class Funcionario:
     def __str__(self):
         return f"Funcionário: {self.nome}, ID: {self.id_funcionario}"
     
-   

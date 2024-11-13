@@ -139,60 +139,35 @@ class GerenciamentoBanco:
                         WHERE id_funcionario = {id_funcionario}'''
             self.cursor.execute(query)
             detalhes_funcionario = self.cursor.fetchone()
+            
             return detalhes_funcionario
         except Exception as e:
             print(f"Erro ao obter detalhes do funcionario: {e}")
             self.fechar_conexao()
             return None
 
-    def obter_detalhes_materia_prima(self, id_materia):
-        try:
-            self.conectar()
-            query = f'''SELECT
-                        c.id_compra as id,
-                        f.Nome_Fantasia as fornecedor,
-                        f.CNPJ as cnpj,
-                        mp.Nome as nome,
-                        mp.Quantidade as quantidade,
-                        c.Data_compra as data_compra,
-                        mp.URL as url
-                    FROM
-                        Materia_Prima mp
-                    INNER JOIN Compra c ON c.id_compra = c.id_compra
-                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
-                    WHERE id_materia = {id_materia}'''
-            self.cursor.execute(query)
-            detalhes_materia_prima = self.cursor.fetchone()
-            print(detalhes_materia_prima)
-            return detalhes_materia_prima()
-        except Exception as e:
-            print(f"Erro ao obter detalhes da materia prima: {e}")
-            self.fechar_conexao()
-            return None
+    def obter_funcionario_login(self, cpf):
 
-    def obter_detalhes_atividade(self, id_atividade):
         try:
             self.conectar()
-            query = f'''SELECT 
-                        a.id_atividade,
-                        f.nome AS nome_funcionario,
-                        p.Plantio AS nome_plantio,
-                        a.Descricao,
-                        a.Prioridade,
-                        a.Duracao,
-                        p.Fase_Atual
-                    FROM 
-                        Atividade a
-                    INNER JOIN 
-                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
-                    INNER JOIN 
-                        Producao p ON a.fk_id_Plantio = p.id_plantio
-                    WHERE id_atividade = {id_atividade}'''
-            self.cursor.execute(query)
-            detalhes_atividade = self.cursor.fetchone()
-            return detalhes_atividade
-        except Exception as e:
-            print(f"Erro ao obter detalhes da atividade: {e}")
+            print(cpf)
+            self.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+            dados_login = self.cursor.fetchone()
+            print(dados_login)
+            return dados_login
+        except pyodbc.IntegrityError as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro de integridade:", error_message)
+            return False, error_message
+        except pyodbc.ProgrammingError as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro de programação:", e)
+            return False, error_message
+        except pyodbc.Error as e:
+            error_message = str(e).split('(')[1].split(')')[0]
+            print("Erro ao inserir fornecedor:", e)
+            return False, error_message
+        finally:
             self.fechar_conexao()
             return None
         
@@ -402,36 +377,6 @@ class GerenciamentoBanco:
             finally:
                 self.fechar_conexao()
 
-    def obter_funcionario_login(self, cpf):
-
-        try:
-            self.conectar()
-            print(cpf)
-            self.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
-            dados_login = self.cursor.fetchone()
-            print(dados_login)
-            return dados_login
-        except pyodbc.IntegrityError as e:
-            error_message = str(e).split('(')[1].split(')')[0]
-            print("Erro de integridade:", error_message)
-            return False, error_message
-        except pyodbc.ProgrammingError as e:
-            error_message = str(e).split('(')[1].split(')')[0]
-            print("Erro de programação:", e)
-            return False, error_message
-        except pyodbc.Error as e:
-            error_message = str(e).split('(')[1].split(')')[0]
-            print("Erro ao inserir fornecedor:", e)
-            return False, error_message
-        finally:
-            self.fechar_conexao()
-
-        self.conectar()
-        self.cursor.execute( '''SELECT senha, cpf, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
-        dados_login = self.cursor.fetchone()
-        if dados_login:
-            return dados_login
-        return None  # Caso não encontre o CPF
 
 
 class Cadastro:
@@ -772,7 +717,7 @@ class Detalhes:
         self.botoes = None
         self.campos = {}
         self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF", "Cargo", "Data inicial"]
-#
+
     def detalhes_fornecedor(self, id_fornecedor):
         self.id_fornecedor_atual = id_fornecedor
         self._alternar_modo_edicao(None, tipo_entidade="fornecedor")
@@ -861,7 +806,7 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-#
+
     def detalhes_cliente(self, id_cliente):
         self.id_cliente_atual = id_cliente
         self._alternar_modo_edicao(None, tipo_entidade="cliente")
@@ -949,7 +894,7 @@ class Detalhes:
     def detalhes_materia_prima(self, id_materia):
         self.id_materia_atual = id_materia
         self._alternar_modo_edicao(None, tipo_entidade="materia_prima")
-        banco = GerenciamentoBanco()
+        banco = Estoque()
 
         # Obter detalhes do fornecedor pelo ID
         detalhes = banco.obter_detalhes_materia_prima(id_materia)
@@ -1059,9 +1004,12 @@ class Detalhes:
             )
         ]
 
-        # Adicionar os campos do dicionário `dados` ao diálogo
+        # Adicionar os campos do dicionário `dados` ao diálogo, permitindo a edição
         for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            if titulo == "Senha":
+                campo = ft.TextField(value="", label="Nova senha (deixe em branco para manter)", color=ft.colors.BLACK, read_only=True)
+            else:
+                campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=(titulo == "ID"))
             self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
@@ -1226,7 +1174,7 @@ class Detalhes:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Detalhes da Produçao", color=ft.colors.BLACK, size=18, weight="bold"),
+                    ft.Text(f"Detalhes do", color=ft.colors.BLACK, size=18, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -1305,7 +1253,10 @@ class Detalhes:
             if not campo.read_only:
                 dados_atualizados[titulo] = campo.value
 
-        
+        if dados_atualizados["Senha"]:
+            dados_atualizados["Senha"] = self.hash_password_sha256(dados_atualizados["Senha"])
+        else:
+            dados_atualizados.pop["Senha"]
 
         if tipo_entidade == "fornecedor":
             banco = Fornecedor()
@@ -1385,82 +1336,8 @@ class Confirmacao:
         self.dialog.open = False
         self.page.update()
 
-class Pedido(GerenciamentoBanco):
-    def __init__(self):
-        super().__init__()
 
-    def obter_pedidos_abertos(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        pe.id_pedido,
-                        c.Nome AS Nome_Cliente,
-                        pd.Produto,
-                        i.Quantidade
-                    FROM
-                        Pedido pe
-                    INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
-                    INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
-                    INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
-                    WHERE
-                        pe.Status = 'Em andamento';'''
-            self.cursor.execute(query)
-            pedidos = self.cursor.fetchall()
-            return pedidos
-        except Exception as e:
-            print(f"Erro ao obter pedidos: {e}")
-            return None
-        finally:
-            self.fechar_conexao()
 
-    def obter_pedidos_finalizados(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        pe.id_pedido,
-                        c.Nome AS Nome_Cliente,
-                        pd.Produto,
-                        i.Quantidade
-                    FROM
-                        Pedido pe
-                    INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
-                    INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
-                    INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
-                    WHERE
-                        pe.Status = 'Finalizado';'''
-            self.cursor.execute(query)
-            pedidos = self.cursor.fetchall()
-            return pedidos
-        except Exception as e:
-            print(f"Erro ao obter pedidos: {e}")
-            self.fechar_conexao()
-            return None
-        
-    def obter_detalhes_pedido(self, id_pedido):
-        try:
-            self.conectar()
-            query = '''SELECT
-                            pe.id_pedido,
-                            c.Nome AS Nome_Cliente,
-                            pe.Data_Pedido,
-                            pd.Produto,
-                            i.Quantidade AS Quantidade_Produto,
-                            pd.Previsao AS Previsao_Entrega,
-                            pe.Status AS Status_Pedido
-                        FROM
-                            Pedido pe
-                        INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
-                        INNER JOIN Item_Pedido i ON pe.id_pedido = i.fk_id_pedido
-                        INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
-                        WHERE
-                            pe.id_pedido = ?;'''
-            self.cursor.execute(query,(id_pedido))
-            detalhes_pedido = self.cursor.fetchone()
-            return detalhes_pedido
-        except Exception as e:
-            print(f"Erro ao obter detalhes do pedido: {e}")
-            self.fechar_conexao()
-            return None
         
 class Fornecedor(GerenciamentoBanco):
     def __init__(self):
@@ -1651,5 +1528,78 @@ class Estoque(GerenciamentoBanco):
             self.fechar_conexao()
             return None
 
+    def obter_detalhes_materia_prima(self, id_materia):
+        try:
+            self.conectar()
+            query = f'''SELECT
+                        c.id_compra as id,
+                        f.Nome_Fantasia as fornecedor,
+                        f.CNPJ as cnpj,
+                        mp.Nome as nome,
+                        mp.Quantidade as quantidade,
+                        c.Data_compra as data_compra,
+                        mp.URL as url
+                    FROM
+                        Materia_Prima mp
+                    INNER JOIN Compra c ON c.id_compra = c.id_compra
+                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
+                    WHERE id_materia = {id_materia}'''
+            self.cursor.execute(query)
+            detalhes_materia_prima = self.cursor.fetchone()
+            print(detalhes_materia_prima)
+            return detalhes_materia_prima()
+        except Exception as e:
+            print(f"Erro ao obter detalhes da materia prima: {e}")
+            self.fechar_conexao()
+            return None
 
+class Atividades(GerenciamentoBanco):
+    def __init__(self):
+        super().__init__()
 
+    def obter_atividades(self):
+        try:
+            self.conectar()
+            query = '''SELECT 
+                        a.id_atividade,
+                        p.Plantio AS nome_plantio,
+                        a.Data
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio;'''
+            self.cursor.execute(query)
+            atividades = self.cursor.fetchone()
+            return atividades
+        except Exception as e:
+            print(f"Erro ao obter atividades: {e}")
+            self.fechar_conexao()
+            return None
+        
+    def obter_detalhes_atividade(self, id_atividade):
+        try:
+            self.conectar()
+            query = f'''SELECT 
+                        a.id_atividade,
+                        f.nome AS nome_funcionario,
+                        p.Plantio AS nome_plantio,
+                        a.Descricao,
+                        a.Prioridade,
+                        a.Duracao,
+                        p.Fase_Atual
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio
+                    WHERE id_atividade = {id_atividade}'''
+            self.cursor.execute(query)
+            detalhes_atividade = self.cursor.fetchone()
+            return detalhes_atividade
+        except Exception as e:
+            print(f"Erro ao obter detalhes da atividade: {e}")
+            self.fechar_conexao()
+            return None

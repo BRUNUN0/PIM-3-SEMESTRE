@@ -18,7 +18,7 @@ def Login(page: ft.Page):
         else: 
             print("Erro de login")
             mostrar_erro_login(page)
-            page.update() 
+            page.update()  
 
 # Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
 

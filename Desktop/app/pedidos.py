@@ -1,6 +1,8 @@
 import flet as ft
 import datetime
-from app.components.classes import GerenciamentoBanco, Cadastro, Detalhes, Pedido
+from app.components.classes import GerenciamentoBanco, Cadastro
+from app.components.pedido import Pedido
+from app.components.detalhes import Detalhes
 
 
 def Pedidos(page: ft.Page):
@@ -208,7 +210,8 @@ def Pedidos(page: ft.Page):
     
     def pedido(id_pedido, cliente, nome, produto):
         # Cria um objeto de detalhes (presumivelmente, para exibir mais informações sobre o fornecedor)
-        detalhes = Detalhes(page)
+        banco = GerenciamentoBanco
+        detalhes = Detalhes(page, banco)
 
         # Cria o contêiner que vai representar o fornecedor.    
         pedido = ft.Container(
@@ -250,7 +253,8 @@ def Pedidos(page: ft.Page):
         return pedido
 
     def pedidos_ativos():
-        banco_pedidos = Pedido()
+        banco = GerenciamentoBanco()
+        banco_pedidos = Pedido(banco)
         pedidos = banco_pedidos.obter_pedidos_abertos()
         if pedidos:
             lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]
@@ -314,8 +318,9 @@ def Pedidos(page: ft.Page):
         return container
     
     def pedidos_finalizados():
-        banco = Pedido()
-        pedidos = banco.obter_pedidos_finalizados()
+        banco = GerenciamentoBanco()
+        banco_pedidos = Pedido(banco)
+        pedidos = banco_pedidos.obter_pedidos_finalizados()
         if pedidos:
             lista_pedidos = [pedido(id_pedido, cliente, nome, produto) for id_pedido, cliente, nome, produto in pedidos]
         else:
