@@ -58,9 +58,6 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return []
 
-
-
-
     def obter_funcionarios(self):
         try:
             self.conectar()
@@ -76,6 +73,27 @@ class GerenciamentoBanco:
             return clientes
         except Exception as e:
             print(f"Erro ao obter clientes: {e}")
+            self.fechar_conexao()
+            return None
+    
+    def obter_atividades(self):
+        try:
+            self.conectar()
+            query = '''SELECT 
+                        a.id_atividade,
+                        p.Plantio AS nome_plantio,
+                        a.Data
+                    FROM 
+                        Atividade a
+                    INNER JOIN 
+                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
+                    INNER JOIN 
+                        Producao p ON a.fk_id_Plantio = p.id_plantio;'''
+            self.cursor.execute(query)
+            atividades = self.cursor.fetchone()
+            return atividades
+        except Exception as e:
+            print(f"Erro ao obter atividades: {e}")
             self.fechar_conexao()
             return None
 
@@ -153,11 +171,8 @@ class GerenciamentoBanco:
             return False, error_message
         finally:
             self.fechar_conexao()
-
-
-
-
-
+            return None
+        
     def cadastro(self, tipo_cadastro, dados):
         self.conectar()
         if tipo_cadastro == 'fornecedor':
@@ -363,10 +378,6 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
-
-
-
-
 
 
 
@@ -1250,12 +1261,6 @@ class Detalhes:
         # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()
-
-    def hash_password_sha256(self, password):
-        hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        return hashed
-
-
 
 class Confirmacao:
     def __init__(self, page, mensagem, on_confirmar, on_cancelar=None):
