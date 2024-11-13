@@ -56,9 +56,6 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return []
 
-
-
-
     def obter_funcionarios(self):
         try:
             self.conectar()
@@ -77,10 +74,6 @@ class GerenciamentoBanco:
             self.fechar_conexao()
             return None
     
-
-
-
-
     def obter_atividades(self):
         try:
             self.conectar()
@@ -101,10 +94,6 @@ class GerenciamentoBanco:
             print(f"Erro ao obter atividades: {e}")
             self.fechar_conexao()
             return None
-
-
-
-
 
     def atualizar_funcionario(self, dados_atualizados, id_funcionario):
         print(dados_atualizados)
@@ -127,12 +116,6 @@ class GerenciamentoBanco:
             print(f"Erro ao atualizar dados do fornecedor {e}")
             self.fechar_conexao()
             return str(e)
-
-
-
-
-        
-
 
     def obter_detalhes_funcionario(self, id_funcionario):
         try:
@@ -212,9 +195,7 @@ class GerenciamentoBanco:
             print(f"Erro ao obter detalhes da atividade: {e}")
             self.fechar_conexao()
             return None
-
-
-
+        
     def cadastro(self, tipo_cadastro, dados):
         self.conectar()
         if tipo_cadastro == 'fornecedor':
@@ -451,10 +432,6 @@ class GerenciamentoBanco:
         if dados_login:
             return dados_login
         return None  # Caso não encontre o CPF
-
-
-
-
 
 
 class Cadastro:
@@ -725,8 +702,6 @@ class Cadastro:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-
-
 
     def _salvar_dados(self, e):
         # Coleta os dados dos inputs e fecha o dialog
@@ -1360,10 +1335,6 @@ class Detalhes:
         # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()
-
-    
-
-
 
 class Confirmacao:
     def __init__(self, page, mensagem, on_confirmar, on_cancelar=None):
