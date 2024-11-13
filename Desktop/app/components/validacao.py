@@ -1,6 +1,6 @@
 import pydoc as dbc
 from app.components.classes import GerenciamentoBanco as gbd
-from app.components.funcionario import Funcionario as f
+from app.components.funcionario import Funcionario
 from hashlib import sha256
 
 class Validacao:
@@ -72,15 +72,15 @@ class Validacao:
 
         return True
 
-class Funcionario:
-    def __init__(self, id_funcionario, nome, cpf, sexo, fk_id_cargo, senha, nascimento, email, setor, fk_data_inicio):
-        self.id_funcionario = id_funcionario
-        self.nome = nome
-        self.cpf = cpf
-        self.sexo = sexo
-        self.fk_id_cargo = fk_id_cargo
-        self.senha = senha
-        self.nascimento = nascimento
-        self.email = email
-        self.setor = setor
-        self.fk_data_inicio = fk_data_inicio
+# class Funcionario:
+#     def __init__(self, id_funcionario, nome, cpf, sexo, fk_id_cargo, senha, nascimento, email, setor, fk_data_inicio):
+#         self.id_funcionario = id_funcionario
+#         self.nome = nome
+#         self.cpf = cpf
+#         self.sexo = sexo
+#         self.fk_id_cargo = fk_id_cargo
+#         self.senha = senha
+#         self.nascimento = nascimento
+#         self.email = email
+#         self.setor = setor
+#         self.fk_data_inicio = fk_data_inicio

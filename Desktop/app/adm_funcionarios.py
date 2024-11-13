@@ -1,7 +1,9 @@
 import flet as ft
 import datetime
-from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
+from app.components.classes import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
+from app.components.detalhes import Detalhes
+from app.components.funcionario import Funcionario
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFuncionarios(page: ft.Page):
@@ -194,7 +196,8 @@ def AdminFuncionarios(page: ft.Page):
     
     # Cria uma instância de Detalhes que gerencia o detalhamento do funcionário
     def funcionario(id_funcionario, nome, cargo):
-        detalhes = Detalhes(page)
+        banco = GerenciamentoBanco()
+        detalhes = Detalhes(page, banco)
             
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
@@ -236,7 +239,8 @@ def AdminFuncionarios(page: ft.Page):
     # Cria uma instância de GerenciamentoBanco para acessar os dados do banco de dados
     def container():
         banco = GerenciamentoBanco()
-        funcionarios = banco.obter_funcionarios()
+        banco_funcionarios = Funcionario(banco)
+        funcionarios = banco_funcionarios.obter_funcionarios()
         if funcionarios:
             # Se existem funcionários, cria a lista de containers para exibir cada funcionário
             lista_funcionarios = [funcionario(id_funcionario, nome, cargo) for id_funcionario, nome, cargo in funcionarios]

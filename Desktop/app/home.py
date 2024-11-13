@@ -3,6 +3,7 @@ import datetime
 from app.components.dialogs import DialogoSaida, Detalhes
 from app.components.classes import GerenciamentoBanco
 from app.components.producao import Producao
+from app.components.detalhes import Detalhes
 
 
 def Home(page: ft.Page):
@@ -206,12 +207,14 @@ def Home(page: ft.Page):
         
         return AppBar
 
-    def pproducao(nome, imagem):
+    def pproducao(id_plantio, nome, imagem):
 
         def on_click_container(e):
             print(f"Clicado: {nome}")
             
-            
+        banco = GerenciamentoBanco()
+        detalhes = Detalhes(page, banco)
+
         planta = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
@@ -221,7 +224,7 @@ def Home(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            on_click=on_click_container,
+            on_click=lambda e: detalhes.detalhes_producao(id_plantio),
             
             content=ft.Row(
                 controls=[
@@ -255,7 +258,7 @@ def Home(page: ft.Page):
         banco_producao = Producao(banco)
         producoes = banco_producao.obter_producao()
         if producoes:
-            lista_producao = [pproducao(nome, imagem) for  _, _, nome, _, imagem in producoes]
+            lista_producao = [pproducao(id_plantio, nome, imagem) for  id_plantio, _, nome, _, imagem in producoes]
         else:
             lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção em andamento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 
@@ -279,47 +282,48 @@ def Home(page: ft.Page):
         )
         return producao
     
-    def grafico():
-        grafico = ft.Container(
-            bgcolor="#99C2A2",
-            border=ft.border.all(
-                color=ft.colors.BLACK
-            ),
-            width=340,
-            height=50,
-            border_radius=9,
-            padding=ft.padding.only(left=12, right=12),
-            on_click=print("Grita socorro"), 
+    # def grafico():
+    #     grafico = ft.Container(
+    #         bgcolor="#99C2A2",
+    #         border=ft.border.all(
+    #             color=ft.colors.BLACK
+    #         ),
+    #         width=340,
+    #         height=50,
+    #         border_radius=9,
+    #         padding=ft.padding.only(left=12, right=12),
+    #         on_click=print("Grita socorro"), 
             
-            content=ft.Row(
-                controls=[
-                    ft.Icon(
-                        name=ft.icons.FOREST,
-                        color=ft.colors.GREEN_900,
-                        size=30
-                        ),
-                    ft.Text(
-                        # value=nome
-                        ),
+    #         content=ft.Row(
+    #             controls=[
+    #                 ft.Icon(
+    #                     name=ft.icons.FOREST,
+    #                     color=ft.colors.GREEN_900,
+    #                     size=30
+    #                     ),
+    #                 ft.Text(
+    #                     # value=nome
+    #                     ),
                     
-                    ft.Container(
-                        alignment=ft.alignment.center_right,
+    #                 ft.Container(
+    #                     alignment=ft.alignment.center_right,
                         
-                        content=ft.Image(
-                            # src=imagem,
-                            width=30,
-                        )
-                    )
-                ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            )
-        )
+    #                     content=ft.Image(
+    #                         # src=imagem,
+    #                         width=30,
+    #                     )
+    #                 )
+    #             ],
+    #             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+    #         )
+    #     )
         
-        return grafico
+    #     return grafico
 
     def grafico_pedidos():
         banco = GerenciamentoBanco()
-        dados_grafico = banco.grafico()  # Retorna dados como [(mes, total_producao), ...]
+        grafico = Producao(banco)
+        dados_grafico = grafico.grafico_qnt_prod_mes()  # Retorna dados como [(mes, total_producao), ...]
 
         if dados_grafico:
             # Criar gráficos com base nos dados retornados

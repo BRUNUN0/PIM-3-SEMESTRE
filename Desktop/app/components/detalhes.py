@@ -6,6 +6,7 @@ from app.components.atividade import Atividade
 from app.components.cliente import Cliente
 from app.components.fornecedor import Fornecedor
 from app.components.estoque import Estoque
+from app.components.funcionario import Funcionario
 from app.components.classes import GerenciamentoBanco
 
 class Detalhes:
@@ -476,6 +477,95 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
+
+    def detalhes_funcionario(self, id_funcionario):
+        self.id_funcionario_atual = id_funcionario
+        self._alternar_modo_edicao(None, tipo_entidade='funcionario')
+        banco = GerenciamentoBanco()
+        funcionario = Funcionario(banco)
+
+        # Obter detalhes do fornecedor pelo ID
+        detalhes = funcionario.obter_detalhes_funcionario(id_funcionario)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do funcionario."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            # print("Erro ao obter os detalhes do funcionario.")
+            return
+
+
+        # Organizar os detalhes em um dicionário para exibição
+        dados = {
+            "ID": detalhes[0],
+            "Nome": detalhes[1],
+            "CPF": detalhes[2],
+            "Sexo": detalhes[3],
+            "Cargo": detalhes[4],
+            "Senha": detalhes[5],
+            "Nascimento": detalhes[6],
+            "Email": detalhes[7],
+            "Setor": detalhes[8],
+            "Data inicial": detalhes[9]
+        }
+
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do Funcionario", size=18, color=ft.colors.BLACK, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo, permitindo a edição
+        for titulo, valor in dados.items():
+            if titulo == "Senha":
+                campo = ft.TextField(value="", label="Nova senha (deixe em branco para manter)", color=ft.colors.BLACK, read_only=True)
+            else:
+                campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=(titulo == "ID"))
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        self.botoes = ft.Row(
+            controls=[
+                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
+            ],
+            alignment=ft.MainAxisAlignment.START
+        )
+
+        conteudo_dialog.append(self.botoes)
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
 
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""

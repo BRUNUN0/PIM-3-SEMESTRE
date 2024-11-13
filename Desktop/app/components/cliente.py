@@ -33,7 +33,7 @@ class Cliente:
     def atualizar_cliente(self, dados_atualizados, id_cliente):
         try:
             self.banco.conectar()
-            query = '''UPDATE Funcionario SET  Nome_Fantasia = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
+            query = '''UPDATE Cliente SET  Nome_Fantasia = ?, Email = ?, Rua = ?, Numero = ?, Bairro = ?, CEP = ?, Cidade = ?, Estado = ? WHERE id_cliente = ?'''
             parametros = (
             dados_atualizados["Nome Fantasia"],
             dados_atualizados["Email"],
@@ -43,11 +43,11 @@ class Cliente:
             dados_atualizados["CEP"],
             dados_atualizados["Cidade"],
             dados_atualizados["Estado"],
-            id_cliente  # Aqui é onde o ID do fornecedor é passado
+            id_cliente  # Aqui é onde o ID do Cliente é passado
         )
             self.banco.cursor.execute(query, parametros)
             self.banco.conn.commit()
         except Exception as e:
-            print(f"Erro ao atualizar dados do fornecedor {e}")
+            print(f"Erro ao atualizar dados do Cliente {e}")
             self.banco.fechar_conexao()
             return str(e)
