@@ -10,7 +10,7 @@ def main(page: ft.Page):
     print(page.route)
 
     # page.go("/adm/funcionarios")
-    page.go('/login')
+    page.go('/pedidos')
     page.update()
 
 if __name__ == "__main__":
