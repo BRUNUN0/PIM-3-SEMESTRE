@@ -1,8 +1,9 @@
 import flet as ft
-from datetime import datetime
-import pyodbc
+import datetime
 from app.components.dialogs import DialogoSaida
-from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro, Producao
+from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
+from app.components.producao import Producao
+from app.components.estoque import Estoque
 
 
 def Plantacao(page: ft.Page):
@@ -197,7 +198,7 @@ def Plantacao(page: ft.Page):
         
         return AppBar
 
-    def materia(id, nome, quantidade, url):       
+    def materia(id, nome, quantidade, url):
         materia_prima = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(
@@ -238,9 +239,10 @@ def Plantacao(page: ft.Page):
         return materia_prima
     
     def materias_primas ():
-
         banco = GerenciamentoBanco()
-        materia_prima_data = banco.obter_materia_prima()
+        banco_materias = Estoque(banco)
+
+        materia_prima_data = banco_materias.obter_materia_prima()
         if materia_prima_data:
             lista_materias_primas = [materia(id, nome, quantidade, url) for id, nome, quantidade, url in materia_prima_data]
         else:
@@ -267,7 +269,9 @@ def Plantacao(page: ft.Page):
         return estoque_mater_prima
 
     def plantacao(id_plantio, plantio, nome, quantidade):
-        detalhes = Detalhes(page)
+        banco = GerenciamentoBanco
+        detalhes = Detalhes(page, banco)
+
         produto = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
@@ -301,8 +305,9 @@ def Plantacao(page: ft.Page):
         return produto
 
     def plantacoes():
-        banco = Producao()
-        producoes = banco.obter_producao()
+        banco = GerenciamentoBanco()
+        banco_producao = Producao(banco)
+        producoes = banco_producao.obter_producao()
         if producoes:
             lista_plantacao = [plantacao(id_plantio, plantio, nome, quantidade) for id_plantio, plantio, nome, quantidade, *rest in producoes]
         else:
@@ -362,7 +367,8 @@ def Plantacao(page: ft.Page):
 
         cadastro = Cadastro(page)
         banco = GerenciamentoBanco()
-        produtos = banco.obter_produtos()
+        banco_produtos = Estoque(banco)
+        produtos = banco_produtos.obter_produtos()
         if produtos:
             lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade, _ in produtos]
         else:
@@ -457,7 +463,8 @@ def Plantacao(page: ft.Page):
                         spacing=10,
                         controls=[
                             ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("materia prima")),
-                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
+                            ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
+                            ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
                         ],
                     )
                 ],

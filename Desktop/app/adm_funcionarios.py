@@ -1,8 +1,5 @@
-from ctypes import alignment
-from turtle import width
 import flet as ft
 import datetime
-import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco, Detalhes
 from app.components.dialogs import ConfirmationDialog
 

@@ -1,7 +1,8 @@
 import flet as ft
 import datetime
 from app.components.dialogs import DialogoSaida, Detalhes
-from app.components.classes import GerenciamentoBanco, Producao
+from app.components.classes import GerenciamentoBanco
+from app.components.producao import Producao
 
 
 def Home(page: ft.Page):
@@ -250,8 +251,9 @@ def Home(page: ft.Page):
     
     def em_producao ():
 
-        banco = Producao()
-        producoes = banco.obter_producao()
+        banco = GerenciamentoBanco()
+        banco_producao = Producao(banco)
+        producoes = banco_producao.obter_producao()
         if producoes:
             lista_producao = [pproducao(nome, imagem) for  _, _, nome, _, imagem in producoes]
         else:

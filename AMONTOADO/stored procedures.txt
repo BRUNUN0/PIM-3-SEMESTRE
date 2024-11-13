@@ -379,13 +379,14 @@ END
 
 
 
-CREATE PROCEDURE RegistrarAtividade
+CREATE PROCEDURE [dbo].[RegistrarAtividade]
     @nome_funcionario NVARCHAR(100),
     @nome_plantio NVARCHAR(100),
     @descricao NVARCHAR(MAX),
     @prioridade INT,
+	@data DATE,
     @duracao TIME,
-    @fase_atual NVARCHAR(100) -- Novo parâmetro para Fase_Atual
+    @fase_atual NVARCHAR(100)
 AS
 BEGIN
     DECLARE @fk_id_funcionario INT;
@@ -420,8 +421,8 @@ BEGIN
         END
 
         -- Inserir a nova atividade
-        INSERT INTO Atividade (fk_id_funcionario, fk_id_Plantio, Descricao, Prioridade, Duracao)
-        VALUES (@fk_id_funcionario, @fk_id_plantio, @descricao, @prioridade, @duracao);
+        INSERT INTO Atividade (fk_id_funcionario, fk_id_Plantio, Descricao, Prioridade, Duracao, Data)
+        VALUES (@fk_id_funcionario, @fk_id_plantio, @descricao, @prioridade, @duracao, @data);
 
         -- Atualizar a fase atual da tabela Producao
         UPDATE Producao
@@ -440,3 +441,4 @@ BEGIN
         RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
 END;
+

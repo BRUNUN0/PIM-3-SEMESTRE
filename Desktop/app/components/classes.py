@@ -1,7 +1,9 @@
 import hashlib
 import flet as ft
 import pyodbc
+from datetime import datetime, date
 from hashlib import sha256
+
 
 class GerenciamentoBanco:
     def __init__(self):
@@ -694,13 +696,14 @@ class Cadastro:
 
 
 class Detalhes:
-    def __init__(self, page):
+    def __init__(self, page, banco):
         """
         Inicializa a classe DetalhesDialog para exibir os detalhes de uma entidade.
         :param page: A página onde o dialog será mostrado.
         :param banco: Instância de GerenciamentoBanco para consultar os dados.
         """
         self.page = page
+        self.banco = banco
         self.dialog = None
         self.em_edicao = False
         self.botoes = None
@@ -1038,34 +1041,6 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-    def detalhes_atividade(self, id_atividade):
-        self.id_atividade_atual = id_atividade
-        self._alternar_modo_edicao(None, tipo_entidade='atividade')
-        banco = GerenciamentoBanco()
-
-        detalhes = banco.obter_detalhes_atividade(id_atividade)
-        print(detalhes)
-
-        if detalhes is None:
-            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes da atividade."), bgcolor=ft.colors.RED)
-            self.page.overlay.append(snackbar)
-            snackbar.open = True
-            self.page.update()
-            return
-        
-        dados = {
-            "ID": detalhes[0],
-            "Nome": detalhes[1],
-            "CPF": detalhes[2],
-            "Sexo": detalhes[3],
-            "Cargo": detalhes[4],
-            "Senha": detalhes[5],
-            "Nascimento": detalhes[6],
-            "Email": detalhes[7],
-            "Setor": detalhes[8],
-            "Data inicial": detalhes[9]
-        }
-        print(dados)
 
     def detalhes_producao(self, id_plantio):
         self.id_plantio_atual = id_plantio
@@ -1133,7 +1108,7 @@ class Detalhes:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-
+#
     def detalhes_pedido(self, id_pedido):
         self.id_pedido_atual = id_pedido
         self._alternar_modo_edicao(None, tipo_entidade='pedido')
@@ -1439,162 +1414,7 @@ class Cliente(GerenciamentoBanco):
             self.fechar_conexao()
             return str(e)
 
-class Producao(GerenciamentoBanco):
-    def __init__(self):
-        super().__init__()
 
-    def obter_producao(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        p.id_plantio,
-                        p.Plantio,
-                        p.Nome,
-                        p.Quantidade,
-                        mp.URL
-                    FROM Producao p
-                    JOIN Materia_Prima mp ON p.fk_id_materia = mp.id_materia
-                    WHERE p.Data_Fim IS NULL;'''
-            self.cursor.execute(query)
-            producao = self.cursor.fetchall()
-            return producao
-        except Exception as e:
-            print(f"Erro ao obter producao: {e}")
-            self.fechar_conexao()
-            return []
 
-    def obter_detalhes_plantio(self, id_plantio):
-        try:
-            self.conectar()
-            query = f'''
-                SELECT
-                    id_plantio,
-                    Plantio,
-                    Data_Inicio,
-                    Nome,
-                    Quantidade
-                FROM 
-                    Producao
-                WHERE id_plantio = {id_plantio}
-            '''
-            self.cursor.execute(query)
-            detalhes = self.cursor.fetchone()
-            return detalhes
-        except Exception as e:
-            print(f"Erro ao obter fornecedores: {e}")
-            self.fechar_conexao()
-            return None
 
-class Estoque(GerenciamentoBanco):
-    def __init__(self):
-        super().__init__()
 
-    def obter_produtos(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        p.id_produto,
-                        p.Produto,
-                        p.Quantidade,
-                        p.Previsao
-                    FROM Produto p'''
-            self.cursor.execute(query)
-            produtos = self.cursor.fetchall()
-            return produtos
-        except Exception as e:
-            print(f"Erro ao obter produtos: {e}")
-            self.fechar_conexao()
-            return None
-
-    def obter_materia_prima(self):
-        try:
-            self.conectar()
-            query = '''SELECT
-                        mp.id_materia,
-                        mp.Nome,
-                        mp.Quantidade,
-                        mp.URL
-                    FROM Materia_Prima mp'''
-            self.cursor.execute(query)
-            materias_primas = self.cursor.fetchall()
-            return materias_primas
-        except Exception as e:
-            print(f"Erro ao obter materias primas: {e}")
-            self.fechar_conexao()
-            return None
-
-    def obter_detalhes_materia_prima(self, id_materia):
-        try:
-            self.conectar()
-            query = f'''SELECT
-                        c.id_compra as id,
-                        f.Nome_Fantasia as fornecedor,
-                        f.CNPJ as cnpj,
-                        mp.Nome as nome,
-                        mp.Quantidade as quantidade,
-                        c.Data_compra as data_compra,
-                        mp.URL as url
-                    FROM
-                        Materia_Prima mp
-                    INNER JOIN Compra c ON c.id_compra = c.id_compra
-                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
-                    WHERE id_materia = {id_materia}'''
-            self.cursor.execute(query)
-            detalhes_materia_prima = self.cursor.fetchone()
-            print(detalhes_materia_prima)
-            return detalhes_materia_prima()
-        except Exception as e:
-            print(f"Erro ao obter detalhes da materia prima: {e}")
-            self.fechar_conexao()
-            return None
-
-class Atividades(GerenciamentoBanco):
-    def __init__(self):
-        super().__init__()
-
-    def obter_atividades(self):
-        try:
-            self.conectar()
-            query = '''SELECT 
-                        a.id_atividade,
-                        p.Plantio AS nome_plantio,
-                        a.Data
-                    FROM 
-                        Atividade a
-                    INNER JOIN 
-                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
-                    INNER JOIN 
-                        Producao p ON a.fk_id_Plantio = p.id_plantio;'''
-            self.cursor.execute(query)
-            atividades = self.cursor.fetchone()
-            return atividades
-        except Exception as e:
-            print(f"Erro ao obter atividades: {e}")
-            self.fechar_conexao()
-            return None
-        
-    def obter_detalhes_atividade(self, id_atividade):
-        try:
-            self.conectar()
-            query = f'''SELECT 
-                        a.id_atividade,
-                        f.nome AS nome_funcionario,
-                        p.Plantio AS nome_plantio,
-                        a.Descricao,
-                        a.Prioridade,
-                        a.Duracao,
-                        p.Fase_Atual
-                    FROM 
-                        Atividade a
-                    INNER JOIN 
-                        Funcionario f ON a.fk_id_funcionario = f.id_funcionario
-                    INNER JOIN 
-                        Producao p ON a.fk_id_Plantio = p.id_plantio
-                    WHERE id_atividade = {id_atividade}'''
-            self.cursor.execute(query)
-            detalhes_atividade = self.cursor.fetchone()
-            return detalhes_atividade
-        except Exception as e:
-            print(f"Erro ao obter detalhes da atividade: {e}")
-            self.fechar_conexao()
-            return None

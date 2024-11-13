@@ -79,107 +79,105 @@ def Pedidos(page: ft.Page):
         
     def botoes():
         botoes = ft.Container(
-            expand=True,
+            # expand=True,
             # height=100,
             bgcolor="#D9FFBA",
+            padding=ft.padding.only(top=10),
             
             content = ft.Column(
-    controls=[
-        ft.Row(
-            controls=[
-                ft.Container(
-                    content=ft.Column(
+                controls=[
+                    ft.Row(
                         controls=[
-                            ft.IconButton(
-                                width=50,
-                                height=50,
-                                icon=ft.icons.HOME,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                            # Botão Home
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.HOME,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                        ),
+                                        ft.Text(
+                                            value='Home',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                )
                             ),
-                            ft.Text(
-                                value='Home',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
+                            # Botão Plantação
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.ECO,
+                                            icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/plantacao')
+                                        ),
+                                        ft.Text(
+                                            value='Plantação',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                )
+                            ),
+                            # Botão Pedidos
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.BOOKMARK_ADD_SHARP,
+                                            icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/pedidos')
+                                        ),
+                                        ft.Text(
+                                            value='Pedidos',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                )
+                            ),
+                            # Botão Atividades
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.CHECKLIST,
+                                            icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/atividades'),
+                                        ),
+                                        ft.Text(
+                                            value='Atividades',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                )
                             )
                         ],
+                        # Centraliza todos os botões na linha
                         alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,  # Ajuste o espaçamento entre os botões
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.ECO,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/plantacao'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Plantação',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.BOOKMARK_ADD_SHARP,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/pedidos'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Pedidos',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.CHECKLIST,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/atividades'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Atividades',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                )
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
-            spacing=20,  # Ajusta o espaçamento entre os botões na linha
-        )
-    ]
-)
-
+                    )
+                ]
+            )
         )
         
         return botoes

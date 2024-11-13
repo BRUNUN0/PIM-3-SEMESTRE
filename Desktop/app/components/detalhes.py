@@ -1,6 +1,7 @@
 import flet as ft
 from hashlib import sha256
 from app.components.pedido import Pedido
+from app.components.atividade import Atividade
 from app.components.classes import GerenciamentoBanco
 
 class Detalhes:
@@ -26,8 +27,7 @@ class Detalhes:
         pedido = Pedido(banco)
 
         detalhes = pedido.obter_detalhes_pedido(id_pedido)
-        print(detalhes)
-
+        
         if detalhes is None:
             snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do pedido."), bgcolor=ft.colors.RED)
             self.page.overlay.append(snackbar)
@@ -45,6 +45,74 @@ class Detalhes:
             "Status": detalhes[6]
         }
 
+        # Conteúdo do diálogo
+        conteudo_dialog = [
+            ft.Row(
+                controls=[
+                    ft.Text(f"Detalhes do", color=ft.colors.BLACK, size=18, weight="bold"),
+                    ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        ]
+
+        # Adicionar os campos do dicionário `dados` ao diálogo
+        for titulo, valor in dados.items():
+            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            self.campos[titulo] = campo
+            conteudo_dialog.append(
+                ft.Row(
+                    controls=[
+                        ft.Text(f"{titulo}:", size=14, color=ft.colors.BLACK, weight="bold"),
+                        campo
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                )
+            )
+
+        # Configurar o diálogo com o conteúdo
+        self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            content=ft.Container(
+                width=550,
+                # padding=ft.padding.only(left=15, right=15),
+                content=ft.Column(
+                    controls=conteudo_dialog,
+                    alignment=ft.MainAxisAlignment.START,
+                    scroll=ft.ScrollMode.AUTO
+                )
+            )
+        )
+
+        # Exibe o dialog
+        self.page.overlay.append(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+
+    def detalhes_atividade(self, id_atividade):
+        self.id_atividade_atual = id_atividade
+        self._alternar_modo_edicao(None, tipo_entidade='atividade')
+        banco = GerenciamentoBanco()
+        atividade = Atividade(banco)
+        detalhes = atividade.obter_detalhes_atividade(id_atividade)
+
+        if detalhes is None:
+            snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes da atividade."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+        
+        dados = {
+            "ID": detalhes[0],
+            "Plantio": detalhes[1],
+            "Descrição da Atividade": detalhes[2],
+            "Prioridade (1 a 3)": detalhes[3],
+            "Data": detalhes[4],
+            "Tempo": detalhes[5],
+            "Fase Atual": detalhes[6]
+        }
         # Conteúdo do diálogo
         conteudo_dialog = [
             ft.Row(
