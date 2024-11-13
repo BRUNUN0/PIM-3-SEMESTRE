@@ -1,8 +1,10 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, Cliente, GerenciamentoBanco, Detalhes
+from app.components.classes import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
+from app.components.cliente import Cliente
+from app.components.detalhes import Detalhes
 
 # Função principal que configura a interface da página de administração de clientes.
 def AdminClientes(page: ft.Page):
@@ -188,7 +190,8 @@ def AdminClientes(page: ft.Page):
     
     # Função que cria um contêiner para exibir informações de um cliente específico.
     def cliente(id_cliente, nome, cnpj):
-        detalhes = Detalhes(page)
+        banco = GerenciamentoBanco()
+        detalhes = Detalhes(page, banco)
 
         fornecedor = ft.Container(
             bgcolor="#99C2A2",
@@ -199,7 +202,6 @@ def AdminClientes(page: ft.Page):
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
-            # on_click=lambda e: print(id_fornecedor),
             on_click=lambda e: detalhes.detalhes_cliente(id_cliente),
             
             content=ft.Row(
@@ -229,8 +231,9 @@ def AdminClientes(page: ft.Page):
 
     # Função que cria um contêiner principal para exibir a lista de clientes e um botão de cadastro.
     def container():
-        banco = Cliente()
-        clientes = banco.obter_clientes()
+        banco = GerenciamentoBanco()
+        banco_cliente = Cliente(banco)
+        clientes = banco_cliente.obter_clientes()
         if clientes:
             # Se existem clientes, cria uma lista de contêineres com informações de cada cliente.
             lista_clientes = [cliente(id_cliente, nome, cnpj) for id_cliente, nome, cnpj in clientes]

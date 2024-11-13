@@ -1,8 +1,10 @@
 import flet as ft
 import time
 import pyodbc
-from app.components.classes import Cadastro, Fornecedor, GerenciamentoBanco, Detalhes
+from app.components.classes import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
+from app.components.detalhes import Detalhes
+from app.components.fornecedor import Fornecedor
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
@@ -185,7 +187,8 @@ def AdminFornecedores(page: ft.Page):
     
     def fornecedor(id_fornecedor, nome, cnpj):
         # Cria um objeto de detalhes (presumivelmente, para exibir mais informações sobre o fornecedor)
-        detalhes = Detalhes(page)
+        banco = GerenciamentoBanco()
+        detalhes = Detalhes(page, banco)
 
         # Cria o contêiner que vai representar o fornecedor.    
         fornecedor = ft.Container(
@@ -222,8 +225,9 @@ def AdminFornecedores(page: ft.Page):
 
     # Instancia o objeto de gerenciamento de banco de dados
     def container():
-        banco = Fornecedor()
-        fornecedores = banco.obter_fornecedores()
+        banco = GerenciamentoBanco()
+        banco_fornecedores = Fornecedor(banco)
+        fornecedores = banco_fornecedores.obter_fornecedores()
         # Verifica se há fornecedores. Se houver, cria a lista de fornecedores com base nas informações do banco
         if fornecedores:
             lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]

@@ -1,9 +1,10 @@
 import flet as ft
 import datetime
 from app.components.dialogs import DialogoSaida
-from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
+from app.components.classes import GerenciamentoBanco, Cadastro
 from app.components.producao import Producao
 from app.components.estoque import Estoque
+from app.components.detalhes import Detalhes
 
 
 def Plantacao(page: ft.Page):

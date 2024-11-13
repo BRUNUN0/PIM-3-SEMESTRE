@@ -38,22 +38,24 @@ class Estoque:
             self.banco.fechar_conexao()
             return None
 
+    # Detalhes Historico de Compra por Matéria Prima
     def obter_detalhes_materia_prima(self, id_materia):
         try:
             self.banco.conectar()
             query = f'''SELECT
-                        c.id_compra as id,
-                        f.Nome_Fantasia as fornecedor,
-                        f.CNPJ as cnpj,
-                        mp.Nome as nome,
-                        mp.Quantidade as quantidade,
-                        c.Data_compra as data_compra,
-                        mp.URL as url
-                    FROM
-                        Materia_Prima mp
-                    INNER JOIN Compra c ON c.id_compra = c.id_compra
-                    INNER JOIN Fornecedor f ON f.Nome_Fantasia = f.Nome_Fantasia
-                    WHERE id_materia = {id_materia}'''
+                            c.id_compra AS id,
+                            f.Nome_Fantasia AS fornecedor,
+                            f.CNPJ AS cnpj,
+                            mp.Nome AS nome,
+                            mp.Quantidade AS quantidade,
+                            c.Data_compra AS data_compra,
+                            mp.URL AS url
+                        FROM
+                            Materia_Prima mp
+                        INNER JOIN Compra c ON c.id_compra = mp.id_materia
+                        INNER JOIN Fornecedor f ON f.id_fornecedor = mp.id_materia
+                        WHERE
+                            mp.id_materia = {id_materia}'''
             self.banco.cursor.execute(query)
             detalhes_materia_prima = self.banco.cursor.fetchone()
             print(detalhes_materia_prima)
