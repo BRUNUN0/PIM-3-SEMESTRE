@@ -156,6 +156,7 @@ class GerenciamentoBanco:
                         WHERE id_funcionario = {id_funcionario}'''
             self.cursor.execute(query)
             detalhes_funcionario = self.cursor.fetchone()
+            
             return detalhes_funcionario
         except Exception as e:
             print(f"Erro ao obter detalhes do funcionario: {e}")
@@ -1084,9 +1085,12 @@ class Detalhes:
             )
         ]
 
-        # Adicionar os campos do dicionário `dados` ao diálogo
+        # Adicionar os campos do dicionário `dados` ao diálogo, permitindo a edição
         for titulo, valor in dados.items():
-            campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=True)
+            if titulo == "Senha":
+                campo = ft.TextField(value="", label="Nova senha (deixe em branco para manter)", color=ft.colors.BLACK, read_only=True)
+            else:
+                campo = ft.TextField(value=str(valor), color=ft.colors.BLACK, read_only=(titulo == "ID"))
             self.campos[titulo] = campo
             conteudo_dialog.append(
                 ft.Row(
@@ -1330,7 +1334,10 @@ class Detalhes:
             if not campo.read_only:
                 dados_atualizados[titulo] = campo.value
 
-        
+        if dados_atualizados["Senha"]:
+            dados_atualizados["Senha"] = self.hash_password_sha256(dados_atualizados["Senha"])
+        else:
+            dados_atualizados.pop["Senha"]
 
         if tipo_entidade == "fornecedor":
             banco = Fornecedor()
@@ -1361,7 +1368,9 @@ class Detalhes:
         self.dialog.open = False
         self.page.update()
 
-    
+    def hash_password_sha256(self, password):
+        hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        return hashed
 
 
 

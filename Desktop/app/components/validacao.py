@@ -8,8 +8,9 @@ class Validacao:
         self.gbd = gbd()  # Instancia o GerenciamentoBanco
 
     def valid_Login(self, cpf, senha):
+        # banco = gbd()
 
-        senha_cripto = sha256(senha.encode()).digest()
+        senha_cripto = sha256(senha.encode('utf-8')).hexdigest()
 
         dados = self.gbd.obter_funcionario_login(cpf)  # Agora usa a instância do banco
         if dados:  # Verifica se dados foram encontrados
