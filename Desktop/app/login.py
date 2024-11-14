@@ -8,10 +8,9 @@ def Login(page: ft.Page):
         cpf_valor = campo_cpf.value
         senha_valor = campo_senha.value
 
-        print(f"CPF:{cpf_valor}, Senha:{senha_valor}")
-        r = valid.valid_Login(cpf_valor, senha_valor)
-
-        if(r):
+        login_sucesso = valid.valid_Login(cpf_valor, senha_valor)
+        
+        if login_sucesso:
             page.go("/")
             page.update()
         else: 

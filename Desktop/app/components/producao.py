@@ -45,3 +45,23 @@ class Producao:
             print(f"Erro ao obter fornecedores: {e}")
             self.banco.fechar_conexao()
             return None
+        
+    def grafico_qnt_prod_mes(self):
+        try:
+            self.banco.conectar()
+            query = '''SELECT 
+                            FORMAT(Data_Inicio, 'MMM') AS Mes, 
+                            SUM(Quantidade) AS Total_Quantidade
+                        FROM 
+                            Producao
+                        GROUP BY 
+                            FORMAT(Data_Inicio, 'MMM'), DATEPART(MONTH, Data_Inicio)
+                        ORDER BY 
+                            DATEPART(MONTH, Data_Inicio);'''
+            self.banco.cursor.execute(query)
+            grafico = self.banco.cursor.fetchall()
+            return grafico
+        except Exception as e:
+            print(f"Erro ao obter grafico")
+            self.banco.fechar_conexao()
+            return []
