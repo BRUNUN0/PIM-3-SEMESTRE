@@ -11,7 +11,7 @@ def main(page: ft.Page):
 
     # page.go("/adm/funcionarios")
     # page.go('/adm/fornecedores')
-    page.go('/adm/funcionarios')
+    page.go('/login')
     page.update()
 
 if __name__ == "__main__":

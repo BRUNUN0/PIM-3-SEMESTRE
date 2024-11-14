@@ -1,22 +1,13 @@
 from app.components.classes import GerenciamentoBanco
 
 class Funcionario:   
-    # def __init__(self, id_funcionario, nome, cpf, sexo, fk_id_cargo, senha, nascimento, email, setor, fk_data_inicio, gerenciamento_banco:GerenciamentoBanco):
+    # def __init__(self, id_funcionario=None, nome=None, cpf=None, sexo=None, fk_id_cargo=None, senha=None, nascimento=None, email=None, setor=None, fk_data_inicio=None, gerenciamento_banco=None):
     def __init__(self, gerenciamento_banco: GerenciamentoBanco):
         self.banco = gerenciamento_banco
-        # self.id_funcionario = id_funcionario
-        # self.nome = nome
-        # self.cpf = cpf
-        # self.sexo = sexo
-        # self.fk_id_cargo = fk_id_cargo
-        # self.senha = senha
-        # self.nascimento = nascimento
-        # self.email = email
-        # self.setor = setor
-        # self.fk_data_inicio = fk_data_inicio
 
-    def __str__(self):
-        return f"Funcionário: {self.nome}, ID: {self.id_funcionario}"
+
+    # def __str__(self):
+    #     return f"Funcionário: {self.nome}, ID: {self.id_funcionario}"
     
     def obter_funcionarios(self):
         try:
@@ -91,7 +82,7 @@ class Funcionario:
 
         try:
             self.banco.conectar()
-            print(cpf)
+            # print(cpf)
             self.banco.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
             dados_login = self.banco.cursor.fetchone()
             print(dados_login)
@@ -100,4 +91,3 @@ class Funcionario:
             print(f"Erro ao obter login")
         finally:
             self.banco.fechar_conexao()
-            return None
