@@ -1,17 +1,16 @@
+from app.components.validacao import Validacao
 import flet as ft
-from app.components.validacao import Validacao 
 
-vl = Validacao()
-
+valid = Validacao()
 def Login(page: ft.Page):
-    
-    def login(e):
+
+    def _login(e):
         cpf_valor = campo_cpf.value
         senha_valor = campo_senha.value
-        print(f"CPF:{cpf_valor}, Senha:{senha_valor}")
 
-        r = vl.valid_Login(cpf_valor, senha_valor)
-        
+        print(f"CPF:{cpf_valor}, Senha:{senha_valor}")
+        r = valid.valid_Login(cpf_valor, senha_valor)
+
         if(r):
             page.go("/")
             page.update()
@@ -19,8 +18,7 @@ def Login(page: ft.Page):
             print("Erro de login")
             mostrar_erro_login(page)
             page.update()  
-
-# Enviado usuario para a pagina "/" (bruno nao sei o que seria"/)
+        
 
     def logo():
         logo = ft.Container(
@@ -34,9 +32,11 @@ def Login(page: ft.Page):
                 height=130,
             ),
             # alignment=ft.alignment.center,
-        )
+        ) 
         return logo
-# Logo da pagina
+    
+
+    # Logo da pagina    
     def background():
         background = ft.Stack(
             controls=[
@@ -90,12 +90,12 @@ def Login(page: ft.Page):
         height=40,
         bgcolor="#13330D",                 #botão entrar
         color=ft.colors.WHITE,
-        on_click=lambda e: login(e)
+        on_click=lambda e: _login(e)
     )
 
 
     
-# Definindo background
+    # Definindo background
     def campos():
         campos = ft.Container(
             content=ft.Column(

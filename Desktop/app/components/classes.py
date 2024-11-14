@@ -790,7 +790,7 @@ class Detalhes:
 
 
 class Confirmacao:
-    def __init__(self, page, mensagem, on_confirmar, on_cancelar=None):
+    def __init__(self, page, mensagem, on_confirmar, on_cancelar=None): 
         """
         Inicializa a classe ConfirmacaoDialog.
         :param page: A página onde o diálogo será exibido.

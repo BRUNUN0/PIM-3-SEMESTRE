@@ -4,7 +4,7 @@ from app.components.producao import Producao
 from app.components.pedido import Pedido
 from app.components.atividade import Atividade
 from app.components.cliente import Cliente
-from app.components.fornecedor import Fornecedor
+from app.components.Fornecedor import Fornecedor
 from app.components.estoque import Estoque
 from app.components.classes import GerenciamentoBanco
 
