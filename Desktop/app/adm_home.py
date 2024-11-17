@@ -25,6 +25,7 @@ def AdminHome(page: ft.Page):
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
+            bgcolor=ft.colors.BLACK,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,

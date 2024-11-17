@@ -4,10 +4,11 @@ from app.components.producao import Producao
 from app.components.pedido import Pedido
 from app.components.atividade import Atividade
 from app.components.cliente import Cliente
-from app.components.Fornecedor import Fornecedor
+from app.components.fornecedor import Fornecedor
 from app.components.estoque import Estoque
 from app.components.funcionario import Funcionario
 from app.components.classes import GerenciamentoBanco
+from app.components.dialogs import ConfirmationDialog
 
 class Detalhes:
     def __init__(self, page, gerenciamento_banco:GerenciamentoBanco):
@@ -588,9 +589,18 @@ class Detalhes:
             campo.update()
 
         if self.em_edicao:
+            dialogo_confirmacao = ConfirmationDialog(
+                title="Confirmar Alterações",
+                content="Deseja realmente salvar as alterações?",
+                actions=[
+                ft.TextButton("Cancelar", on_click=lambda e: dialogo_confirmacao.close_dialog()),
+                ft.ElevatedButton("Confirmar", on_click=lambda e: [dialogo_confirmacao.close_dialog(), self.salvar_alteracoes(None, tipo_entidade=tipo_entidade)])
+                ],
+                page=self.page
+            )
             # Quando em modo de edição, mostra o botão "Salvar"
             self.botoes.controls = [
-                ft.ElevatedButton("Salvar", on_click=lambda e: self.salvar_alteracoes(e, tipo_entidade=tipo_entidade))
+                ft.ElevatedButton("Salvar", on_click=lambda e: dialogo_confirmacao.open_dialog())
             ]
         else:
             # Quando em modo de leitura, mostra o botão "Editar"
@@ -598,6 +608,8 @@ class Detalhes:
                 ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
             ]
         self.page.update()
+
+
 
     def salvar_alteracoes(self, e, tipo_entidade):
         dados_atualizados = {}
