@@ -617,21 +617,20 @@ class Detalhes:
             if not campo.read_only:
                 dados_atualizados[titulo] = campo.value
 
-        if dados_atualizados["Senha"]:
+        if "Senha" in dados_atualizados and dados_atualizados["Senha"]:  # Verifica se a chave existe e não é vazia
             dados_atualizados["Senha"] = self.hash_password_sha256(dados_atualizados["Senha"])
         else:
-            dados_atualizados.pop["Senha"]
+            dados_atualizados.pop("Senha", None)  # Remove a chave se não for necessária
 
+        banco = GerenciamentoBanco()
         if tipo_entidade == "fornecedor":
-            banco = Fornecedor()
-            resultado = banco.atualizar_fornecedor(dados_atualizados, self.id_fornecedor_atual)
+            fornecedor = Fornecedor(banco)
+            resultado = fornecedor.atualizar_fornecedor(dados_atualizados, self.id_fornecedor_atual)
         elif tipo_entidade == "cliente":
-            banco = GerenciamentoBanco()
             cliente = Cliente(banco)
             resultado = cliente.atualizar_cliente(dados_atualizados, self.id_cliente_atual)
         elif tipo_entidade == "funcionario":
-            # banco = Funcionario()
-            banco = GerenciamentoBanco()
+            # funcionario = Funcionario(banco)
             resultado = banco.atualizar_funcionario(dados_atualizados, self.id_funcionario_atual)
         else:
             print("Tipo de entidade desconhecido")

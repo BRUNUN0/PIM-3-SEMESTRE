@@ -259,7 +259,7 @@ def AdminFuncionarios(page: ft.Page):
 
             content=ft.Column(
                 controls=[
-                    ft.Text(value="Funcionarios"),
+                    ft.Text(value="Funcionarios", color=ft.colors.BLACK),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,

@@ -1,8 +1,10 @@
+from click import style
 import flet as ft
 import time
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
+from app.components.classes import GerenciamentoBanco, Cadastro
+from app.components.estoque import Estoque
 
 
 
@@ -25,7 +27,6 @@ def AdminHome(page: ft.Page):
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
-            bgcolor=ft.colors.BLACK,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,
@@ -414,7 +415,8 @@ def AdminHome(page: ft.Page):
 
         cadastro = Cadastro(page)
         banco = GerenciamentoBanco()
-        produtos = banco.obter_produtos()
+        produtos = Estoque(banco)
+        produtos = produtos.obter_produtos()
         if produtos:
             lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade, _ in produtos]
         else:
@@ -434,11 +436,16 @@ def AdminHome(page: ft.Page):
                         content=ft.Column(
                             controls=[
                                 ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                                ft.Column(
-                                    controls=
-                                    lista_produtos,
-                                    spacing=6,
-                                    scroll=ft.ScrollMode.AUTO
+                                ft.Container(
+                                    content=
+                                    ft.Column(
+                                        controls=
+                                        lista_produtos,
+                                        spacing=6,
+                                        scroll=ft.ScrollMode.AUTO
+                                    ),
+                                    expand=True,
+                                    height=200
                                 )
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -529,7 +536,8 @@ def AdminHome(page: ft.Page):
                     ft.Row(
                         controls=[
                             grafico_plantas(),
-                            pedidos()
+                            pedidos(),
+                            grupo()
                         ]
                     ),
                 ],
