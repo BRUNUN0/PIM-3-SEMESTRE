@@ -59,7 +59,7 @@ def rotas(page: ft.Page):
     
     def on_resize(event):
         # Aqui você pode colocar qualquer ação desejada quando a tela for redimensionada
-        print(f"Nova largura: {page.window.width}, Nova altura: {page.window.height}")
+        # print(f"Nova largura: {page.window.width}, Nova altura: {page.window.height}")
         page.update()
 
     # Associa a função `on_resize` ao evento de redimensionamento da página

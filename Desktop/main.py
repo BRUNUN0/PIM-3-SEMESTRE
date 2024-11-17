@@ -5,16 +5,13 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def main(page: ft.Page):
-    page.theme = ft.Theme(color_scheme_seed="blue")
     page.title = "PIXFARM"
-    page.window.maximized = False
+    page.window.maximized = True
     page.window.resizable = False
     rotas(page)
     print(page.route)
 
-    # page.go("/adm/funcionarios")
-    page.go('/adm/fornecedores')
-    # page.go('/adm')
+    page.go('/platacao')
     page.update()
 
 if __name__ == "__main__":

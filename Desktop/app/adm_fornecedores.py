@@ -1,6 +1,5 @@
 import flet as ft
 import datetime
-import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
 from app.components.detalhes import Detalhes
@@ -9,7 +8,6 @@ from app.components.fornecedor import Fornecedor
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
 
-    # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
         agora = datetime.datetime.now()
         relogio = ft.Container(
@@ -22,6 +20,8 @@ def AdminFornecedores(page: ft.Page):
             )
         )
         return relogio
+
+
     
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
@@ -36,33 +36,18 @@ def AdminFornecedores(page: ft.Page):
             on_click= lambda e: page.go('/adm')
         )
         return logo
-
-
+    
     def icon():
         def go_home(e):
             page.go('/')
             confirmation_dialog.close_dialog()
-            mostrar_feedback("Você saiu do modo de Administrador")
-
 
         def sair(e):
             confirmation_dialog.open_dialog()
 
-        def mostrar_feedback(mensagem):
-            # Cria um Snackbar com a mensagem de feedback
-            snackbar = ft.SnackBar(
-                content=ft.Text(mensagem),
-                bgcolor=ft.colors.GREEN,
-                duration=3000  # Duração de 3 segundos
-            )
-            page.overlay.append(snackbar)
-            snackbar.open = True
-            page.update()
-
         confirmation_dialog = ConfirmationDialog(
             "Deseja sair de administrador?",
-            " ",
-            # "Escolha se deseja ir para tela inicial ou sair",
+            "Escolha se deseja ir para tela inicial ou sair",
             [
                 ft.TextButton('Cancelar', on_click=lambda e: confirmation_dialog.close_dialog()),
                 ft.TextButton('Pagina Inicial', on_click=go_home)
@@ -84,19 +69,15 @@ def AdminFornecedores(page: ft.Page):
             )
         )
         return icon
-    # Função que cria a barra superior da aplicação com opções de navegação e logout.   
+
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.  
     def appbar_superior():
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[
                     relogio(),
                     logo(),
-                    icon()
-                    # ft.IconButton(
-                    #     icon=ft.icons.LOGOUT,
-                    #     icon_color=ft.colors.BLACK,
-                    #     on_click=sair
-                    # )
+                    icon(),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -104,7 +85,7 @@ def AdminFornecedores(page: ft.Page):
         
         return app_sup
 
-    # Função para criar os botões de navegação na tela do administrador.     
+    # Função para criar os botões de navegação na tela do administrador.  
     def botoes():
         botoes = ft.Container(
             bgcolor="#D9FFBA",
@@ -187,16 +168,17 @@ def AdminFornecedores(page: ft.Page):
         
         return botoes
     
+    # Função para criar a barra superior (AppBar) da página.
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
             width=page.window.width,
+            padding=ft.padding.all(10),
             height=175,
             expand=True,
             
             content=ft.Column(
                 controls=[
-                    # Define os controles (conteúdos) dentro da AppBar.
                     ft.Container(
                         expand=True,
                         content=ft.Column(
@@ -236,15 +218,20 @@ def AdminFornecedores(page: ft.Page):
                         size=30
                         ),
                     ft.Text(
-                        value=f"ID: {id_fornecedor}"
-                        ),
-                    
-                    ft.Text(
-                        value=nome
+                        value=f"ID: {id_fornecedor}",
+                        color=ft.colors.BLACK,
+                        width=180
                         ),
                     ft.Text(
-                        value=cnpj
-                    ),
+                        value=nome,
+                        color=ft.colors.BLACK,
+                        width=250
+                        ),
+                    ft.Text(
+                        value=f"CNPJ: {cnpj}",
+                        color=ft.colors.BLACK,
+                        width=200
+                        ),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
@@ -354,7 +341,6 @@ def AdminFornecedores(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
         )
     )
-    
-    # page.on_resized = page.update()
+
 
     return Main

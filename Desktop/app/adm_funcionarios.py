@@ -61,7 +61,6 @@ def AdminFuncionarios(page: ft.Page):
                         icon=ft.icons.LOGOUT,
                         icon_color=ft.colors.BLACK,
                         on_click=sair,
-                        # alignment=ft.alignment.center_right
                     )
                 ],
                 alignment=ft.MainAxisAlignment.END
@@ -218,15 +217,18 @@ def AdminFuncionarios(page: ft.Page):
                         ),
                     ft.Text(
                         value=f'ID: {id_funcionario}',
+                        color=ft.colors.BLACK,
                         width=200,
                         ),
                     
                     ft.Text(
                         value=nome,
+                        color=ft.colors.BLACK,
                         width=250,
                         ),
                     ft.Text(
                         value=cargo,
+                        color=ft.colors.BLACK,
                         width=200,
                     )
                 ],
