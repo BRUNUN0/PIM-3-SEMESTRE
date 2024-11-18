@@ -1,41 +1,45 @@
+from click import style
 import flet as ft
-import time
+import datetime
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.classes import GerenciamentoBanco, Detalhes, Cadastro
+from app.components.classes import GerenciamentoBanco, Cadastro
+from app.components.estoque import Estoque
 
 
 
 def AdminHome(page: ft.Page):
-    def sair(e):
-        page.go("/login")  # Redireciona de volta para a tela de login
 
     # Função que cria um contêiner para exibir o horário e a data.     
     def relogio():
+        agora = datetime.datetime.now()
         relogio = ft.Container(
+            width=200,
             content=ft.Column(
                 controls=[
-                    ft.Text(value="00:00:00", size=16),
-                    ft.Text(value="28/10/2024"),
+                    ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),
+                    ft.Text(value=agora.strftime("%d/%m/%Y"), color=ft.colors.BLACK),
                 ]
             )
         )
         return relogio
+
     
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
+            width=200,
             content=ft.Image(
                 src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
                 width=50,
                 height=50,
             ),
             alignment=ft.alignment.top_center,
+            on_click= lambda e: page.go('/adm')
         )
         return logo
-
-    # Função que cria a barra superior da aplicação com opções de navegação e logout.   
-    def appbar_superior():
+    
+    def icon():
         def go_home(e):
             page.go('/')
             confirmation_dialog.close_dialog()
@@ -52,17 +56,30 @@ def AdminHome(page: ft.Page):
             ],
             page
         )
+        icon = ft.Container(
+            width=200,
+            content=ft.Row(
+                controls=[
+                    ft.IconButton(
+                        icon=ft.icons.LOGOUT,
+                        icon_color=ft.colors.BLACK,
+                        on_click=sair,
+                        # alignment=ft.alignment.center_right
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+        return icon
 
+    # Função que cria a barra superior da aplicação com opções de navegação e logout.  
+    def appbar_superior():
         app_sup = ft.Container(
             content=ft.Row(
                 controls=[
                     relogio(),
                     logo(),
-                    ft.IconButton(
-                        icon=ft.icons.LOGOUT,
-                        icon_color=ft.colors.BLACK,
-                        on_click=sair
-                    )
+                    icon(),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -70,106 +87,102 @@ def AdminHome(page: ft.Page):
         
         return app_sup
 
-    # Função para criar os botões de navegação na tela do administrador.   
+    # Função para criar os botões de navegação na tela do administrador.  
     def botoes():
         botoes = ft.Container(
-            expand=True,
-            # height=100,
             bgcolor="#D9FFBA",
+            padding=ft.padding.only(top=10),
             
             content = ft.Column(
-    controls=[
-        ft.Row(
-            controls=[
-                # Primeiro botão: Clientes
-                ft.Container(
-                    content=ft.Column(
+                controls=[
+                    ft.Row(
                         controls=[
-                            ft.IconButton(
-                                width=50,
-                                height=50,
-                                icon=ft.icons.HOME,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/adm/clientes'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                            # Primeiro botão: Clientes
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.BUSINESS_CENTER,
+                                            icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go("/adm/clientes"),
+                                        ),
+                                        ft.Text(
+                                            value='Clientes',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
                             ),
-                            ft.Text(
-                                value='Clientes',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
+                            # Segundo botão: Funcionários
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.PERSON,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/adm/funcionarios'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Funcionários',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                            ),
+                            # Terceiro botão: Fornecedores
+                            ft.Container(
+                                width=150,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.IconButton(
+                                            icon=ft.icons.FACTORY,
+                                            icon_size=32,
+                                            on_click=lambda e: page.go('/adm/fornecedores'),
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                        ),
+                                        ft.Text(
+                                            value='Fornecedores',
+                                            color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            size=16,
+                                        )
+                                    ],
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
                             )
                         ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,  # Ajuste o espaçamento entre os botões
-                ),
-                # Segundo botão: Funcionários
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.PERSON,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/adm/funcionarios'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Funcionários',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                ),
-                # Terceiro botão: Fornecedores
-                ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.icons.CONTENT_PASTE_SEARCH,
-                                icon_size=32,
-                                on_click=lambda e: page.go('/adm/fornecedores'),
-                                icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
-                            ),
-                            ft.Text(
-                                value='Fornecedores',
-                                color= ft.colors.with_opacity(0.5, ft.colors.BLACK),
-                                size=16,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    ),
-                    alignment=ft.alignment.center,
-                    padding=10,
-                )
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
-            spacing=20,  # Ajusta o espaçamento entre os botões na linha
-        )
-    ]
-)
-
+                        alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
+                        spacing=20,  # Ajusta o espaçamento entre os botões na linha
+                    )
+                ]
+            )
         )
         
         return botoes
     
-    # Cria um contêiner para a barra de navegação (AppBar)
+    # Função para criar a barra superior (AppBar) da página.
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
             width=page.window.width,
+            padding=ft.padding.all(10),
             height=175,
+            expand=True,
             
             content=ft.Column(
                 controls=[
                     ft.Container(
+                        expand=True,
                         content=ft.Column(
                             controls=[
                                 appbar_superior(),
@@ -206,7 +219,7 @@ def AdminHome(page: ft.Page):
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Text(label, width=50),
+                        ft.Text(label, color=ft.colors.BLACK, width=50),
                         ft.Container(
                             width=valor * 2,
                             height=20,
@@ -225,9 +238,10 @@ def AdminHome(page: ft.Page):
         # Criação do contêiner do gráfico que vai conter as barras
         grafico = ft.Container(
             width=350,
-            height=500,
+            # height=500,
             bgcolor='#D6D6D6',
             border_radius=16,
+            padding=ft.padding.only(bottom=15),
 
             content=ft.Column(
                 controls=[
@@ -241,113 +255,6 @@ def AdminHome(page: ft.Page):
         )
         return grafico
     
-    # Função chamada quando o contêiner é clicado.
-    def planta(nome, imagem):
-        def on_click_container(e):
-            
-            def fechar(dialog):
-                dialog.open = False
-                page.update()
-                
-            dialog = ft.AlertDialog(
-                title=ft.Text(f"Detalhes do Plantio"),
-                content=ft.Container(
-                    height=300,
-                    bgcolor=ft.colors.BLUE,
-                    content=ft.Column(
-                    controls=[
-                        ft.Text("ID Plantio:", size=16),
-                        ft.Container(
-                            content=ft.Text(f'#ID PLANTIO', size=16),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150                        ),
-                        ft.Text("Item final", size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR NOME'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text("Data de Início", size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR DATA'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text('Quantidade', size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR QUANTIDADE'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        ),
-                        ft.Text('Fase Atual', size=16),
-                        ft.Container(
-                            content=ft.Text('#VALOR FASE_ATUAL'),
-                            bgcolor='#D9D9D9',
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            width=150
-                        )
-                    ],
-                    spacing=6,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                    )
-                ),
-                    
-                actions=[
-                    ft.TextButton("Fechar", on_click=lambda e: fechar(dialog))
-                ],
-                actions_alignment=ft.alignment.center_right
-            )
-            page.overlay.append(dialog)
-            dialog.open = True
-            page.update()
-            
-        planta = ft.Container(
-            bgcolor="#99C2A2",
-            border=ft.border.all(
-                color=ft.colors.BLACK
-            ),
-            width=340,
-            height=50,
-            border_radius=9,
-            padding=ft.padding.only(left=12, right=12),
-            on_click=on_click_container, # -------------------------------------- AQUI CHAMA A FUNÇÃO DO BOTÃO      ATT.BRUNO
-            
-            content=ft.Row(
-                controls=[
-                    ft.Icon(
-                        name=ft.icons.FOREST,
-                        color=ft.colors.BLACK,
-                        size=30
-                        ),
-                    ft.Text(
-                        value=nome
-                        ),
-                    
-                    ft.Container(
-                        alignment=ft.alignment.center_right,
-                        
-                        content=ft.Image(
-                            src=imagem,
-                            width=30,
-                        )
-                    )
-                ],
-                # scroll='auto',
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            )
-        )
-        
-        return planta
-    
     def pedidos ():
         # Instancia o objeto de gerenciamento de banco para acessar dados
         # banco = GerenciamentoBanco()
@@ -360,26 +267,19 @@ def AdminHome(page: ft.Page):
         #     # Se não houver plantas, exibe uma mensagem dizendo que nenhum pedido foi encontrado
         #     lista_plantas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado")], alignment=ft.MainAxisAlignment.CENTER))]
 
-        pedidos = ft.Container(
-            width=350,
-            height=500,
+        estoque_mater_prima = ft.Container(
+            width= 350,
             bgcolor='#D6D6D6',
             border_radius=16,
-
+            padding=ft.padding.only(bottom=15),
             content=ft.Column(
                 controls=[
-                    ft.Text(value='COLUMN', color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),
-                    # ft.Column(
-                    #     controls=
-                    #     lista_plantas,
-                    #     spacing=6,
-                    #     scroll=ft.ScrollMode.AUTO
-                    # )
+                    ft.Text(value='Estoque Materia Prima', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
         )
-        return pedidos
+        return estoque_mater_prima
 
     def grupo():
 
@@ -413,7 +313,8 @@ def AdminHome(page: ft.Page):
 
         cadastro = Cadastro(page)
         banco = GerenciamentoBanco()
-        produtos = banco.obter_produtos()
+        produtos = Estoque(banco)
+        produtos = produtos.obter_produtos()
         if produtos:
             lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade, _ in produtos]
         else:
@@ -433,11 +334,16 @@ def AdminHome(page: ft.Page):
                         content=ft.Column(
                             controls=[
                                 ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                                ft.Column(
-                                    controls=
-                                    lista_produtos,
-                                    spacing=6,
-                                    scroll=ft.ScrollMode.AUTO
+                                ft.Container(
+                                    content=
+                                    ft.Column(
+                                        controls=
+                                        lista_produtos,
+                                        spacing=6,
+                                        scroll=ft.ScrollMode.AUTO
+                                    ),
+                                    expand=True,
+                                    height=200
                                 )
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -522,13 +428,14 @@ def AdminHome(page: ft.Page):
 
     def conteudo():
         conteudo = ft.Container(
-            padding=ft.padding.only(left=25,),
+            padding=ft.padding.only(left=15, bottom=15),
             content=ft.ResponsiveRow(
                 controls=[
                     ft.Row(
                         controls=[
                             grafico_plantas(),
-                            pedidos()
+                            pedidos(),
+                            grupo()
                         ]
                     ),
                 ],

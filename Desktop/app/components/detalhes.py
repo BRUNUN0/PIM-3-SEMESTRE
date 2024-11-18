@@ -4,10 +4,11 @@ from app.components.producao import Producao
 from app.components.pedido import Pedido
 from app.components.atividade import Atividade
 from app.components.cliente import Cliente
-from app.components.Fornecedor import Fornecedor
+from app.components.fornecedor import Fornecedor
 from app.components.estoque import Estoque
 from app.components.funcionario import Funcionario
 from app.components.classes import GerenciamentoBanco
+from app.components.dialogs import ConfirmationDialog
 
 class Detalhes:
     def __init__(self, page, gerenciamento_banco:GerenciamentoBanco):
@@ -588,9 +589,18 @@ class Detalhes:
             campo.update()
 
         if self.em_edicao:
+            dialogo_confirmacao = ConfirmationDialog(
+                title="Confirmar Alterações",
+                content="Deseja realmente salvar as alterações?",
+                actions=[
+                ft.TextButton("Cancelar", on_click=lambda e: dialogo_confirmacao.close_dialog()),
+                ft.ElevatedButton("Confirmar", on_click=lambda e: [dialogo_confirmacao.close_dialog(), self.salvar_alteracoes(None, tipo_entidade=tipo_entidade)])
+                ],
+                page=self.page
+            )
             # Quando em modo de edição, mostra o botão "Salvar"
             self.botoes.controls = [
-                ft.ElevatedButton("Salvar", on_click=lambda e: self.salvar_alteracoes(e, tipo_entidade=tipo_entidade))
+                ft.ElevatedButton("Salvar", on_click=lambda e: dialogo_confirmacao.open_dialog())
             ]
         else:
             # Quando em modo de leitura, mostra o botão "Editar"
@@ -599,27 +609,28 @@ class Detalhes:
             ]
         self.page.update()
 
+
+
     def salvar_alteracoes(self, e, tipo_entidade):
         dados_atualizados = {}
         for titulo, campo in self.campos.items():
             if not campo.read_only:
                 dados_atualizados[titulo] = campo.value
 
-        if dados_atualizados["Senha"]:
+        if "Senha" in dados_atualizados and dados_atualizados["Senha"]:  # Verifica se a chave existe e não é vazia
             dados_atualizados["Senha"] = self.hash_password_sha256(dados_atualizados["Senha"])
         else:
-            dados_atualizados.pop["Senha"]
+            dados_atualizados.pop("Senha", None)  # Remove a chave se não for necessária
 
+        banco = GerenciamentoBanco()
         if tipo_entidade == "fornecedor":
-            banco = Fornecedor()
-            resultado = banco.atualizar_fornecedor(dados_atualizados, self.id_fornecedor_atual)
+            fornecedor = Fornecedor(banco)
+            resultado = fornecedor.atualizar_fornecedor(dados_atualizados, self.id_fornecedor_atual)
         elif tipo_entidade == "cliente":
-            banco = GerenciamentoBanco()
             cliente = Cliente(banco)
             resultado = cliente.atualizar_cliente(dados_atualizados, self.id_cliente_atual)
         elif tipo_entidade == "funcionario":
-            # banco = Funcionario()
-            banco = GerenciamentoBanco()
+            # funcionario = Funcionario(banco)
             resultado = banco.atualizar_funcionario(dados_atualizados, self.id_funcionario_atual)
         else:
             print("Tipo de entidade desconhecido")

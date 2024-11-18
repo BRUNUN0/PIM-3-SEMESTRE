@@ -1,16 +1,13 @@
 import flet as ft
 import datetime
-from app.components.dialogs import DialogoSaida, Detalhes
+from app.components.dialogs import ConfirmationDialog, DialogoSaida, Detalhes
 from app.components.classes import GerenciamentoBanco
 from app.components.producao import Producao
 from app.components.detalhes import Detalhes
 
 
 def Home(page: ft.Page):
-    page.theme = ft.Theme(color_scheme_seed="blue")
     page.title = "Home"
-    def sair(e):
-        page.go("/login")  # Redireciona de volta para a tela de login
     
     def relogio():
         agora = datetime.datetime.now()
@@ -29,7 +26,9 @@ def Home(page: ft.Page):
         logo = ft.Container(
             width=200,
             content=ft.Image(
-                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
+                # src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=True",
+                # src = "https://ibb.co/8x9fQ4W",
+                src = "app/assets/Logo.png",
                 width=50,
                 height=50,
             ),
@@ -37,16 +36,30 @@ def Home(page: ft.Page):
         )
         return logo
         
-    def appbar_superior():
-        dialogo_saida = DialogoSaida(page)
-        
-        app_sup = ft.Container(
+    def menu():
+        def go_adm(e):
+            page.go('/login')
+            confirmation_dialog.close_dialog()
+            
+
+        def sair(e):
+            confirmation_dialog.open_dialog()
+
+        confirmation_dialog = ConfirmationDialog(
+            "Deseja realmente sair?",
+            " ",
+            [
+                ft.TextButton('Não', on_click=lambda e: confirmation_dialog.close_dialog()),
+                ft.TextButton('Sim', on_click=lambda e: go_adm())
+            ],
+            page
+        )
+
+        menu = ft.Container(
+            width=200,
             content=ft.Row(
                 controls=[
-                    relogio(),
-                    logo(),
                     ft.PopupMenuButton(
-                        bgcolor=ft.colors.WHITE,
                         icon=ft.icons.MENU,
                         icon_color=ft.colors.BLACK,
                         icon_size=40,
@@ -61,10 +74,24 @@ def Home(page: ft.Page):
                             ft.PopupMenuItem(
                                 icon=ft.icons.LOGOUT,
                                 text='Sair',
-                                on_click=lambda e: dialogo_saida.abrir()
+                                on_click=sair
                             )
                         ]
                     )
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+        return menu
+
+    def appbar_superior():        
+        app_sup = ft.Container(
+            content=ft.Row(
+                controls=[
+                    relogio(),
+                    logo(),
+                    menu()
+
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -73,25 +100,21 @@ def Home(page: ft.Page):
         return app_sup
         
     def botoes():
-        def hover_btn(e):
-            e.control.icon_color=ft.colors.BLACK if e.data == "true" else None
-            e.control.update()
-        
-
         botoes = ft.Container(
-            expand=True,
-            # height=100,
+            # expand=True,
             bgcolor="#D9FFBA",
+            padding=ft.padding.only(top=10),
+            
             content = ft.Column(
                 controls=[
                     ft.Row(
                         controls=[
+                            # Botão Home
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
-                                            width=50,
-                                            height=50,
                                             icon=ft.icons.HOME,
                                             icon_size=32,
                                             on_click=lambda e: page.go('/'),
@@ -103,20 +126,20 @@ def Home(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             ),
+                            # Botão Plantação
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.ECO,
                                             icon_size=32,
-                                            on_click=lambda e: page.go('/plantacao'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/plantacao')
                                         ),
                                         ft.Text(
                                             value='Plantação',
@@ -124,20 +147,20 @@ def Home(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             ),
+                            # Botão Pedidos
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.BOOKMARK_ADD_SHARP,
                                             icon_size=32,
-                                            on_click=lambda e: page.go('/pedidos'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/pedidos')
                                         ),
                                         ft.Text(
                                             value='Pedidos',
@@ -145,20 +168,20 @@ def Home(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             ),
+                            # Botão Atividades
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.CHECKLIST,
                                             icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                             on_click=lambda e: page.go('/atividades'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                                         ),
                                         ft.Text(
                                             value='Atividades',
@@ -166,19 +189,16 @@ def Home(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             )
                         ],
+                        # Centraliza todos os botões na linha
                         alignment=ft.MainAxisAlignment.CENTER,
-                        spacing=20,
                     )
                 ]
             )
-
         )
         
         return botoes
@@ -186,7 +206,6 @@ def Home(page: ft.Page):
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
-            width=page.window.width,
             height=175,
             expand=True,
             
@@ -208,10 +227,6 @@ def Home(page: ft.Page):
         return AppBar
 
     def pproducao(id_plantio, nome, imagem):
-
-        def on_click_container(e):
-            print(f"Clicado: {nome}")
-            
         banco = GerenciamentoBanco()
         detalhes = Detalhes(page, banco)
 
@@ -230,16 +245,16 @@ def Home(page: ft.Page):
                 controls=[
                     ft.Icon(
                         name=ft.icons.FOREST,
-                        color=ft.colors.GREEN_900,
+                        color=ft.colors.BLACK,
                         size=30
                         ),
                     ft.Text(
-                        value=nome
+                        value=nome,
+                        color=ft.colors.BLACK
                         ),
                     
                     ft.Container(
                         alignment=ft.alignment.center_right,
-                        
                         content=ft.Image(
                             src=imagem,
                             width=30,
@@ -281,44 +296,6 @@ def Home(page: ft.Page):
             )
         )
         return producao
-    
-    # def grafico():
-    #     grafico = ft.Container(
-    #         bgcolor="#99C2A2",
-    #         border=ft.border.all(
-    #             color=ft.colors.BLACK
-    #         ),
-    #         width=340,
-    #         height=50,
-    #         border_radius=9,
-    #         padding=ft.padding.only(left=12, right=12),
-    #         on_click=print("Grita socorro"), 
-            
-    #         content=ft.Row(
-    #             controls=[
-    #                 ft.Icon(
-    #                     name=ft.icons.FOREST,
-    #                     color=ft.colors.GREEN_900,
-    #                     size=30
-    #                     ),
-    #                 ft.Text(
-    #                     # value=nome
-    #                     ),
-                    
-    #                 ft.Container(
-    #                     alignment=ft.alignment.center_right,
-                        
-    #                     content=ft.Image(
-    #                         # src=imagem,
-    #                         width=30,
-    #                     )
-    #                 )
-    #             ],
-    #             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-    #         )
-    #     )
-        
-    #     return grafico
 
     def grafico_pedidos():
         banco = GerenciamentoBanco()
@@ -330,7 +307,7 @@ def Home(page: ft.Page):
             lista_producao = [
                 ft.Row(
                     controls=[
-                        ft.Text(mes, width=50),
+                        ft.Text(mes, color=ft.colors.BLACK, width=50),
                         ft.Container(
                             width=total_producao * 2,  # Ajuste o multiplicador para escalar a largura da barra
                             height=20,
@@ -398,7 +375,6 @@ def Home(page: ft.Page):
         bgcolor=ft.colors.WHITE,
         expand=True,
         padding=ft.padding.only(bottom=10),
-
         content=ft.Column(
             controls=[
                 ft.Container(
@@ -413,5 +389,4 @@ def Home(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
         )
     )
-
     return Main

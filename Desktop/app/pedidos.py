@@ -80,7 +80,6 @@ def Pedidos(page: ft.Page):
     def botoes():
         botoes = ft.Container(
             # expand=True,
-            # height=100,
             bgcolor="#D9FFBA",
             padding=ft.padding.only(top=10),
             
@@ -185,7 +184,6 @@ def Pedidos(page: ft.Page):
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
-            width=page.window.width,
             height=175,
             expand=True,
             
