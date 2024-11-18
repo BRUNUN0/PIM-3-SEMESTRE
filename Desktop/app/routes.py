@@ -13,7 +13,7 @@ from app.adm_fornecedores import AdminFornecedores
 
 
 def rotas(page: ft.Page):
-    def route_change(route):
+    def route_change(route):            
         page.views.clear()
 
         # Pagina de Login
