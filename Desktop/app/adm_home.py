@@ -3,7 +3,7 @@ import flet as ft
 import datetime
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.classes import GerenciamentoBanco, Cadastro
+from app.components.classes import GerenciamentoBanco, Cadastro, Excluir
 from app.components.estoque import Estoque
 
 
@@ -237,11 +237,12 @@ def AdminHome(page: ft.Page):
 
         # Criação do contêiner do gráfico que vai conter as barras
         grafico = ft.Container(
-            width=350,
+            # width=350,
+            expand=True,
             # height=500,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.only(bottom=15),
+            padding=ft.padding.only(left=15, right=15),
 
             content=ft.Column(
                 controls=[
@@ -255,26 +256,68 @@ def AdminHome(page: ft.Page):
         )
         return grafico
     
-    def pedidos ():
-        # Instancia o objeto de gerenciamento de banco para acessar dados
-        # banco = GerenciamentoBanco()
-        # plantas = banco.obter_pedidos()
-        # # Verifica se existem plantas no banco de dados
-        # if plantas:
-        #     # Se houver plantas, cria uma lista de contêineres para cada planta
-        #     lista_plantas = [planta(nome, imagem) for nome, imagem in plantas]
-        # else:
-        #     # Se não houver plantas, exibe uma mensagem dizendo que nenhum pedido foi encontrado
-        #     lista_plantas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum pedido encontrado")], alignment=ft.MainAxisAlignment.CENTER))]
+    def materia(id, nome, quantidade, url):
+        materia_prima = ft.Container(
+            bgcolor="#99C2A2",
+            border=ft.border.all(color=ft.colors.BLACK),
+            expand=True,
+            height=50,
+            border_radius=9,
+            padding=ft.padding.only(left=12, right=12),
+            
+            content=ft.Row(
+                controls=[
+                    ft.Text(
+                        value=f"ID: {id}",
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=nome,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Text(
+                        value=quantidade,
+                        color=ft.colors.BLACK
+                    ),
+                    ft.Container(
+                        alignment=ft.alignment.center_right,
+                        
+                        content=ft.Image(
+                            src=url,
+                            width=30,
+                        )
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            )
+        )
+        
+        return materia_prima
+    
+    def materias_primas ():
+        banco = GerenciamentoBanco()
+        banco_materias = Estoque(banco)
 
+        materia_prima_data = banco_materias.obter_materia_prima()
+        if materia_prima_data:
+            lista_materias_primas = [materia(id, nome, quantidade, url) for id, nome, quantidade, url in materia_prima_data]
+        else:
+            lista_materias_primas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma materia prima encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
         estoque_mater_prima = ft.Container(
-            width= 350,
+            expand=True,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.only(bottom=15),
+            padding=ft.padding.only(left=15, right=15),
+
             content=ft.Column(
                 controls=[
                     ft.Text(value='Estoque Materia Prima', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                    ft.Column(
+                        controls=
+                        lista_materias_primas,
+                        spacing=6,
+                        scroll=ft.ScrollMode.AUTO
+                    )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
@@ -287,8 +330,8 @@ def AdminHome(page: ft.Page):
             plantados = ft.Container(
                 bgcolor="#99C2A2",
                 border=ft.border.all(color=ft.colors.BLACK),
-                # width=340,
-                height=50,
+                expand=True,
+                height=30,
                 border_radius=9,
                 padding=ft.padding.only(left=12, right=12),
                 content=ft.Row(
@@ -312,6 +355,7 @@ def AdminHome(page: ft.Page):
             return plantados
 
         cadastro = Cadastro(page)
+        excluir = Excluir(page)
         banco = GerenciamentoBanco()
         produtos = Estoque(banco)
         produtos = produtos.obter_produtos()
@@ -322,7 +366,7 @@ def AdminHome(page: ft.Page):
 
         grupo = ft.Container(
             expand=True,
-            padding=ft.padding.only(left=15, right=15, bottom=15),
+            padding=ft.padding.only(left=15, right=15),
             content=ft.Column(
                 controls=[
                     ft.Container(
@@ -343,14 +387,14 @@ def AdminHome(page: ft.Page):
                                         scroll=ft.ScrollMode.AUTO
                                     ),
                                     expand=True,
-                                    height=200
+                                    # height=200
                                 )
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER
                         )
                     ),
                     ft.Row(
-                        height=100,
+                        height=70,
                         spacing=10,
                         controls=[
                             ft.Container(
@@ -380,7 +424,7 @@ def AdminHome(page: ft.Page):
                         ]
                     ),
                     ft.Row(
-                        height=100,
+                        height=70,
                         spacing=10,
                         controls=[
                             ft.Container(
@@ -414,8 +458,7 @@ def AdminHome(page: ft.Page):
                         spacing=10,
                         controls=[
                             ft.ElevatedButton("Novo Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("novo produto")),
-                            # ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
-                            # ft.ElevatedButton("Finalizar Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("finalizar producao")),
+                            ft.ElevatedButton("Excluir Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: excluir.abrir_dialogo_id("produto")),
                         ],
                     )
                 ],
@@ -428,13 +471,13 @@ def AdminHome(page: ft.Page):
 
     def conteudo():
         conteudo = ft.Container(
-            padding=ft.padding.only(left=15, bottom=15),
+            padding=ft.padding.only(left=15),
             content=ft.ResponsiveRow(
                 controls=[
                     ft.Row(
                         controls=[
                             grafico_plantas(),
-                            pedidos(),
+                            materias_primas(),
                             grupo()
                         ]
                     ),

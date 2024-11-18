@@ -6,6 +6,8 @@ from app.components.detalhes import Detalhes
 
 
 def Pedidos(page: ft.Page):
+    page.title = "Pedidos"
+
 
     def relogio():
         agora = datetime.datetime.now()

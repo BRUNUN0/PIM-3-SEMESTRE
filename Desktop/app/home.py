@@ -1,3 +1,4 @@
+from turtle import left, right
 import flet as ft
 import datetime
 from app.components.dialogs import ConfirmationDialog, DialogoSaida, Detalhes
@@ -49,8 +50,8 @@ def Home(page: ft.Page):
             "Deseja realmente sair?",
             " ",
             [
-                ft.TextButton('Não', on_click=lambda e: confirmation_dialog.close_dialog()),
-                ft.TextButton('Sim', on_click=lambda e: go_adm())
+                ft.TextButton('Não', on_click=lambda e: confirmation_dialog.close_dialog(e)),
+                ft.TextButton('Sim', on_click=lambda e: go_adm(e))
             ],
             page
         )
@@ -101,7 +102,6 @@ def Home(page: ft.Page):
         
     def botoes():
         botoes = ft.Container(
-            # expand=True,
             bgcolor="#D9FFBA",
             padding=ft.padding.only(top=10),
             
@@ -235,7 +235,6 @@ def Home(page: ft.Page):
             border=ft.border.all(
                 color=ft.colors.BLACK
             ),
-            width=340,
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
@@ -280,6 +279,7 @@ def Home(page: ft.Page):
         producao = ft.Container(
             width=350,
             bgcolor='#D6D6D6',
+            padding=ft.padding.only(left=10, right=10),
             border_radius=16,
 
             content=ft.Column(

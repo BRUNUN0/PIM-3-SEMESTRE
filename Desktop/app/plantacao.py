@@ -8,6 +8,8 @@ from app.components.detalhes import Detalhes
 
 
 def Plantacao(page: ft.Page):
+    page.title = "Plantação"
+
     def sair(e):
         page.go("/login")  # Redireciona de volta para a tela de login
 
@@ -233,10 +235,8 @@ def Plantacao(page: ft.Page):
     def materia(id, nome, quantidade, url):
         materia_prima = ft.Container(
             bgcolor="#99C2A2",
-            border=ft.border.all(
-                color=ft.colors.BLACK
-            ),
-            width=340,
+            border=ft.border.all(color=ft.colors.BLACK),
+            expand=True,
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
@@ -280,10 +280,10 @@ def Plantacao(page: ft.Page):
         else:
             lista_materias_primas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma materia prima encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
         estoque_mater_prima = ft.Container(
-            width= 350,
+            expand=True,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.only(bottom=15),
+            padding=ft.padding.only(left=15, right=15),
 
             content=ft.Column(
                 controls=[
@@ -307,7 +307,6 @@ def Plantacao(page: ft.Page):
         produto = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
-            width=340,
             height=50,
             border_radius=9,
             padding=ft.padding.only(left=12, right=12),
@@ -346,10 +345,10 @@ def Plantacao(page: ft.Page):
             lista_plantacao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma plantaçao encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
             
         plantacoes = ft.Container(
-            width=350,
+            expand=True,
             bgcolor="#D6D6D6",
             border_radius=16,
-            padding=ft.padding.only(bottom=15),
+            padding=ft.padding.only(left=15, right=15),
 
 
             content=ft.Column(
@@ -408,7 +407,6 @@ def Plantacao(page: ft.Page):
 
         grupo = ft.Container(
             expand=True,
-            padding=ft.padding.only(left=15, right=15, bottom=15),
             content=ft.Column(
                 controls=[
                     ft.Container(
@@ -416,7 +414,7 @@ def Plantacao(page: ft.Page):
                         width=750,
                         bgcolor="#D6D6D6",
                         border_radius=16,
-                        padding=ft.padding.all(15),
+                        padding=ft.padding.only(left=15, right=15),
                         content=ft.Column(
                             controls=[
                                 ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
@@ -492,7 +490,7 @@ def Plantacao(page: ft.Page):
                     ),
                     ft.Row(
                         height=50,
-                        spacing=10,
+                        spacing=5,
                         controls=[
                             ft.ElevatedButton("Registrar Recebimento", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("materia prima")),
                             ft.ElevatedButton("Iniciar Nova Produção", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_registro("iniciar producao")),
@@ -509,7 +507,6 @@ def Plantacao(page: ft.Page):
 
     def conteudo():
         conteudo = ft.Container(
-            padding=ft.padding.only(left=25,),
             content=ft.ResponsiveRow(
                 controls=[
                     ft.Row(
@@ -529,7 +526,7 @@ def Plantacao(page: ft.Page):
     Main = ft.Container(
         bgcolor=ft.colors.WHITE,
         expand=True,
-        padding=ft.padding.only(bottom=10),
+        padding=ft.padding.only(bottom=5),
 
         content=ft.Column(
             controls=[

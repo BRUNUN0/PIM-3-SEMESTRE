@@ -1,8 +1,11 @@
 import hashlib
+from turtle import bgcolor
 import flet as ft
 import pyodbc
 from datetime import datetime, date
 from hashlib import sha256
+
+from estoque import Estoque
 
 
 class GerenciamentoBanco:
@@ -31,13 +34,6 @@ class GerenciamentoBanco:
             finally:
                 self.conn = None
                 self.cursor = None
-
-
-
-
-
-
-
 
     def cadastro(self, tipo_cadastro, dados):
         self.conectar()
@@ -571,78 +567,135 @@ class Cadastro:
         return hashed
 
 
-
-class Detalhes:
-    def __init__(self, page, banco):
+class Excluir:
+    def __init__(self, page):
         """
-        Inicializa a classe DetalhesDialog para exibir os detalhes de uma entidade.
-        :param page: A página onde o dialog será mostrado.
-        :param banco: Instância de GerenciamentoBanco para consultar os dados.
+        Inicializa a classe Excluir com a página onde o diálogo será exibido.
+        :param page: A página do aplicativo onde o diálogo será mostrado.
         """
         self.page = page
-        self.banco = banco
-        self.dialog = None
-        self.em_edicao = False
-        self.botoes = None
-        self.campos = {}
-        self.campos_nao_editaveis = ["ID", "Nome/Razão Social", "CNPJ", "CPF", "Cargo", "Data inicial"]
+        self.dialog_input = None
+        self.dialog_confirmacao = None
+        self.id_input = None
+        self.nome_input = None
+        self.tipo_entidade = None
 
-
-
-
-
-    
-
-
-
-class Confirmacao:
-    def __init__(self, page, mensagem, on_confirmar, on_cancelar=None): 
+    def abrir_dialogo_id(self, tipo_entidade):
         """
-        Inicializa a classe ConfirmacaoDialog.
-        :param page: A página onde o diálogo será exibido.
-        :param mensagem: A mensagem a ser exibida no diálogo de confirmação.
-        :param on_confirmar: Função a ser chamada quando o usuário confirmar.
-        :param on_cancelar: Função a ser chamada quando o usuário cancelar (opcional).
+        Abre um diálogo solicitando o ID para exclusão e configura a entidade correspondente.
+        :param tipo_entidade: String representando o tipo de entidade a ser excluída (ex.: "fornecedor", "cliente").
         """
-        self.page = page
-        self.mensagem = mensagem
-        self.on_confirmar = on_confirmar
-        self.on_cancelar = on_cancelar
+        self.tipo_entidade = tipo_entidade
 
-        # Criar o diálogo de confirmação
-        self.dialog = ft.AlertDialog(
+        self.id_input = ft.TextField(label=f"ID do {tipo_entidade.capitalize()} a ser excluído", width=300, dense=True)
+        self.nome_input = ft.TextField(label=f"Nome do {tipo_entidade.capitalize()} a ser concluído", width=300, dense=True)
+
+        self.dialog_input = ft.AlertDialog(
             modal=True,
-            title=ft.Text("Confirmação", size=18, weight="bold"),
-            content=ft.Text(self.mensagem),
+            title=ft.Text(f"Excluir {tipo_entidade.capitalize()}", size=20, weight="bold"),
+            content=ft.Column(
+                [self.id_input, self.nome_input],
+                tight=True,
+                spacing=10
+            ),
             actions=[
-                ft.ElevatedButton("Sim", on_click=self._confirmar),
-                ft.ElevatedButton("Cancelar", on_click=self._cancelar)
-            ]
+                ft.TextButton("Cancelar", on_click=self.fechar_dialogo),
+                ft.ElevatedButton("Próximo", on_click=self.confirmar_exclusao)
+            ],
+            actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )
 
-    def exibir(self):
-        """Exibe o diálogo de confirmação."""
-        self.page.overlay.append(self.dialog)
-        self.dialog.open = True
+        self.page.overlay.append(self.dialog_input)
+        self.dialog_input.open = True
         self.page.update()
 
-    def _confirmar(self, e):
-        """Executa a função de confirmação e fecha o diálogo."""
-        if self.on_confirmar:
-            self.on_confirmar()
-        self._fechar()
+    def confirmar_exclusao(self, e):
+        
+        """
+        Verifica o ID e abre um diálogo de confirmação antes de realizar a exclusão.
+        :param e: Evento de clique.
+        """
+        id_para_excluir = self.id_input.value
+        nome_produto = self.nome_input
+        if not id_para_excluir or not nome_produto:
+            snack_bar = ft.SnackBar(ft.Text("Por favor, insira um ID e nome válidos."), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snack_bar)
+            snack_bar.open = True
+            self.page.update()
+            return
+        
+        gb = GerenciamentoBanco()
+        banco = Estoque(gb)
+        produto = banco.
 
-    def _cancelar(self, e):
-        """Executa a função de cancelamento (se houver) e fecha o diálogo."""
-        if self.on_cancelar:
-            self.on_cancelar()
-        self._fechar()
+        self.dialog_confirmacao = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Confirmação de Exclusão", size=20, weight="bold"),
+            content=ft.Text(f"Tem certeza de que deseja excluir o {self.tipo_entidade.capitalize()} com ID {id_para_excluir}?"),
+            actions=[
+                ft.ElevatedButton("Excluir", on_click=lambda e: self.excluir_registro(e, id_para_excluir)),
+                ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo),
+            ],
+            actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+        )
 
-    def _fechar(self):
-        """Fecha o diálogo e atualiza a página."""
-        self.page.overlay.remove(self.dialog)
-        self.dialog.open = False
+        self.fechar_dialogo()  # Fecha o diálogo anterior
+        self.page.overlay.append(self.dialog_confirmacao)
+        self.dialog_confirmacao.open = True
         self.page.update()
+
+    def excluir_registro(self, e, id_para_excluir):
+        from app.components.estoque import Estoque
+        """
+        Realiza a exclusão do registro com base no tipo de entidade e ID fornecido.
+        :param e: Evento de clique.
+        :param id_para_excluir: ID do registro a ser excluído.
+        """
+        if self.tipo_entidade == "produto":
+            gb = GerenciamentoBanco()
+            banco = Estoque(gb)
+            resultado = banco.excluir_produto(id_para_excluir)
+        # elif self.tipo_entidade == "cliente":
+        #     banco = GerenciamentoBanco()
+        #     cliente = Cliente(banco)
+        #     resultado = cliente.excluir_cliente(id_para_excluir)
+        # elif self.tipo_entidade == "funcionario":
+        #     banco = GerenciamentoBanco()
+        #     resultado = banco.excluir_funcionario(id_para_excluir)
+        else:
+            snack_bar = ft.SnackBar(ft.Text("Tipo de entidade desconhecido!"), bgcolor=ft.colors.RED)
+            self.page.overlay.append(snack_bar)
+            snack_bar.open = True
+            self.page.update()
+            return
+
+        if resultado is True:
+            snack_bar = ft.SnackBar(ft.Text(f"{self.tipo_entidade.capitalize()} com ID {id_para_excluir} excluído com sucesso!"), bgcolor=ft.colors.GREEN)
+        else:
+            snack_bar = ft.SnackBar(ft.Text(f"Erro ao excluir {self.tipo_entidade.capitalize()} com ID {id_para_excluir}!"), bgcolor=ft.colors.RED)
+
+        self.page.overlay.append(snack_bar)
+        snack_bar.open = True
+        self.fechar_dialogo()
+        self.page.update()
+
+    def fechar_dialogo(self, e=None):
+        """
+        Fecha qualquer diálogo aberto.
+        :param e: Evento de clique (opcional).
+        """
+        if self.dialog_input:
+            self.dialog_input.open = False
+        if self.dialog_confirmacao:
+            self.dialog_confirmacao.open = False
+        self.page.update()
+
+
+# ft.ElevatedButton("Confirmar", on_click=lambda e: [dialogo_confirmacao.close_dialog(), self.salvar_alteracoes(None, tipo_entidade=tipo_entidade)])
+
+
+
+
 
 
 

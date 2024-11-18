@@ -20,6 +20,10 @@ class Estoque:
             print(f"Erro ao obter produtos: {e}")
             self.banco.fechar_conexao()
             return None
+        
+    def validar_produto(self, id_produto, nome_produto):
+        produtos = self.obter_produtos()
+        if produtos
 
     def obter_materia_prima(self):
         try:
@@ -64,3 +68,25 @@ class Estoque:
             print(f"Erro ao obter detalhes da materia prima: {e}")
             self.banco.fechar_conexao()
             return None
+        
+    def excluir_produto(self, id_produto, excluir_estoque=False):
+        try:
+            self.banco.conectar()
+            # Exclui o registro do produto
+            query_produto = "DELETE FROM Produto WHERE id_produto = ?"
+            self.banco.cursor.execute(query_produto, (id_produto,))
+            
+            # Se o usuário optou por excluir o estoque, executa a exclusão na tabela Produtos
+            if excluir_estoque:
+                query_estoque = "DELETE FROM Produtos WHERE id_produto = ?"
+                self.banco.cursor.execute(query_estoque, (id_produto,))
+
+            # Confirma as alterações no banco de dados
+            self.banco.conn.commit()
+            return True
+
+        except Exception as e:
+            print("Erro ao apagar produto:", e)
+            return False
+        finally:
+            self.banco.fechar_conexao()

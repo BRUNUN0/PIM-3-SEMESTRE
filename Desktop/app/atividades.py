@@ -1,20 +1,24 @@
 import flet as ft
-import time
+import datetime
 import pyodbc
 from app.components.classes import Cadastro, GerenciamentoBanco
-from app.components.dialogs import DialogoSaida
+from app.components.dialogs import DialogoSaida, ConfirmationDialog
 from app.components.atividade import Atividade
 from app.components.detalhes import Detalhes
 
 
 def Atividades(page: ft.Page):
+    page.title = "Atividades"
+
 
     def relogio():
+        agora = datetime.datetime.now()
         relogio = ft.Container(
+            width=200,
             content=ft.Column(
                 controls=[
-                    ft.Text(value="00:00:00", size=16),
-                    ft.Text(value="28/10/2024"),
+                    ft.Text(value=agora.strftime("%H:%M:%S"), color=ft.colors.BLACK, size=16),
+                    ft.Text(value=agora.strftime("%d/%m/%Y"), color=ft.colors.BLACK),
                 ]
             )
         )
@@ -22,8 +26,9 @@ def Atividades(page: ft.Page):
     
     def logo():
         logo = ft.Container(
+            width=200,
             content=ft.Image(
-                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=true",
+                src="https://github.com/BRUNUN0/PIM-3-SEMESTRE/blob/b1af43c3defbc2696df0e40dc2520914365e6c97/Mobile/app/assets/Logo.png?raw=True",
                 width=50,
                 height=50,
             ),
@@ -31,14 +36,29 @@ def Atividades(page: ft.Page):
         )
         return logo
         
-    def appbar_superior():
-        dialogo_saida = DialogoSaida(page)
-        
-        app_sup = ft.Container(
+    def menu():
+        def go_adm(e):
+            page.go('/login')
+            confirmation_dialog.close_dialog()
+            
+
+        def sair(e):
+            confirmation_dialog.open_dialog()
+
+        confirmation_dialog = ConfirmationDialog(
+            "Deseja realmente sair?",
+            " ",
+            [
+                ft.TextButton('Não', on_click=lambda e: confirmation_dialog.close_dialog()),
+                ft.TextButton('Sim', on_click=lambda e: go_adm())
+            ],
+            page
+        )
+
+        menu = ft.Container(
+            width=200,
             content=ft.Row(
                 controls=[
-                    relogio(),
-                    logo(),
                     ft.PopupMenuButton(
                         icon=ft.icons.MENU,
                         icon_color=ft.colors.BLACK,
@@ -54,10 +74,24 @@ def Atividades(page: ft.Page):
                             ft.PopupMenuItem(
                                 icon=ft.icons.LOGOUT,
                                 text='Sair',
-                                on_click=lambda e: dialogo_saida.abrir()
+                                on_click=sair
                             )
                         ]
                     )
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+        return menu
+
+    def appbar_superior():        
+        app_sup = ft.Container(
+            content=ft.Row(
+                controls=[
+                    relogio(),
+                    logo(),
+                    menu()
+
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
@@ -67,20 +101,19 @@ def Atividades(page: ft.Page):
         
     def botoes():
         botoes = ft.Container(
-            expand=True,
-            # height=100,
             bgcolor="#D9FFBA",
+            padding=ft.padding.only(top=10),
             
             content = ft.Column(
                 controls=[
                     ft.Row(
                         controls=[
+                            # Botão Home
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
-                                            width=50,
-                                            height=50,
                                             icon=ft.icons.HOME,
                                             icon_size=32,
                                             on_click=lambda e: page.go('/'),
@@ -92,20 +125,20 @@ def Atividades(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,  # Ajuste o espaçamento entre os botões
+                                )
                             ),
+                            # Botão Plantação
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.ECO,
                                             icon_size=32,
-                                            on_click=lambda e: page.go('/plantacao'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/plantacao')
                                         ),
                                         ft.Text(
                                             value='Plantação',
@@ -113,20 +146,20 @@ def Atividades(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             ),
+                            # Botão Pedidos
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.BOOKMARK_ADD_SHARP,
                                             icon_size=32,
-                                            on_click=lambda e: page.go('/pedidos'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
+                                            on_click=lambda e: page.go('/pedidos')
                                         ),
                                         ft.Text(
                                             value='Pedidos',
@@ -134,20 +167,20 @@ def Atividades(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             ),
+                            # Botão Atividades
                             ft.Container(
+                                width=150,
                                 content=ft.Column(
                                     controls=[
                                         ft.IconButton(
                                             icon=ft.icons.CHECKLIST,
                                             icon_size=32,
+                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK),
                                             on_click=lambda e: page.go('/atividades'),
-                                            icon_color = ft.colors.with_opacity(0.5, ft.colors.BLACK), 
                                         ),
                                         ft.Text(
                                             value='Atividades',
@@ -155,15 +188,13 @@ def Atividades(page: ft.Page):
                                             size=16,
                                         )
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                alignment=ft.alignment.center,
-                                padding=10,
+                                )
                             )
                         ],
-                        alignment=ft.MainAxisAlignment.CENTER,  # Centraliza todos os botões na linha
-                        spacing=20,  # Ajusta o espaçamento entre os botões na linha
+                        # Centraliza todos os botões na linha
+                        alignment=ft.MainAxisAlignment.CENTER,
                     )
                 ]
             )
@@ -175,6 +206,7 @@ def Atividades(page: ft.Page):
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
             height=175,
+            expand=True,
             
             content=ft.Column(
                 controls=[
