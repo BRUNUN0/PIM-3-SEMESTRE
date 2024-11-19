@@ -33,6 +33,7 @@ class Validacao:
                     "nome": nome,
                     "cargo": cargo,
                 }
+                print(f'Antes de salvar o usuario no salvar sessão: {usuario}')
                 funcionario.salvar_sessao(usuario)
                 # dados_funcionario = dado.obter_detalhes_funcionario(_id)
                 # print(dados_funcionario)
@@ -43,7 +44,8 @@ class Validacao:
     
     def verificar_usuario_logado(self, funcionario: Funcionario, page: ft.Page):
         usuario = funcionario.obter_sessao()
-        if not usuario:
+        print(f"Usuario logado: {usuario}")
+        if not usuario or not usuario.get('nome'):
             page.go('/login')
             return False
         return True

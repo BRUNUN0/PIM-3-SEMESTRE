@@ -2,9 +2,6 @@ import pyodbc
 import flet as ft
 
 
-
-
-
 class Detalhes:
     def __init__(self, title, detalhes):
         """
@@ -52,10 +49,6 @@ class Detalhes:
         """
         dialog.open = False
         page.update()
-
-
-
-
 
 # CLASSE PARA CRIAÇÃO DE DIALOGS DE SAIDA
 class ConfirmationDialog:

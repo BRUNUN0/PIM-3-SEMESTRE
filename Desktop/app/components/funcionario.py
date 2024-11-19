@@ -8,11 +8,17 @@ class Funcionario:
 
     def salvar_sessao(self, usuario):
         # Salva as informações do usuário na sessão.
+        print(f"Antes de salvar o usuário no salvar_sessao: {usuario}")
         self.sessao['usuario_logado'] = usuario
-        print(f'Usuario {usuario['nome']} logado com sucesso.')
+        print(f"Sessão salva: {self.sessao}")
+        print(f"Usuario {usuario['nome']} logado com sucesso.")
+        # print(f'Usuario {usuario['nome']} logado com sucesso. Sessão salva: {self.sessao}')
 
     def obter_sessao(self):
         # Retorna as informações do usuário logado.
+        # return self.sessao['usuario_logado']
+        # return self.sessao.get('usuario_logado')
+        print(f"Obtendo sessão: {self.sessao}")
         return self.sessao.get('usuario_logado')
     
     def limpar_sessao(self):

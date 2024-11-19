@@ -507,6 +507,19 @@ class Cadastro:
         self.page.update()
 
     def _salvar_dados(self, e):
+
+        campos_invalidos = [campo for campo, entrada in self.inputs.items() if not entrada.value.strip()]
+        if campos_invalidos:
+            # Exibe mensagem de erro se houver campos vazios
+            snackbar = ft.SnackBar(
+                content=ft.Text(f"Os campos {', '.join(campos_invalidos)} não podem estar vazios!"),
+                bgcolor=ft.colors.RED
+            )
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
+
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
 
