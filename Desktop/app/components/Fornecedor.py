@@ -1,4 +1,4 @@
-from app.components.classes import GerenciamentoBanco
+from app.components.gerenciamento_banco import GerenciamentoBanco
 
 class Fornecedor:
     def __init__(self, gerenciamento_banco: GerenciamentoBanco):

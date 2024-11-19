@@ -2,7 +2,7 @@ from turtle import left, right
 import flet as ft
 import datetime
 from app.components.dialogs import ConfirmationDialog, DialogoSaida, Detalhes
-from app.components.classes import GerenciamentoBanco
+from app.components.gerenciamento_banco import GerenciamentoBanco
 from app.components.producao import Producao
 from app.components.detalhes import Detalhes
 

@@ -3,7 +3,7 @@ import flet as ft
 import datetime
 import pyodbc
 from app.components.dialogs import ConfirmationDialog
-from app.components.classes import GerenciamentoBanco, Cadastro, Excluir
+from app.components.gerenciamento_banco import GerenciamentoBanco, Cadastro, Excluir
 from app.components.estoque import Estoque
 
 

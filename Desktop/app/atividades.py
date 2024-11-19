@@ -1,7 +1,6 @@
 import flet as ft
 import datetime
-import pyodbc
-from app.components.classes import Cadastro, GerenciamentoBanco
+from app.components.gerenciamento_banco import Cadastro, GerenciamentoBanco
 from app.components.dialogs import DialogoSaida, ConfirmationDialog
 from app.components.atividade import Atividade
 from app.components.detalhes import Detalhes

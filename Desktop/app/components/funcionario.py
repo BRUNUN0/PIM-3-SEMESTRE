@@ -1,4 +1,4 @@
-from app.components.classes import GerenciamentoBanco
+from app.components.gerenciamento_banco import GerenciamentoBanco
 
 class Funcionario:   
     # def __init__(self, id_funcionario=None, nome=None, cpf=None, sexo=None, fk_id_cargo=None, senha=None, nascimento=None, email=None, setor=None, fk_data_inicio=None, gerenciamento_banco=None):

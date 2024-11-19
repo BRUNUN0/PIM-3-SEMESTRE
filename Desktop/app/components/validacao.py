@@ -1,7 +1,7 @@
 
 import pydoc as dbc 
 import flet as ft
-from app.components.classes import GerenciamentoBanco as gbd
+from app.components.gerenciamento_banco import GerenciamentoBanco as gbd
 from app.components.funcionario import Funcionario
 from hashlib import sha256
 

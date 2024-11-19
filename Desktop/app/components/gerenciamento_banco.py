@@ -1,11 +1,10 @@
 import hashlib
-from turtle import bgcolor
 import flet as ft
 import pyodbc
 from datetime import datetime, date
 from hashlib import sha256
 
-from estoque import Estoque
+# from app.estoque import Estoque
 
 
 class GerenciamentoBanco:
@@ -296,11 +295,12 @@ class Cadastro:
 
         self.datepicker_control = None
 
-        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
+        # Itera sobre os grupos de campos
         for grupo in grupos_campos:
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
             campos = grupo["campos"]
 
+            # Cria os campos de entrada
             for campo in campos:
                 if campo in ("Data", "Data Inicio", "Data Fim", "Nascimento"):  # Verifica se o campo é "Data"
                     date_field_flag = {"is_open": False}  # Flag para controlar a abertura
@@ -331,18 +331,12 @@ class Cadastro:
                         read_only=True,  # Apenas exibição
                         on_focus=handle_focus
                     )
-                    self.inputs[campo] = date_field
+                    self.inputs[campo] = date_field  # Armazena no dicionário
                 else:
                     # Cria campos normais
                     self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
 
-            for campo in campos:
-                if campo == "Senha":
-                    self.senha_input = ft.TextField(label="Senha", password=True)  # Cria um campo de senha
-                    conteudo_dialog.append(self.senha_input)
-                else:
-                    conteudo_dialog.append(ft.TextField(label=campo))
-
+            # Adiciona os campos ao conteúdo do diálogo, agrupados em linhas
             for i in range(0, len(campos), 2):
                 linha = ft.Row(
                     controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
@@ -350,9 +344,7 @@ class Cadastro:
                 )
                 conteudo_dialog.append(linha)
 
-
-
-
+        # Botão de salvar
         botoes = ft.Row(
             controls=[
                 ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
@@ -362,6 +354,7 @@ class Cadastro:
 
         conteudo_dialog.append(botoes)
 
+        # Cria o diálogo com o conteúdo
         self.dialog = ft.AlertDialog(
             bgcolor=ft.colors.WHITE,
             modal=True,
@@ -378,6 +371,7 @@ class Cadastro:
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
+
 
     def abrir_registro(self, tipo_cadastro):
         """
@@ -588,13 +582,12 @@ class Excluir:
         self.tipo_entidade = tipo_entidade
 
         self.id_input = ft.TextField(label=f"ID do {tipo_entidade.capitalize()} a ser excluído", width=300, dense=True)
-        self.nome_input = ft.TextField(label=f"Nome do {tipo_entidade.capitalize()} a ser concluído", width=300, dense=True)
 
         self.dialog_input = ft.AlertDialog(
             modal=True,
             title=ft.Text(f"Excluir {tipo_entidade.capitalize()}", size=20, weight="bold"),
             content=ft.Column(
-                [self.id_input, self.nome_input],
+                [self.id_input],
                 tight=True,
                 spacing=10
             ),
@@ -610,39 +603,59 @@ class Excluir:
         self.page.update()
 
     def confirmar_exclusao(self, e):
-        
+        from app.components.estoque import Estoque
         """
         Verifica o ID e abre um diálogo de confirmação antes de realizar a exclusão.
         :param e: Evento de clique.
         """
-        id_para_excluir = self.id_input.value
-        nome_produto = self.nome_input
-        if not id_para_excluir or not nome_produto:
-            snack_bar = ft.SnackBar(ft.Text("Por favor, insira um ID e nome válidos."), bgcolor=ft.colors.RED)
+        id_para_excluir = self.id_input.value.strip()
+        
+        # Valida o Produto no Banco
+        try:
+            # Verificar se o ID foi fornecido
+            if not id_para_excluir:
+                mensagem = "Por favor, insira um ID válido."
+            else:
+                # Validar o produto no banco
+                gb = GerenciamentoBanco()
+                banco = Estoque(gb)
+                produto = banco.validar_produto(id_produto=id_para_excluir)
+
+                if not produto:
+                    mensagem = f"Produto com ID {id_para_excluir} não encontrado."
+                else:
+                    # Produto encontrado, seguir com o diálogo de confirmação
+                    self.dialog_confirmacao = ft.AlertDialog(
+                        modal=True,
+                        title=ft.Text("Confirmação de Exclusão", size=20, weight="bold"),
+                        content=ft.Text(f"Tem certeza de que deseja excluir o {self.tipo_entidade.capitalize()} com ID {id_para_excluir}?"),
+                        actions=[
+                            ft.ElevatedButton("Excluir", on_click=lambda e: self.excluir_registro(e, id_para_excluir)),
+                            ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo),
+                        ],
+                        actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                    )
+
+                    self.fechar_dialogo()  # Fecha o diálogo anterior
+                    self.page.overlay.append(self.dialog_confirmacao)
+                    self.dialog_confirmacao.open = True
+                    self.page.update()
+                    return  # Sai da função para evitar exibir o Snackbar
+
+                # Exibir Snackbar com a mensagem de erro
+            snack_bar = ft.SnackBar(ft.Text(mensagem), bgcolor=ft.colors.RED)
             self.page.overlay.append(snack_bar)
             snack_bar.open = True
             self.page.update()
-            return
-        
-        gb = GerenciamentoBanco()
-        banco = Estoque(gb)
-        produto = banco.
 
-        self.dialog_confirmacao = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Confirmação de Exclusão", size=20, weight="bold"),
-            content=ft.Text(f"Tem certeza de que deseja excluir o {self.tipo_entidade.capitalize()} com ID {id_para_excluir}?"),
-            actions=[
-                ft.ElevatedButton("Excluir", on_click=lambda e: self.excluir_registro(e, id_para_excluir)),
-                ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo),
-            ],
-            actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-        )
-
-        self.fechar_dialogo()  # Fecha o diálogo anterior
-        self.page.overlay.append(self.dialog_confirmacao)
-        self.dialog_confirmacao.open = True
-        self.page.update()
+        except Exception as e:
+            print(f"Erro ao validar produto: {e}")
+            snack_bar = ft.SnackBar(
+                ft.Text("Ocorreu um erro inesperado."), bgcolor=ft.colors.RED
+            )
+            self.page.overlay.append(snack_bar)
+            snack_bar.open = True
+            self.page.update()
 
     def excluir_registro(self, e, id_para_excluir):
         from app.components.estoque import Estoque
@@ -655,13 +668,6 @@ class Excluir:
             gb = GerenciamentoBanco()
             banco = Estoque(gb)
             resultado = banco.excluir_produto(id_para_excluir)
-        # elif self.tipo_entidade == "cliente":
-        #     banco = GerenciamentoBanco()
-        #     cliente = Cliente(banco)
-        #     resultado = cliente.excluir_cliente(id_para_excluir)
-        # elif self.tipo_entidade == "funcionario":
-        #     banco = GerenciamentoBanco()
-        #     resultado = banco.excluir_funcionario(id_para_excluir)
         else:
             snack_bar = ft.SnackBar(ft.Text("Tipo de entidade desconhecido!"), bgcolor=ft.colors.RED)
             self.page.overlay.append(snack_bar)
@@ -689,19 +695,4 @@ class Excluir:
         if self.dialog_confirmacao:
             self.dialog_confirmacao.open = False
         self.page.update()
-
-
-# ft.ElevatedButton("Confirmar", on_click=lambda e: [dialogo_confirmacao.close_dialog(), self.salvar_alteracoes(None, tipo_entidade=tipo_entidade)])
-
-
-
-
-
-
-
-        
-
-
-
-
 

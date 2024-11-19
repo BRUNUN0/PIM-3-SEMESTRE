@@ -1,6 +1,6 @@
 import flet as ft
 import datetime
-from app.components.classes import Cadastro, GerenciamentoBanco
+from app.components.gerenciamento_banco import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
 from app.components.detalhes import Detalhes
 from app.components.fornecedor import Fornecedor

@@ -1,4 +1,4 @@
-from app.components.classes import GerenciamentoBanco
+from app.components.gerenciamento_banco import GerenciamentoBanco
 
 class Estoque:
     def __init__(self, gerenciamento_banco:GerenciamentoBanco):
@@ -21,9 +21,25 @@ class Estoque:
             self.banco.fechar_conexao()
             return None
         
-    def validar_produto(self, id_produto, nome_produto):
-        produtos = self.obter_produtos()
-        if produtos
+    def validar_produto(self, id_produto):
+        """
+        Valida se um produto existe no banco de dados pelo seu ID.
+        :param id_produto: ID do produto a ser validado.
+        :return: Dicionário com os dados do produto, caso exista; caso contrário, retorna None.
+        """
+        try:
+            self.banco.conectar()
+            query = "SELECT * FROM Produto WHERE id_produto = ?"
+            self.banco.cursor.execute(query, (id_produto,))
+            resultado = self.banco.cursor.fetchone()
+            print(resultado)
+
+            if resultado:
+                return resultado  # Retorna o produto encontrado
+            return None  # Produto não encontrado
+        except Exception as e:
+            print(f"Erro ao validar produto: {e}")
+            raise
 
     def obter_materia_prima(self):
         try:
@@ -33,7 +49,8 @@ class Estoque:
                         mp.Nome,
                         mp.Quantidade,
                         mp.URL
-                    FROM Materia_Prima mp'''
+                    FROM Materia_Prima mp
+                    WHERE mp.Quantidade >= 1;'''
             self.banco.cursor.execute(query)
             materias_primas = self.banco.cursor.fetchall()
             return materias_primas

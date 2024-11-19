@@ -7,7 +7,7 @@ from app.components.cliente import Cliente
 from app.components.fornecedor import Fornecedor
 from app.components.estoque import Estoque
 from app.components.funcionario import Funcionario
-from app.components.classes import GerenciamentoBanco
+from app.components.gerenciamento_banco import GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
 
 class Detalhes:

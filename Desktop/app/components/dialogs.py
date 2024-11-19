@@ -109,11 +109,3 @@ class DialogoSaida(ConfirmationDialog):
         self.page.go('/login')  # Ajuste o redirecionamento se necessário
         self.close_dialog()
 
-
-
-
-
-
-
-
-
