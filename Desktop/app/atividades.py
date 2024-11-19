@@ -271,7 +271,6 @@ def Atividades(page: ft.Page):
 
         cadastro = Cadastro(page)
         container = ft.Container(
-            width=page.window.width,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,

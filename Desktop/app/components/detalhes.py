@@ -291,7 +291,7 @@ class Detalhes:
 
         self.botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="cliente"))
+                ft.ElevatedButton("Editar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="cliente"))
             ],
             alignment=ft.MainAxisAlignment.START
         )
@@ -380,7 +380,7 @@ class Detalhes:
 
         self.botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="fornecedor"))
+                ft.ElevatedButton("Editar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="fornecedor"))
             ],
             alignment=ft.MainAxisAlignment.START
         )
@@ -541,7 +541,7 @@ class Detalhes:
 
         self.botoes = ft.Row(
             controls=[
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
+                ft.ElevatedButton("Editar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade="funcionario"))
             ],
             alignment=ft.MainAxisAlignment.START
         )
@@ -575,7 +575,7 @@ class Detalhes:
         if not hasattr(self, 'botoes') or self.botoes is None:
             self.botoes = ft.Row(
                 controls=[
-                    ft.ElevatedButton("Editar", on_click=self._alternar_modo_edicao)
+                    ft.ElevatedButton("Editar", bgcolor="#13330D", on_click=self._alternar_modo_edicao)
                     ],
                 alignment=ft.MainAxisAlignment.START
                 )
@@ -600,12 +600,12 @@ class Detalhes:
             )
             # Quando em modo de edição, mostra o botão "Salvar"
             self.botoes.controls = [
-                ft.ElevatedButton("Salvar", on_click=lambda e: dialogo_confirmacao.open_dialog())
+                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: dialogo_confirmacao.open_dialog())
             ]
         else:
             # Quando em modo de leitura, mostra o botão "Editar"
             self.botoes.controls = [
-                ft.ElevatedButton("Editar", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
+                ft.ElevatedButton("Editar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
             ]
         self.page.update()
 

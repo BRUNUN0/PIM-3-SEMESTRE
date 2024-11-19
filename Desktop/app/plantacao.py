@@ -507,6 +507,7 @@ def Plantacao(page: ft.Page):
 
     def conteudo():
         conteudo = ft.Container(
+            padding=ft.padding.only(left=10, right=10),
             content=ft.ResponsiveRow(
                 controls=[
                     ft.Row(

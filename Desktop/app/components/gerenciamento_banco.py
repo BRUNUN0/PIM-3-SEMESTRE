@@ -1,4 +1,5 @@
 import hashlib
+from turtle import color
 import flet as ft
 import pyodbc
 from datetime import datetime, date
@@ -372,7 +373,6 @@ class Cadastro:
         self.dialog.open = True
         self.page.update()
 
-
     def abrir_registro(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
@@ -584,16 +584,17 @@ class Excluir:
         self.id_input = ft.TextField(label=f"ID do {tipo_entidade.capitalize()} a ser excluído", width=300, dense=True)
 
         self.dialog_input = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
-            title=ft.Text(f"Excluir {tipo_entidade.capitalize()}", size=20, weight="bold"),
+            title=ft.Text(f"Excluir {tipo_entidade.capitalize()}", size=20, color=ft.colors.BLACK, weight="bold"),
             content=ft.Column(
                 [self.id_input],
                 tight=True,
                 spacing=10
             ),
             actions=[
-                ft.TextButton("Cancelar", on_click=self.fechar_dialogo),
-                ft.ElevatedButton("Próximo", on_click=self.confirmar_exclusao)
+                ft.TextButton("Próximo", on_click=self.confirmar_exclusao),
+                ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo)
             ],
             actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )

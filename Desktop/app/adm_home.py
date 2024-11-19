@@ -9,6 +9,8 @@ from app.components.estoque import Estoque
 
 
 def AdminHome(page: ft.Page):
+    page.title = "Administrador Home"
+
 
     # Função que cria um contêiner para exibir o horário e a data.     
     def relogio():
@@ -174,7 +176,6 @@ def AdminHome(page: ft.Page):
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
-            width=page.window.width,
             padding=ft.padding.all(10),
             height=175,
             expand=True,

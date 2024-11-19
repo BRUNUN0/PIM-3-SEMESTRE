@@ -7,6 +7,7 @@ from app.components.fornecedor import Fornecedor
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
+    page.title = "Administrador: Fornecedores"
 
     def relogio():
         agora = datetime.datetime.now()
@@ -21,8 +22,6 @@ def AdminFornecedores(page: ft.Page):
         )
         return relogio
 
-
-    
     # Função que cria um contêiner para exibir o logotipo da aplicação.
     def logo():
         logo = ft.Container(
@@ -172,7 +171,6 @@ def AdminFornecedores(page: ft.Page):
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
-            width=page.window.width,
             padding=ft.padding.all(10),
             height=175,
             expand=True,
@@ -254,7 +252,6 @@ def AdminFornecedores(page: ft.Page):
         # Cria o objeto de cadastro (presumivelmente, para adicionar novos fornecedores)
         cadastro = Cadastro(page)
         container = ft.Container(
-            width=page.window.width,
             bgcolor='#D9D9D9',
             padding=ft.padding.all(15),
             border_radius=20,
@@ -341,6 +338,5 @@ def AdminFornecedores(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
         )
     )
-
-
+    
     return Main

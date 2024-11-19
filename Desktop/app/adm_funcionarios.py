@@ -7,6 +7,7 @@ from app.components.funcionario import Funcionario
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFuncionarios(page: ft.Page):
+    page.title = "Administrador: Funcionarios"
 
     # Função que cria um contêiner para exibir o horário e a data.
     def relogio():
@@ -170,7 +171,6 @@ def AdminFuncionarios(page: ft.Page):
     def AppBar():
         AppBar = ft.Container(
             bgcolor="#D9FFBA",
-            width=page.window.width,
             padding=ft.padding.all(10),
             height=175,
             expand=True,
@@ -253,7 +253,6 @@ def AdminFuncionarios(page: ft.Page):
         # Instância para o cadastro de novos funcionários
         cadastro = Cadastro(page)
         container = ft.Container(
-            width=page.window.width,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,

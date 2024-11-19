@@ -1,4 +1,3 @@
-from turtle import left, right
 import flet as ft
 import datetime
 from app.components.dialogs import ConfirmationDialog, DialogoSaida, Detalhes

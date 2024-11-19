@@ -3,6 +3,8 @@ import flet as ft
 
 valid = Validacao()
 def Login(page: ft.Page):
+    page.title = "PIXFARM"
+
 
     def _login(e):
         cpf_valor = campo_cpf.value

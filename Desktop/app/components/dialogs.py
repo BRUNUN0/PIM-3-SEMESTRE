@@ -69,9 +69,10 @@ class ConfirmationDialog:
     def create_dialog(self):
         # Cria o diálogo com as ações especificadas
         self.dialog = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
             modal=True,
-            title=ft.Text(self.title),
-            content=ft.Text(self.content),
+            title=ft.Text(self.title, color=ft.colors.BLACK),
+            content=ft.Text(self.content, color=ft.colors.BLACK),
             actions=self.actions,  # Usa as ações definidas
             actions_alignment='center'
         )
