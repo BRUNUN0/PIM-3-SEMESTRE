@@ -1,10 +1,8 @@
-
 import pydoc as dbc 
 import flet as ft
 from app.components.gerenciamento_banco import GerenciamentoBanco as gbd
 from app.components.funcionario import Funcionario
 from hashlib import sha256
-
 
 
 class Validacao:
@@ -13,25 +11,46 @@ class Validacao:
 
     def valid_Login(self, cpf, senha):
         banco = gbd()
-        dado = Funcionario(banco)
+        funcionario = Funcionario(banco)
         # fornecedores = banco_fornecedores.obter_fornecedores()
 
         # Recebe a senha inserida 
         senha_cripto = sha256(senha.encode('utf-8')).hexdigest()
-        print(senha_cripto)
+        print(f'Senha criptografada: {senha_cripto}')
 
-        dados = dado.obter_funcionario_login(cpf)  # Agora usa a instância do banco
+        # Obtém os dados do banco
+        dados = funcionario.obter_funcionario_login(cpf)  # Agora usa a instância do banco
         print(dados)
 
 
         if dados:  # Verifica se dados foram encontrados
-            __senha, __cpf, _id = dados[0], dados[1], dados[2]
+            senha_db, cpf_db, id_funcionario, nome, cargo = dados
 
-            if senha_cripto == __senha and cpf == __cpf:
-                dados_funcionario = dado.obter_detalhes_funcionario(_id)
-                print(dados_funcionario)
+            if senha_cripto == senha_db and cpf == cpf_db:
+                usuario = {
+                    "id": id_funcionario,
+                    "cpf": cpf_db,
+                    "nome": nome,
+                    "cargo": cargo,
+                }
+                funcionario.salvar_sessao(usuario)
+                # dados_funcionario = dado.obter_detalhes_funcionario(_id)
+                # print(dados_funcionario)
                 return True
+            
+        print("Credenciais inválidas")
         return False  # Caso o login não seja bem-sucedido
-
     
-
+    def verificar_usuario_logado(self, funcionario: Funcionario, page: ft.Page):
+        usuario = funcionario.obter_sessao()
+        if not usuario:
+            page.go('/login')
+            return False
+        return True
+        
+    def Logout(page: ft.Page, funcionario: Funcionario):
+        """
+        Realiza o logout do usuário.
+        """
+        funcionario.limpar_sessao()
+        page.go("/login")  # Redireciona para a tela de login

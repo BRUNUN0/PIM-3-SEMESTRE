@@ -10,11 +10,27 @@ from app.adm_clientes import AdminClientes
 from app.adm_funcionarios import AdminFuncionarios
 from app.adm_fornecedores import AdminFornecedores
 
+from app.components.gerenciamento_banco import GerenciamentoBanco as gb
+from app.components.funcionario import Funcionario
+from app.components.validacao import Validacao
+
+valid = Validacao()
 
 
 def rotas(page: ft.Page):
+    banco = gb()
+    funcionario = Funcionario(banco)
+
+
     def route_change(route):            
         page.views.clear()
+
+        rotas_protegidas = [
+            "/", "/plantacao", "/pedidos", "/atividades", "/adm", "/adm/clientes", "/adm/funcionarios", "/adm/fornecedores"
+        ]
+
+        if page.route in rotas_protegidas and not valid.verificar_usuario_logado(funcionario, page):
+            return
 
         # Pagina de Login
         if page.route == "/login":

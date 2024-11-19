@@ -1,13 +1,23 @@
 from app.components.gerenciamento_banco import GerenciamentoBanco
+from hashlib import sha256
 
 class Funcionario:   
-    # def __init__(self, id_funcionario=None, nome=None, cpf=None, sexo=None, fk_id_cargo=None, senha=None, nascimento=None, email=None, setor=None, fk_data_inicio=None, gerenciamento_banco=None):
     def __init__(self, gerenciamento_banco: GerenciamentoBanco):
         self.banco = gerenciamento_banco
+        self.sessao = {}
 
+    def salvar_sessao(self, usuario):
+        # Salva as informações do usuário na sessão.
+        self.sessao['usuario_logado'] = usuario
+        print(f'Usuario {usuario['nome']} logado com sucesso.')
 
-    # def __str__(self):
-    #     return f"Funcionário: {self.nome}, ID: {self.id_funcionario}"
+    def obter_sessao(self):
+        # Retorna as informações do usuário logado.
+        return self.sessao.get('usuario_logado')
+    
+    def limpar_sessao(self):
+        self.sessao.clear()
+        print('Usuario deslogado com sucesso')
     
     def obter_funcionarios(self):
         try:
@@ -79,15 +89,24 @@ class Funcionario:
             return str(e)
 
     def obter_funcionario_login(self, cpf):
-
         try:
             self.banco.conectar()
-            # print(cpf)
-            self.banco.cursor.execute( '''SELECT Senha, CPF, id_funcionario FROM Funcionario WHERE cpf = ?''', (cpf,))
+            query = '''SELECT Senha, CPF, id_funcionario, Nome, Cargo 
+                    FROM Funcionario 
+                    INNER JOIN Cargo ON Funcionario.fk_id_cargo = Cargo.id_cargo
+                    WHERE CPF = ?'''
+            self.banco.cursor.execute(query, (cpf,))
             dados_login = self.banco.cursor.fetchone()
-            print(dados_login)
-            return dados_login
+
+            if not dados_login:
+                print("Usuário não encontrado.")
+                return None
+
+            return dados_login  # Retorna os dados diretamente para validação posterior
+
         except Exception as e:
-            print(f"Erro ao obter login")
+            print(f"Erro ao obter login: {e}")
         finally:
             self.banco.fechar_conexao()
+
+        return None

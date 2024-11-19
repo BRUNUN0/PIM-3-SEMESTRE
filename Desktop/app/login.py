@@ -18,7 +18,20 @@ def Login(page: ft.Page):
         else: 
             print("Erro de login")
             mostrar_erro_login(page)
-            page.update()  
+            page.update()
+
+    def mostrar_erro_login(page):
+        dialog = ft.AlertDialog(
+            content=ft.Container(
+                width=60,
+                height=25,
+                content=ft.Text("CPF ou Senha incorretos!"),
+                alignment=ft.alignment.center,
+            ),
+        )
+        page.overlay.append(dialog)
+        dialog.open = True
+        page.update()
         
 
     def logo():
@@ -177,15 +190,3 @@ def Login(page: ft.Page):
 
     return Main
 
-def mostrar_erro_login(page):
-    dialog = ft.AlertDialog(
-        content=ft.Container(
-            width=60,
-            height=25,
-            content=ft.Text("CPF ou Senha incorretos!"),
-            alignment=ft.alignment.center,
-        ),
-    )
-    page.overlay.append(dialog)
-    dialog.open = True
-    page.update()
