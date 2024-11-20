@@ -16,7 +16,7 @@ class Cliente:
             self.banco.fechar_conexao()
             return None
 
-    def obter_detalhes_clientes(self, id_cliente):
+    def obter_detalhes_cliente(self, id_cliente):
         try:
             # Obter os detalhes do cliente
             self.banco.conectar()

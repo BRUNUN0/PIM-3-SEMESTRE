@@ -459,7 +459,7 @@ def AdminHome(page: ft.Page):
                         spacing=10,
                         controls=[
                             ft.ElevatedButton("Novo Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: cadastro.abrir_cadastro("novo produto")),
-                            ft.ElevatedButton("Excluir Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: excluir.abrir_dialogo_id("produto")),
+                            ft.ElevatedButton("Excluir Produto", expand=True, bgcolor="#13330D", color=ft.colors.WHITE, on_click=lambda e: excluir.abrir_dialogo_exclusao("produto")),
                         ],
                     )
                 ],

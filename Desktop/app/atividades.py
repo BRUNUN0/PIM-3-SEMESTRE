@@ -239,19 +239,22 @@ def Atividades(page: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.Icon(
-                        name=ft.icons.FOREST,
+                        name=ft.icons.TASK,
                         color=ft.colors.BLACK,
                         size=30
                         ),
                     ft.Text(
-                        value=f"ID: {id_atividade}"
+                        value=f"ID: {id_atividade}",
+                        color=ft.colors.BLACK
                         ),
                     
                     ft.Text(
-                        value=nome
+                        value=nome,
+                        color=ft.colors.BLACK
                         ),
                     ft.Text(
-                        value=data
+                        value=data,
+                        color=ft.colors.BLACK
                     ),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -337,7 +340,7 @@ def Atividades(page: ft.Page):
     Main = ft.Container(
         expand=True,
         padding=ft.padding.all(0),
-        # bgcolor=ft.colors.RED,
+        bgcolor=ft.colors.WHITE,
 
         content=ft.Column(
             controls=[

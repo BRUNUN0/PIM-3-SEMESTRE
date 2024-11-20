@@ -27,7 +27,6 @@ class Detalhes:
 
     def detalhes_pedido(self, id_pedido):
         self.id_pedido_atual = id_pedido
-        self._alternar_modo_edicao(None, tipo_entidade='pedido')
 
         banco = GerenciamentoBanco()
         pedido = Pedido(banco)
@@ -55,7 +54,7 @@ class Detalhes:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Detalhes do", color=ft.colors.BLACK, size=18, weight="bold"),
+                    ft.Text(f"Detalhes do Pedido", color=ft.colors.BLACK, size=18, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -98,7 +97,6 @@ class Detalhes:
 
     def detalhes_atividade(self, id_atividade):
         self.id_atividade_atual = id_atividade
-        self._alternar_modo_edicao(None, tipo_entidade='atividade')
         banco = GerenciamentoBanco()
         atividade = Atividade(banco)
         detalhes = atividade.obter_detalhes_atividade(id_atividade)
@@ -123,7 +121,7 @@ class Detalhes:
         conteudo_dialog = [
             ft.Row(
                 controls=[
-                    ft.Text(f"Detalhes do", color=ft.colors.BLACK, size=18, weight="bold"),
+                    ft.Text(f"Detalhes da Atividade", color=ft.colors.BLACK, size=18, weight="bold"),
                     ft.IconButton(icon=ft.icons.CLOSE, icon_color=ft.colors.BLACK, on_click=self._fechar_dialog)
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -610,7 +608,6 @@ class Detalhes:
         self.page.update()
 
 
-
     def salvar_alteracoes(self, e, tipo_entidade):
         dados_atualizados = {}
         for titulo, campo in self.campos.items():
@@ -630,8 +627,8 @@ class Detalhes:
             cliente = Cliente(banco)
             resultado = cliente.atualizar_cliente(dados_atualizados, self.id_cliente_atual)
         elif tipo_entidade == "funcionario":
-            # funcionario = Funcionario(banco)
-            resultado = banco.atualizar_funcionario(dados_atualizados, self.id_funcionario_atual)
+            funcionario = Funcionario(banco)
+            resultado = funcionario.atualizar_funcionario(dados_atualizados, self.id_funcionario_atual)
         else:
             print("Tipo de entidade desconhecido")
             return

@@ -1,5 +1,4 @@
 import hashlib
-from turtle import color
 import flet as ft
 import pyodbc
 from datetime import datetime, date
@@ -240,7 +239,6 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
-
 
 
 class Cadastro:
@@ -587,7 +585,7 @@ class Excluir:
         self.nome_input = None
         self.tipo_entidade = None
 
-    def abrir_dialogo_id(self, tipo_entidade):
+    def abrir_dialogo_exclusao(self, tipo_entidade):
         """
         Abre um diálogo solicitando o ID para exclusão e configura a entidade correspondente.
         :param tipo_entidade: String representando o tipo de entidade a ser excluída (ex.: "fornecedor", "cliente").
