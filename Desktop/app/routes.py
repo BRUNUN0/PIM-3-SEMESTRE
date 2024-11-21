@@ -29,7 +29,10 @@ def rotas(page: ft.Page):
         #     "/", "/plantacao", "/pedidos", "/atividades", "/adm", "/adm/clientes", "/adm/funcionarios", "/adm/fornecedores"
         # ]
 
-        # if page.route in rotas_protegidas and not valid.verificar_usuario_logado(funcionario, page):
+        # usuario_logado = valid.verificar_usuario_logado(funcionario, page)
+        # print(f"Rota acessada: {page.route}, Usuario logado: {usuario_logado}")
+
+        # if page.route in rotas_protegidas and not usuario_logado:
         #     return
 
         # Pagina de Login

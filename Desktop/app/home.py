@@ -334,7 +334,7 @@ def Home(page: ft.Page):
             width=350,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.all(15),
+            padding=ft.padding.only(left=15, right=15),
             content=ft.Column(
                 controls=[
                     ft.Text(value='Produção por Mês:', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),

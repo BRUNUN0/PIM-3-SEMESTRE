@@ -31,7 +31,6 @@ def Pedidos(page: ft.Page):
                 height=50,
             ),
             alignment=ft.alignment.top_center,
-            on_click= lambda e: page.go('/adm')
         )
         return logo
     

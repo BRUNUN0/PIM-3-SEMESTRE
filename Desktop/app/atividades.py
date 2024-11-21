@@ -1,3 +1,4 @@
+import colorsys
 import flet as ft
 import datetime
 from app.components.gerenciamento_banco import Cadastro, GerenciamentoBanco
@@ -239,7 +240,7 @@ def Atividades(page: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.Icon(
-                        name=ft.icons.TASK,
+                        name=ft.icons.TASK_ALT,
                         color=ft.colors.BLACK,
                         size=30
                         ),
@@ -281,6 +282,8 @@ def Atividades(page: ft.Page):
 
             content=ft.Column(
                 controls=[
+                    ft.Text(
+                        value="Atividades", color=ft.colors.BLACK),
                     ft.Container(
                         expand=True,
                         bgcolor=ft.colors.WHITE,
@@ -299,9 +302,8 @@ def Atividades(page: ft.Page):
                         content=ft.Row(
                             controls=[
                                 ft.ElevatedButton(
-                                    text='Cadastrar',
+                                    text='Registrar Atividade',
                                     color=ft.colors.WHITE,
-                                    width=120,
                                     height=40,
                                     bgcolor=ft.colors.GREEN_900,
                                     on_click=lambda e: cadastro.abrir_registro('atividade')
@@ -311,7 +313,9 @@ def Atividades(page: ft.Page):
                         )
 
                     )
-                ]
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
 
         )

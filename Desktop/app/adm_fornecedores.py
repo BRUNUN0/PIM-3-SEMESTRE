@@ -211,7 +211,7 @@ def AdminFornecedores(page: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.Icon(
-                        name=ft.icons.FOREST,
+                        name=ft.icons.LOCAL_SHIPPING,
                         color=ft.colors.BLACK,
                         size=30
                         ),
