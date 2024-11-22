@@ -1,12 +1,13 @@
 from app.components.validacao import Validacao
 import flet as ft
 
-valid = Validacao()
+
 def Login(page: ft.Page):
     page.title = "PIXFARM"
 
-
     def _login(e):
+        valid = Validacao()
+
         cpf_valor = campo_cpf.value
         senha_valor = campo_senha.value
 
@@ -15,22 +16,14 @@ def Login(page: ft.Page):
         if login_sucesso:
             page.go("/")
             page.update()
-        else: 
-            print("Erro de login")
+        else:
             mostrar_erro_login(page)
             page.update()
 
     def mostrar_erro_login(page):
-        dialog = ft.AlertDialog(
-            content=ft.Container(
-                width=60,
-                height=25,
-                content=ft.Text("CPF ou Senha incorretos!"),
-                alignment=ft.alignment.center,
-            ),
-        )
-        page.overlay.append(dialog)
-        dialog.open = True
+        snackbar = ft.SnackBar(ft.Text('CPF ou Senha inválidos!'), bgcolor=ft.colors.RED)
+        page.overlay.append(snackbar)
+        snackbar.open = True
         page.update()
         
 

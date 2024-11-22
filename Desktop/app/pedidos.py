@@ -221,11 +221,6 @@ def Pedidos(page: ft.Page):
             
             content=ft.Row(
                 controls=[
-                    # ft.Icon(
-                    #     name=ft.icons.FOREST,
-                    #     color=ft.colors.BLACK,
-                    #     size=30
-                    #     ),
                     ft.Text(
                         value=f"ID: {id_pedido}",
                         color=ft.colors.BLACK
@@ -261,11 +256,11 @@ def Pedidos(page: ft.Page):
 
         cadastro = Cadastro(page)
         container = ft.Container(
+            expand=True,
             bgcolor='#D9D9D9',
             padding=ft.padding.only(left=15, right=15, top=15, bottom=5),
             border_radius=20,
-            expand=True,
-
+            
             content=ft.Column(
                 controls=[
                     ft.Text(value='Pedidos Ativos', color=ft.colors.BLACK, size=20, weight=ft.FontWeight.BOLD),
@@ -291,12 +286,11 @@ def Pedidos(page: ft.Page):
                                     color=ft.colors.WHITE,
                                     height=40,
                                     bgcolor="#13330D",
-                                    on_click=lambda e: print("fazer")
+                                    on_click=lambda e: cadastro.abrir_registro('finalizar pedido')
                                 ),
                                 ft.ElevatedButton(
                                     text='Registrar Pedido',
                                     color=ft.colors.WHITE,
-                                    # width=120,
                                     height=40,
                                     bgcolor="#13330D",
                                     on_click=lambda e: cadastro.abrir_registro('pedido')
@@ -353,7 +347,7 @@ def Pedidos(page: ft.Page):
             
     def conteudo():
         conteudo = ft.Container(
-            padding=ft.padding.only(left=25, right=25, top=0, bottom=0),
+            padding=ft.padding.only(left=15, right=15),
             expand=True,
             content=ft.ResponsiveRow(
                 controls=[
@@ -361,21 +355,17 @@ def Pedidos(page: ft.Page):
                         controls=[
                             pedidos_ativos(),
                             pedidos_finalizados()
-                        ],
-                    ),
-                ],
-                # alignment=ft.MainAxisAlignment.CENTER,
+                        ]
+                    )
+                ]
             )
         )
-
         return conteudo
 
     Main = ft.Container(
         bgcolor=ft.colors.WHITE,
         expand=True,
-        padding=ft.padding.only(bottom=10),
-
-
+        padding=ft.padding.only(bottom=5),
         content=ft.Column(
             controls=[
                 ft.Container(
@@ -390,7 +380,4 @@ def Pedidos(page: ft.Page):
             alignment=ft.MainAxisAlignment.CENTER,
         )
     )
-    
-    # page.on_resized = page.update()
-
     return Main

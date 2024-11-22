@@ -1,4 +1,4 @@
-# from app.components.validacao import Validacao
+from app.components.validacao import Validacao
 import flet as ft
 
 # valid = Validacao()
@@ -7,34 +7,28 @@ def Login(page: ft.Page):
 
 
     def _login(e):
+        valid = Validacao()
         cpf_valor = campo_cpf.value
         senha_valor = campo_senha.value
 
         print(f"cpf do cara: {cpf_valor}")
         print(f"senha do caba: {senha_valor}")
 
-    #     # login_sucesso = valid.valid_Login(cpf_valor, senha_valor)
+        login_sucesso = valid.valid_Login(cpf_valor, senha_valor)
         
-    #     if login_sucesso:
-    #         page.go("/")
-    #         page.update()
-    #     else: 
-    #         print("Erro de login")
-    #         mostrar_erro_login(page)
-    #         page.update()
+        if login_sucesso:
+            page.go("/")
+            page.update()
+        else: 
+            print("Erro de login")
+            mostrar_erro_login(page)
+            page.update()
 
-    # def mostrar_erro_login(page):
-    #     dialog = ft.AlertDialog(
-    #         content=ft.Container(
-    #             width=60,
-    #             height=25,
-    #             content=ft.Text("CPF ou Senha incorretos!"),
-    #             alignment=ft.alignment.center,
-    #         ),
-    #     )
-    #     page.overlay.append(dialog)
-    #     dialog.open = True
-    #     page.update()
+    def mostrar_erro_login(page):
+        snackbar = ft.SnackBar(ft.Text("CPF ou Senha incorretos!"), bgcolor=ft.colors.RED)
+        page.overlay.append(snackbar)
+        snackbar.open = True
+        page.update()
         
 
     def logo():

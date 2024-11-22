@@ -1,3 +1,4 @@
+from math import exp
 import flet as ft
 import datetime
 from app.components.dialogs import DialogoSaida, ConfirmationDialog
@@ -283,16 +284,22 @@ def Plantacao(page: ft.Page):
             expand=True,
             bgcolor='#D6D6D6',
             border_radius=16,
-            padding=ft.padding.only(left=15, right=15),
+            padding=ft.padding.only(left=15, right=15, bottom=10),
 
             content=ft.Column(
                 controls=[
                     ft.Text(value='Estoque Materia Prima', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                    ft.Column(
-                        controls=
-                        lista_materias_primas,
-                        spacing=6,
-                        scroll=ft.ScrollMode.AUTO
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.WHITE,
+                        border_radius=12,
+                        padding=ft.padding.all(15),
+                        content=ft.Column(
+                            controls=
+                            lista_materias_primas,
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        )
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -347,18 +354,23 @@ def Plantacao(page: ft.Page):
         plantacoes = ft.Container(
             expand=True,
             bgcolor="#D6D6D6",
+            padding=ft.padding.only(left=15, right=15, bottom=10),
             border_radius=16,
-            padding=ft.padding.only(left=15, right=15),
-
 
             content=ft.Column(
                 controls=[
                     ft.Text(value='Itens Plantados', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                    ft.Column(
-                        controls=
-                        lista_plantacao,
-                        spacing=6,
-                        scroll=ft.ScrollMode.AUTO
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.WHITE,
+                        padding=ft.padding.all(15),
+                        border_radius=12,
+                        content=ft.Column(
+                            controls=
+                            lista_plantacao,
+                            spacing=6,
+                            scroll=ft.ScrollMode.AUTO
+                        )
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -414,15 +426,22 @@ def Plantacao(page: ft.Page):
                         width=750,
                         bgcolor="#D6D6D6",
                         border_radius=16,
-                        padding=ft.padding.only(left=15, right=15),
+                        padding=ft.padding.only(left=15, right=15, bottom=10),
                         content=ft.Column(
                             controls=[
                                 ft.Text(value='Estoque Produtos', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
-                                ft.Column(
-                                    controls=
-                                    lista_produtos,
-                                    spacing=6,
-                                    scroll=ft.ScrollMode.AUTO
+                                ft.Container(
+                                    expand=True,
+                                    bgcolor=ft.colors.WHITE,
+                                    padding=ft.padding.all(15),
+                                    border_radius=12,
+                                    content=ft.Column(
+                                        controls=
+                                        lista_produtos,
+                                        spacing=6,
+                                        scroll=ft.ScrollMode.AUTO
+                                    )
+
                                 )
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER

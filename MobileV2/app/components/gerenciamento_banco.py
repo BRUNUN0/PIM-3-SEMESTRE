@@ -237,6 +237,7 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
+        
 
 
 class Cadastro:

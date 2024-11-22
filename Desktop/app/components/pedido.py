@@ -3,12 +3,12 @@ from app.components.gerenciamento_banco import GerenciamentoBanco
 class Pedido:
     def __init__(self, gerenciamento_banco:GerenciamentoBanco):
         # Armazena a instância de GerenciamentoBanco
-        self.gerenciamento_banco = gerenciamento_banco
+        self.banco = gerenciamento_banco
 
     def obter_pedidos_abertos(self):
         try:
             # Chama o método conectar na instância da classe GerenciamentoBanco
-            self.gerenciamento_banco.conectar()
+            self.banco.conectar()
             
             # Define a consulta SQL
             query = '''SELECT
@@ -25,21 +25,21 @@ class Pedido:
                         pe.Status = 'Em andamento';'''
             
             # Executa a consulta
-            self.gerenciamento_banco.cursor.execute(query)
+            self.banco.cursor.execute(query)
             
             # Obtém os resultados
-            pedidos = self.gerenciamento_banco.cursor.fetchall()
+            pedidos = self.banco.cursor.fetchall()
             return pedidos
         except Exception as e:
             print(f"Erro ao obter pedidos: {e}")
             return None
         finally:
             # Fecha a conexão com o banco
-            self.gerenciamento_banco.fechar_conexao()
+            self.banco.fechar_conexao()
 
     def obter_pedidos_finalizados(self):
         try:
-            self.gerenciamento_banco.conectar()
+            self.banco.conectar()
             query = '''SELECT
                         pe.id_pedido,
                         c.Nome AS Nome_Cliente,
@@ -52,17 +52,17 @@ class Pedido:
                     INNER JOIN Cliente c ON pe.fk_id_cliente = c.id_cliente
                     WHERE
                         pe.Status = 'Finalizado';'''
-            self.gerenciamento_banco.cursor.execute(query)
-            pedidos = self.gerenciamento_banco.cursor.fetchall()
+            self.banco.cursor.execute(query)
+            pedidos = self.banco.cursor.fetchall()
             return pedidos
         except Exception as e:
             print(f"Erro ao obter pedidos: {e}")
-            self.gerenciamento_banco.fechar_conexao()
+            self.banco.fechar_conexao()
             return None
         
     def obter_detalhes_pedido(self, id_pedido):
         try:
-            self.gerenciamento_banco.conectar()
+            self.banco.conectar()
             query = '''SELECT
                             pe.id_pedido,
                             c.Nome AS Nome_Cliente,
@@ -78,10 +78,28 @@ class Pedido:
                         INNER JOIN Produto pd ON pd.id_produto = i.fk_id_produto
                         WHERE
                             pe.id_pedido = ?;'''
-            self.gerenciamento_banco.cursor.execute(query,(id_pedido))
-            detalhes_pedido = self.gerenciamento_banco.cursor.fetchone()
+            self.banco.cursor.execute(query,(id_pedido))
+            detalhes_pedido = self.banco.cursor.fetchone()
             return detalhes_pedido
         except Exception as e:
             print(f"Erro ao obter detalhes do pedido: {e}")
-            self.gerenciamento_banco.fechar_conexao()
+            self.banco.fechar_conexao()
             return None
+        
+    def contar_pedidos_abertos(self):
+        try:
+            self.banco.conectar()
+            query = '''SELECT 
+                            COUNT(*) AS Total_Pedidos_Abertos 
+                        FROM 
+                            Pedido 
+                        WHERE 
+                            Status = 'Em andamento';'''
+            self.banco.cursor.execute(query)
+            n_pedidos_abertos = self.banco.cursor.fetchone()
+            return n_pedidos_abertos
+        except Exception as e:
+            print(f"Erro ao obter soma de pedidos abertos: {e}")
+            self.banco.fechar_conexao()
+            return None
+        

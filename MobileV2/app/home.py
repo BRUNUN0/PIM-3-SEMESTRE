@@ -3,6 +3,7 @@ import datetime
 from app.components.gerenciamento_banco import GerenciamentoBanco
 from app.components.detalhes import Detalhes
 from app.components.producao import Producao
+from app.components.pedido import Pedido
 
 def Home(page: ft.Page):
 
@@ -34,6 +35,7 @@ def Home(page: ft.Page):
     
     def menu():
         menu = ft.PopupMenuButton(
+            bgcolor=ft.colors.WHITE,
             icon=ft.icons.MENU,
             icon_color=ft.colors.BLACK,
             icon_size=40,
@@ -67,9 +69,60 @@ def Home(page: ft.Page):
         return appbar
     
     def container():
-        container = ft.Container(
+        banco = GerenciamentoBanco()
+        pedidos = Pedido(banco)
+        n_pedidos = pedidos.contar_pedidos_abertos()
+        print(n_pedidos)
+
+        cards = ft.Container(
+            padding=ft.padding.only(left=10, right=10),
+            # height=900,
             # expand
-            bgcolor=ft.colors.RED,
+            content=ft.Row(
+                controls=[
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.RED,
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='Pedidos Ativos', size=18, weight='bold', text_align=ft.TextAlign.CENTER, color=ft.colors.BLACK),
+                                ft.Text(value=n_pedidos, size=12, text_align=ft.TextAlign.CENTER, color=ft.colors.BLACK)
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                        )
+                    ),
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.BLUE,
+                        content=ft.Text(value='teste2')
+                    ),
+                    ft.Container(
+                        expand=True,
+                        bgcolor=ft.colors.GREEN,
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='testando'),
+                                ft.Text(value='testando ainda')
+                            ]
+                        )
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+            )
+        )
+        container = ft.Container(
+            # expand=True,
+            height=120,
+            bgcolor=ft.colors.WHITE,
+            border_radius=20,
+            content=ft.Column(
+                controls=[
+                    cards
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
         )
         return container
     
@@ -145,6 +198,7 @@ def Home(page: ft.Page):
             padding=ft.padding.only(left=10, right=10, bottom=10),
             content=ft.Column(
                 controls=[
+                    container(),
                     plantacoes()
                 ]
             )
@@ -159,6 +213,7 @@ def Home(page: ft.Page):
         # height=860,
         expand=True,
         bgcolor='#7FA677',
+        padding=ft.padding.only(top=15),
         # border_radius=20,
         content=ft.Column(
             controls=[

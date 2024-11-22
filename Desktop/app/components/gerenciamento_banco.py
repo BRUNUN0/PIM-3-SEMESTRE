@@ -237,6 +237,25 @@ class GerenciamentoBanco:
                 return False, error_message
             finally:
                 self.fechar_conexao()
+        elif tipo_cadastro == "finalizar pedido":
+            try:
+                self.cursor.execute('''{CALL FinalizarPedido (?)}''', dados['ID do Pedido'])
+                self.conn.commit()
+                return True, None
+            except pyodbc.IntegrityError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de integridade:", error_message)
+                return False, error_message
+            except pyodbc.ProgrammingError as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro de programação:", e)
+                return False, error_message
+            except pyodbc.Error as e:
+                error_message = str(e).split('(')[1].split(')')[0]
+                print("Erro ao inserir fornecedor:", e)
+                return False, error_message
+            finally:
+                self.fechar_conexao()
 
 
 class Cadastro:
@@ -389,6 +408,9 @@ class Cadastro:
             "atividade": [
                 {"titulo": "Responsável da Atividade", "campos": ["Nome do Funcionario", "Nome Plantio"]},
                 {"titulo": "Detalhes da Atividade", "campos": ["Descrição", "Prioridade(1 a 3)", "Data", "Duração", "Fase Atual"]}
+            ],
+            "finalizar pedido": [
+                {"titulo": "Finalizar Pedido", "campos": ["ID do Pedido"]}
             ]
         }
 
