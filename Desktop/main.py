@@ -6,12 +6,13 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def main(page: ft.Page):
     page.title = "PIXFARM"
-    page.window.maximized = True
+    # page.window.maximized = True
     page.window.resizable = False
     rotas(page)
     print(page.route)
 
-    page.go('/pedidos')
+    # page.go('/login')
+    page.go('/adm/funcionarios')
     page.update()
 
 if __name__ == "__main__":

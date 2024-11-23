@@ -9,10 +9,14 @@ class Validacao:
     def __init__(self):
         pass
 
+
     def valid_Login(self, cpf, senha):
+        if not self.validar_cpf(cpf):
+            print('CPF inválido.')
+            return False
+
         banco = gbd()
         funcionario = Funcionario(banco)
-        # fornecedores = banco_fornecedores.obter_fornecedores()
 
         # Recebe a senha inserida 
         senha_cripto = sha256(senha.encode('utf-8')).hexdigest()
@@ -56,3 +60,26 @@ class Validacao:
         """
         funcionario.limpar_sessao()
         page.go("/login")  # Redireciona para a tela de login
+
+    @staticmethod
+    def validar_cpf(cpf):
+        if not cpf:  # Verifica se o CPF é vazio ou None
+            return False
+        # Remove caracteres não numéricos
+        cpf = ''.join(filter(str.isdigit, cpf))
+        
+        if len(cpf) != 11 or cpf == cpf[0] * 11:
+            return False
+        
+        try:
+            # Verifica o primeiro dígito verificador
+            soma = sum(int(cpf[i]) * (10 - i) for i in range(9))
+            digito1 = (soma * 10 % 11) % 10
+
+            # Verifica o segundo dígito verificador
+            soma = sum(int(cpf[i]) * (11 - i) for i in range(10))
+            digito2 = (soma * 10 % 11) % 10
+
+            return digito1 == int(cpf[9]) and digito2 == int(cpf[10])
+        except ValueError:
+            return False

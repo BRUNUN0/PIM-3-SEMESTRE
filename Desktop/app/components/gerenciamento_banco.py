@@ -84,8 +84,8 @@ class GerenciamentoBanco:
         elif tipo_cadastro == 'funcionario':
             try:
                 self.cursor.execute(
-                    '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
+                    '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados["RG"], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
                 )
                 self.conn.commit()
                 return True, None
@@ -286,7 +286,7 @@ class Cadastro:
                 {"titulo": "Endereço", "campos": ["Rua", "Numero", "Bairro", "CEP", "Cidade", "Estado"]}
             ],
             "funcionario": [
-                {"titulo": "Informações do Funcionario", "campos": ["Nome", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
+                {"titulo": "Informações do Funcionario", "campos": ["Nome", "RG", "CPF", "Sexo", "Nascimento", "Email", "Setor", "Senha"]},
                 {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data Inicio"]}
             ],
             "materia prima": [
@@ -537,6 +537,7 @@ class Cadastro:
             snackbar.open = True
             self.page.update()
             return
+        
 
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}

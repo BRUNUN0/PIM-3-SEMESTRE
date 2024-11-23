@@ -8,10 +8,22 @@ def Login(page: ft.Page):
     def _login(e):
         valid = Validacao()
 
-        cpf_valor = campo_cpf.value
-        senha_valor = campo_senha.value
+        cpf = campo_cpf.value
+        senha = campo_senha.value
 
-        login_sucesso = valid.valid_Login(cpf_valor, senha_valor)
+        if not cpf:
+            mostrar_erro_login(page, "O CPF não pode estar vazio!")
+            return
+
+        if not senha:
+            mostrar_erro_login(page, "A senha não pode estar vazia!")
+            return
+
+        if not Validacao.validar_cpf(cpf):
+            mostrar_erro_login(page, "CPF inválido!")
+            return
+
+        login_sucesso = valid.valid_Login(cpf, senha)
         
         if login_sucesso:
             page.go("/")
@@ -20,11 +32,14 @@ def Login(page: ft.Page):
             mostrar_erro_login(page)
             page.update()
 
-    def mostrar_erro_login(page):
-        snackbar = ft.SnackBar(ft.Text('CPF ou Senha inválidos!'), bgcolor=ft.colors.RED)
+    def mostrar_erro_login(page, mensagem="CPF ou Senha inválidos!"):
+        snackbar = ft.SnackBar(ft.Text(mensagem), bgcolor=ft.colors.RED)
         page.overlay.append(snackbar)
         snackbar.open = True
         page.update()
+    
+    def _red_senha(e):
+        print('Recupera')
         
 
     def logo():
@@ -88,9 +103,12 @@ def Login(page: ft.Page):
             size=14
         )
     )
+    btn_senha = ft.TextButton(
+        text="Redefinir Senha",
+        on_click=lambda e: _red_senha(e)
+    )
     btn_login = ft.ElevatedButton(
         text="Entrar",
-        width=100,
         height=40,
         bgcolor="#13330D",                 #botão entrar
         color=ft.colors.WHITE,
@@ -107,8 +125,14 @@ def Login(page: ft.Page):
                     campo_cpf,
                     campo_senha,
                     ft.Container(
-                        btn_login,
-                        padding=ft.padding.only(left=250),
+                        content=ft.Row(
+                            spacing=140,
+                            controls=[
+                                btn_senha,
+                                btn_login,
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER
+                        )
                     )
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
@@ -129,8 +153,6 @@ def Login(page: ft.Page):
                                 height=300,
                                 bgcolor='#7FA677',
                                 border_radius=ft.border_radius.all(20),
-                                
-                                
                             ),
                             ft.Container(
                                 logo(),
