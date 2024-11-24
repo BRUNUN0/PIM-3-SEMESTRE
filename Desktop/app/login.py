@@ -1,4 +1,5 @@
 from app.components.validacao import Validacao
+from app.components.gerenciamento_banco import Atualizar
 import flet as ft
 
 
@@ -39,7 +40,9 @@ def Login(page: ft.Page):
         page.update()
     
     def _red_senha(e):
+        atualizar = Atualizar(page)
         print('Recupera')
+        atualizar.abrir_dialogo_atualizar()
         
 
     def logo():

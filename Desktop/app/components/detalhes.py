@@ -237,7 +237,7 @@ class Detalhes:
         cliente = Cliente(banco)
 
         # Obter detalhes do fornecedor pelo ID
-        detalhes = cliente.obter_detalhes_clientes(id_cliente)
+        detalhes = cliente.obter_detalhes_cliente(id_cliente)
 
         if detalhes is None:
             snackbar = ft.SnackBar(ft.Text("Erro ao obter detalhes do cliente."), bgcolor=ft.colors.RED)

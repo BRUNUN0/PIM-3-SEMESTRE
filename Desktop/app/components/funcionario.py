@@ -1,5 +1,7 @@
 from app.components.gerenciamento_banco import GerenciamentoBanco
+import hashlib
 from hashlib import sha256
+from datetime import datetime
 
 class Funcionario:   
     def __init__(self, gerenciamento_banco: GerenciamentoBanco):
@@ -47,22 +49,28 @@ class Funcionario:
         try:
             # Obter detalhes do funcionario
             self.banco.conectar()
-            query = f'''SELECT
+            query = f'''SELECT 
                             f.id_funcionario as id,
-                            f.nome as nome,
+                            f.Nome as nome,
                             f.CPF as cpf,
                             f.Sexo as sexo,
-                            c.cargo as cargo,
-                            f.senha as senha,
-                            f.Nascimento as nascimento,
+                            c.Cargo as cargo,
+                            f.Senha as senha,
+                            FORMAT(f.Nascimento, 'dd-MM-yyyy') as nascimento,
                             f.Email as email,
                             f.Setor as setor,
-                            hc.Data_Inicio as data_inicio
-                            FROM
-                        Funcionario f
-                        INNER JOIN Cargo c ON c.Cargo = c.Cargo
-                        INNER JOIN Historico_Cargo hc ON hc.Data_Inicio = hc.Data_Inicio
-                        WHERE id_funcionario = {id_funcionario}'''
+                            FORMAT(hc.Data_Inicio, 'dd-MM-yyyy') as data_inicio
+                        FROM
+                            Funcionario f
+                        INNER JOIN Cargo c ON f.fk_id_cargo = c.id_cargo
+                        INNER JOIN Historico_Cargo hc ON f.id_funcionario = hc.fk_id_funcionario
+                            AND hc.Data_Inicio = (
+                                SELECT MAX(Data_Inicio)
+                                FROM Historico_Cargo
+                                WHERE fk_id_funcionario = f.id_funcionario
+                            )
+                        WHERE 
+                            f.id_funcionario = {id_funcionario};'''
             self.banco.cursor.execute(query)
             detalhes_funcionario = self.banco.cursor.fetchone()
             
@@ -76,16 +84,33 @@ class Funcionario:
         print(dados_atualizados)
         try:
             self.banco.conectar()
-            query = f'''UPDATE Funcionario SET  Nome = ?, Sexo = ?, Senha = ?, Nascimento = ?, Email = ?, Setor = ? WHERE id_funcionario = ?'''
+
+            # Garantir que a data esteja no formato YYYY-MM-DD antes de salvar
+            if "Nascimento" in dados_atualizados and dados_atualizados["Nascimento"]:
+                # Converte a data para o formato YYYY-MM-DD se estiver no formato DD-MM-YYYY
+                dados_atualizados["Nascimento"] = datetime.strptime(dados_atualizados["Nascimento"], "%d-%m-%Y").strftime("%Y-%m-%d")
+
+            # Se a senha não foi passada (campo vazio ou ausente), manter a senha existente
+            if "Senha" not in dados_atualizados or not dados_atualizados["Senha"]:
+                # Buscar a senha atual no banco de dados
+                query_busca_senha = '''SELECT Senha FROM Funcionario WHERE id_funcionario = ?'''
+                self.banco.cursor.execute(query_busca_senha, (id_funcionario,))
+                senha_atual = self.banco.cursor.fetchone()
+                if senha_atual:
+                    # Atribui a senha atual ao dicionário
+                    dados_atualizados["Senha"] = senha_atual[0]
+            print(dados_atualizados)
+            query = '''UPDATE Funcionario SET Nome = ?, Sexo = ?, Senha = ?, Nascimento = ?, Email = ?, Setor = ? WHERE id_funcionario = ?'''
             parametros = (
-            dados_atualizados["Nome"],
-            dados_atualizados["Sexo"],
-            dados_atualizados["Senha"],
-            dados_atualizados["Nascimento"],
-            dados_atualizados["Email"],
-            dados_atualizados["Setor"],
-            id_funcionario
+                dados_atualizados["Nome"],
+                dados_atualizados["Sexo"],
+                dados_atualizados["Senha"],  # A senha agora estará garantida, seja a nova ou a atual
+                dados_atualizados["Nascimento"],  # A data já estará no formato correto
+                dados_atualizados["Email"],
+                dados_atualizados["Setor"],
+                id_funcionario
             )
+            
             self.banco.cursor.execute(query, parametros)
             self.banco.conn.commit()
             return True
@@ -116,3 +141,54 @@ class Funcionario:
             self.banco.fechar_conexao()
 
         return None
+    
+    def verifica_rg_senha(self, rg, senha_atual):
+        try:
+            self.banco.conectar()
+            query = ''' SELECT
+                            f.RG,
+                            f.Senha
+                        FROM
+                            Funcionario f
+                        WHERE
+                            f.RG = ?'''
+            self.banco.cursor.execute(query, (rg))
+            dados = self.banco.cursor.fetchone()
+            if dados:
+                senha_hash = dados[0]  # A senha armazenada no banco
+                # Verifica se a senha atual corresponde ao que está no banco
+                if senha_hash == self.hash_password(senha_atual):
+                    return True
+                else:
+                    return False
+            return False
+
+        except Exception as e:
+            print(f"Erro ao verificar RG e senha: {e}")
+            return False
+
+        finally:
+            self.banco.fechar_conexao()
+
+    def atualizar_senha(self, rg, nova_senha_hash):
+        try:
+            self.banco.conectar()
+            query = ''' UPDATE Funcionario
+                        SET Senha = ?
+                        WHERE RG = ?'''
+            self.banco.cursor.execute(query, (nova_senha_hash, rg))
+            self.banco.cursor.commit()
+            # Verifica se alguma linha foi afetada
+            if self.banco.cursor.rowcount > 0:
+                print(f"Senha do funcionário com RG {rg} atualizada com sucesso.")
+                return True
+            else:
+                print(f"Nenhum funcionário encontrado com o RG {rg}.")
+                return False
+
+        except Exception as e:
+            print(f"Erro ao atualizar a senha: {e}")
+            return False
+
+        finally:
+            self.banco.fechar_conexao()

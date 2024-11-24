@@ -1,7 +1,7 @@
 import hashlib
 import flet as ft
 import pyodbc
-from datetime import datetime, date
+from datetime import datetime
 from hashlib import sha256
 
 
@@ -32,7 +32,7 @@ class GerenciamentoBanco:
                 self.conn = None
                 self.cursor = None
 
-    def cadastro(self, tipo_cadastro, dados):
+    def cadastro(self, tipo_cadastro, dados): 
         self.conectar()
         if tipo_cadastro == 'fornecedor':
             try:
@@ -85,7 +85,7 @@ class GerenciamentoBanco:
             try:
                 self.cursor.execute(
                     '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados["RG"], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data_Inicio'])
+                    (dados['Nome'], dados["RG"], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data Inicio'])
                 )
                 self.conn.commit()
                 return True, None
@@ -269,7 +269,7 @@ class Cadastro:
         self.inputs = {}
         self.senha_input = None
         self.dados_salvos = None  # Armazena temporariamente os dados salvos para possível reversão
-
+        
     def abrir_cadastro(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
@@ -309,68 +309,70 @@ class Cadastro:
             )
         ]
 
-        self.datepicker_control = None
+        def criar_campo(nome_campo):
+            if nome_campo in ("Data", "Data Inicio", "Data Fim", "Nascimento"):
+                campo_texto = ft.TextField(label=nome_campo, read_only=True, width=200)
+                botao_calendario = ft.IconButton(
+                    icon=ft.icons.CALENDAR_TODAY,
+                    tooltip=f"Selecionar {nome_campo}",
+                    on_click=lambda e, dest=campo_texto: abrir_datepicker(e, dest)
+                )
+                self.inputs[nome_campo] = campo_texto
+                return ft.Row(
+                    controls=[campo_texto, botao_calendario],
+                    alignment=ft.MainAxisAlignment.START
+                )
+            else:
+                campo_texto = ft.TextField(label=nome_campo, color=ft.colors.BLACK, width=250)
+                self.inputs[nome_campo] = campo_texto
+                return campo_texto
 
-        # Itera sobre os grupos de campos
+        # Função para abrir o DatePicker
+        def abrir_datepicker(e, campo_destino):
+            self.page.dialog = ft.DatePicker(
+                on_change=lambda event: on_date_selected(event, campo_destino),
+                cancel_text="Cancelar",
+                confirm_text="Confirmar"
+            )
+            self.page.dialog.open = True
+            self.page.update()
+
+        # Função chamada ao selecionar uma data
+        def on_date_selected(event, campo_destino):
+            try:
+                data = datetime.strptime(event.data.split('T')[0], '%Y-%m-%d')
+                campo_destino.value = data.strftime('%d-%m-%Y')
+            except Exception as e:
+                print(f"Erro ao selecionar a data: {e}")
+            self.page.dialog.open = False
+            self.page.update()
+
+        # Itera pelos grupos e organiza os campos em colunas
         for grupo in grupos_campos:
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
             campos = grupo["campos"]
 
-            # Cria os campos de entrada
-            for campo in campos:
-                if campo in ("Data", "Data Inicio", "Data Fim", "Nascimento"):  # Verifica se o campo é "Data"
-                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
-
-                    def handle_focus(e, campo=campo):
-                        if not date_field_flag["is_open"]:
-                            date_field_flag["is_open"] = True
-                            self.page.open(
-                                ft.DatePicker(
-                                    cancel_text='Cancelar',
-                                    confirm_text='Confirmar',
-                                    error_format_text='Data inválida',
-                                    field_hint_text='MM/DD/YYYY',
-                                    help_text='Selecione uma data no calendário',
-                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
-                                    on_change=lambda e: (
-                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
-                                        self.page.update(),
-                                        setattr(date_field_flag, 'is_open', False)  # Reseta a flag após seleção
-                                    ),
-                                    on_dismiss=lambda e: setattr(date_field_flag, 'is_open', False)  # Reseta a flag após cancelamento
-                                )
-                            )
-
-                    date_field = ft.TextField(
-                        label=campo,
-                        width=250,
-                        read_only=True,  # Apenas exibição
-                        on_focus=handle_focus
-                    )
-                    self.inputs[campo] = date_field  # Armazena no dicionário
-                else:
-                    # Cria campos normais
-                    self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
-
-            # Adiciona os campos ao conteúdo do diálogo, agrupados em linhas
+            linhas = []
             for i in range(0, len(campos), 2):
-                linha = ft.Row(
-                    controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                )
-                conteudo_dialog.append(linha)
+                linha = []
+                linha.append(criar_campo(campos[i]))
+                if i + 1 < len(campos):
+                    linha.append(criar_campo(campos[i + 1]))
+                linhas.append(ft.Row(controls=linha, alignment=ft.MainAxisAlignment.START))
+
+            conteudo_dialog.extend(linhas)
 
         # Botão de salvar
-        botoes = ft.Row(
-            controls=[
-                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
-            ],
-            alignment=ft.MainAxisAlignment.END
+        conteudo_dialog.append(
+            ft.Row(
+                controls=[
+                    ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
         )
 
-        conteudo_dialog.append(botoes)
-
-        # Cria o diálogo com o conteúdo
+        # Criar o diálogo
         self.dialog = ft.AlertDialog(
             bgcolor=ft.colors.WHITE,
             modal=True,
@@ -388,6 +390,11 @@ class Cadastro:
         self.dialog.open = True
         self.page.update()
 
+        # Imprime todos os itens de self.inputs
+        # print("Conteúdo de self.inputs.items():")
+        # for campo, entrada in self.inputs.items():
+        #     print(f"{campo}: {entrada.value}")
+ 
     def abrir_registro(self, tipo_cadastro):
         """
         Abre um AlertDialog configurado com os campos apropriados para o tipo de cadastro fornecido.
@@ -425,6 +432,7 @@ class Cadastro:
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN
             )
         ]
+        
 
         self.itens_pedido = []
 
@@ -525,6 +533,7 @@ class Cadastro:
         self.page.update()
 
     def _salvar_dados(self, e):
+        from app.components.validacao import Validacao
 
         campos_invalidos = [campo for campo, entrada in self.inputs.items() if not entrada.value.strip()]
         if campos_invalidos:
@@ -538,13 +547,27 @@ class Cadastro:
             self.page.update()
             return
         
-
+        
         # Coleta os dados dos inputs e fecha o dialog
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
 
+        # Valida o CPF antes de continuar
+        cpf = self.dados_salvos.get("CPF", "")
+        if not Validacao.validar_cpf(cpf):
+            snackbar = ft.SnackBar(
+                content=ft.Text("CPF inválido. Por favor, insira um CPF válido."),
+                bgcolor=ft.colors.RED
+            )
+            self.page.overlay.append(snackbar)
+            snackbar.open = True
+            self.page.update()
+            return
         # Verificação do campo "Senha" e aplica hash
         if "Senha" in self.dados_salvos and self.dados_salvos["Senha"]:
             self.dados_salvos["Senha"] = self.hash_password(self.dados_salvos["Senha"])
+
+
+        self.dados_salvos = self.converter_datas(self.dados_salvos)
 
         # Fecha o diálogo
         self.dialog.open = False
@@ -556,6 +579,7 @@ class Cadastro:
     def inserir_banco(self):
         banco = GerenciamentoBanco()
         sucesso, error_message = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
+
         if sucesso:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),
@@ -592,6 +616,19 @@ class Cadastro:
         hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
         return hashed
 
+    def converter_datas(self, dados):
+        """
+        Função que converte as datas no dicionário para o formato 'YYYY-MM-DD'
+        """
+        for campo, valor in dados.items():
+            if campo in ["Data", "Data Inicio", "Data Fim", "Nascimento"]:  # Liste os campos de data
+                try:
+                    # Tentativa de conversão para o formato esperado 'YYYY-MM-DD'
+                    dados[campo] = datetime.strptime(valor, "%d-%m-%Y").strftime("%Y-%m-%d")
+                except ValueError:
+                    print(f"Erro ao converter a data do campo {campo}. Valor fornecido: {valor}")
+                    dados[campo] = None  # Ou defina um valor padrão, se necessário
+        return dados
 
 class Excluir:
     def __init__(self, page):
@@ -729,3 +766,105 @@ class Excluir:
             self.dialog_confirmacao.open = False
         self.page.update()
 
+class Atualizar:
+    def __init__(self, page):
+        """
+        Inicializa a classe Atualizar com a página onde o diálogo será exibido.
+        :param page: A página do aplicativo onde o diálogo será mostrado.
+        """
+        self.page = page
+        self.dialog_atualizar = None
+        self.rg_input = None
+        self.senha_atual_input = None
+        self.nova_senha_input = None
+        self.confirma_nova_senha_input = None
+        self.funcionario = None
+
+    def abrir_dialogo_atualizar(self):
+        """
+        Abre um diálogo solicitando o RG, senha atual, nova senha e confirmação da nova senha para atualização.
+        """
+        self.rg_input = ft.TextField(label="RG do Funcionário", width=300, dense=True)
+        self.senha_atual_input = ft.TextField(label="Senha Atual", width=300, password=True, dense=True)
+        self.nova_senha_input = ft.TextField(label="Nova Senha", width=300, password=True, dense=True)
+        self.confirma_nova_senha_input = ft.TextField(label="Confirmar Nova Senha", width=300, password=True, dense=True)
+        
+        # Diálogo para inserir RG e dados para atualização
+        self.dialog_atualizar = ft.AlertDialog(
+            bgcolor=ft.colors.WHITE,
+            modal=True,
+            title=ft.Text("Redefinir Senha", size=20, color=ft.colors.BLACK, weight="bold"),
+            content=ft.Column([self.rg_input, self.senha_atual_input, self.nova_senha_input, self.confirma_nova_senha_input], tight=True, spacing=10),
+            actions=[
+                ft.ElevatedButton("Atualizar", on_click=self.atualizar_senha),
+                ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo)
+            ],
+            actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+        )
+
+        self.page.overlay.append(self.dialog_atualizar)
+        self.dialog_atualizar.open = True
+        self.page.update()
+
+    def atualizar_senha(self, e):
+        from app.components.funcionario import Funcionario
+        """
+        Atualiza a senha do funcionário após validação dos campos.
+        """
+        rg = self.rg_input.value.strip()
+        senha_atual = self.senha_atual_input.value.strip()
+        nova_senha = self.nova_senha_input.value.strip()
+        confirma_nova_senha = self.confirma_nova_senha_input.value.strip()
+
+        # Validações
+        if not rg or not senha_atual or not nova_senha or not confirma_nova_senha:
+            self.exibir_snack_bar("Todos os campos devem ser preenchidos.", ft.colors.RED)
+            return
+
+        if nova_senha != confirma_nova_senha:
+            self.exibir_snack_bar("A nova senha e a confirmação não coincidem.", ft.colors.RED)
+            return
+
+        # Consulta o funcionário pelo RG
+        self.funcionario = Funcionario.verifica_rg_senha(rg, senha_atual)
+
+        if not self.funcionario:
+            self.exibir_snack_bar(f"Funcionário com RG {rg} não encontrado.", ft.colors.RED)
+            return
+
+        # Criptografa a nova senha antes de salvar no banco
+        nova_senha_hash = self.hash_password(nova_senha)
+
+        # Atualiza a senha no banco de dados
+        sucesso = Funcionario.atualizar_senha(rg, nova_senha_hash)
+        if sucesso:
+            self.exibir_snack_bar("Senha atualizada com sucesso!", ft.colors.GREEN)
+        else:
+            self.exibir_snack_bar("Erro ao atualizar a senha.", ft.colors.RED)
+
+        # Fecha o diálogo após atualização
+        self.fechar_dialogo()
+
+    def exibir_snack_bar(self, mensagem, cor):
+        """
+        Exibe uma mensagem de feedback na tela.
+        :param mensagem: Mensagem a ser exibida no snackbar.
+        :param cor: Cor de fundo do snackbar.
+        """
+        snack_bar = ft.SnackBar(ft.Text(mensagem), bgcolor=cor)
+        self.page.overlay.append(snack_bar)
+        snack_bar.open = True
+        self.page.update()
+
+    def fechar_dialogo(self, e=None):
+        """
+        Fecha o diálogo aberto.
+        :param e: Evento de clique (opcional).
+        """
+        if self.dialog_atualizar:
+            self.dialog_atualizar.open = False
+        self.page.update()
+
+    def hash_password(self, password):
+        hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        return hashed

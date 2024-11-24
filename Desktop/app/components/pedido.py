@@ -66,7 +66,7 @@ class Pedido:
             query = '''SELECT
                             pe.id_pedido,
                             c.Nome AS Nome_Cliente,
-                            pe.Data_Pedido,
+                            FORMAT(pe.Data_Pedido, 'dd/MM/yyyy'),
                             pd.Produto,
                             i.Quantidade AS Quantidade_Produto,
                             pd.Previsao AS Previsao_Entrega,
