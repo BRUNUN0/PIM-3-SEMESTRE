@@ -22,6 +22,7 @@ class Funcionario:
         # return self.sessao.get('usuario_logado')
         print(f"Obtendo sessão: {self.sessao}")
         return self.sessao.get('usuario_logado')
+        
     
     def limpar_sessao(self):
         self.sessao.clear()
@@ -56,10 +57,10 @@ class Funcionario:
                             f.Sexo as sexo,
                             c.Cargo as cargo,
                             f.Senha as senha,
-                            FORMAT(f.Nascimento, 'dd-MM-yyyy') as nascimento,
+                            FORMAT(f.Nascimento, 'dd/MM/yyyy') as nascimento,
                             f.Email as email,
                             f.Setor as setor,
-                            FORMAT(hc.Data_Inicio, 'dd-MM-yyyy') as data_inicio
+                            FORMAT(hc.Data_Inicio, 'dd/MM/yyyy') as data_inicio
                         FROM
                             Funcionario f
                         INNER JOIN Cargo c ON f.fk_id_cargo = c.id_cargo
@@ -151,18 +152,11 @@ class Funcionario:
                         FROM
                             Funcionario f
                         WHERE
-                            f.RG = ?'''
-            self.banco.cursor.execute(query, (rg))
+                            f.RG = ? AND Senha = ?'''
+            self.banco.cursor.execute(query, (rg, senha_atual))
             dados = self.banco.cursor.fetchone()
-            if dados:
-                senha_hash = dados[0]  # A senha armazenada no banco
-                # Verifica se a senha atual corresponde ao que está no banco
-                if senha_hash == self.hash_password(senha_atual):
-                    return True
-                else:
-                    return False
-            return False
-
+            print(dados)
+            return True
         except Exception as e:
             print(f"Erro ao verificar RG e senha: {e}")
             return False
@@ -170,13 +164,13 @@ class Funcionario:
         finally:
             self.banco.fechar_conexao()
 
-    def atualizar_senha(self, rg, nova_senha_hash):
+    def atualizar_senha(self, rg, senha_atual, nova_senha):
         try:
             self.banco.conectar()
             query = ''' UPDATE Funcionario
                         SET Senha = ?
-                        WHERE RG = ?'''
-            self.banco.cursor.execute(query, (nova_senha_hash, rg))
+                        WHERE RG = ? AND Senha = ?'''
+            self.banco.cursor.execute(query, (nova_senha, rg, senha_atual))
             self.banco.cursor.commit()
             # Verifica se alguma linha foi afetada
             if self.banco.cursor.rowcount > 0:

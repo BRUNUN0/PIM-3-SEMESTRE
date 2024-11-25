@@ -54,6 +54,7 @@ CREATE TABLE Cargo (
 CREATE TABLE Funcionario (
     id_funcionario INT IDENTITY(1,1) PRIMARY KEY,
     Nome NVARCHAR(100),
+    RG VARCHAR(20),
     CPF CHAR(11),
     Sexo CHAR(1),
     fk_id_cargo INT,

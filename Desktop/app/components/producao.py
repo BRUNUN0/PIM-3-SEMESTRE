@@ -31,7 +31,7 @@ class Producao:
                 SELECT
                     id_plantio,
                     Plantio,
-                    Data_Inicio,
+                    FORMAT(Data_Inicio, 'dd/MM/yyyy'),
                     Nome,
                     Quantidade
                 FROM 

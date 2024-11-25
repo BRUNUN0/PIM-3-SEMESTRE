@@ -110,12 +110,13 @@ class Detalhes:
         
         dados = {
             "ID": detalhes[0],
-            "Plantio": detalhes[1],
-            "Descrição da Atividade": detalhes[2],
-            "Prioridade (1 a 3)": detalhes[3],
-            "Data": detalhes[4],
-            "Tempo": detalhes[5],
-            "Fase Atual": detalhes[6]
+            "Funcionario": detalhes[1],
+            "Plantio": detalhes[2],
+            "Data": detalhes[3],
+            "Descrição da Atividade": detalhes[4],
+            "Prioridade (1 a 3)": detalhes[5],
+            "Tempo": detalhes[6],
+            "Fase Atual": detalhes[7]
         }
         # Conteúdo do diálogo
         conteudo_dialog = [
@@ -252,14 +253,15 @@ class Detalhes:
         dados = {
             "ID": detalhes[0],
             "Nome": detalhes[1],
-            "CNPJ": detalhes[2],
-            "Email": detalhes[3],
-            "Rua": detalhes[4],
-            "Número": detalhes[5],
-            "Bairro": detalhes[6],
-            "CEP": detalhes[7],
-            "Cidade": detalhes[8],
-            "Estado": detalhes[9]
+            "Nome Fantasia": detalhes[2],
+            "CNPJ": detalhes[3],
+            "Email": detalhes[4],
+            "Rua": detalhes[5],
+            "Número": detalhes[6],
+            "Bairro": detalhes[7],
+            "CEP": detalhes[8],
+            "Cidade": detalhes[9],
+            "Estado": detalhes[10]
         }
 
         # Conteúdo do diálogo
@@ -565,7 +567,6 @@ class Detalhes:
         self.dialog.open = True
         self.page.update()
 
-
     def _alternar_modo_edicao(self, e, tipo_entidade):
         """Alterna o modo de edição dos campos e ajusta o botão de salvar para a entidade especificada."""
         self.em_edicao = not self.em_edicao
@@ -606,7 +607,6 @@ class Detalhes:
                 ft.ElevatedButton("Editar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=lambda e: self._alternar_modo_edicao(e, tipo_entidade=tipo_entidade))
             ]
         self.page.update()
-
 
     def salvar_alteracoes(self, e, tipo_entidade):
         dados_atualizados = {}
