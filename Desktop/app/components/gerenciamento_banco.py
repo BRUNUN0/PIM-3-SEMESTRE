@@ -646,7 +646,7 @@ class Cadastro:
         Função que converte as datas no dicionário para o formato 'YYYY-MM-DD'
         """
         for campo, valor in dados.items():
-            if campo in ["Data", "Data Inicio", "Data Fim", "Nascimento"]:  # Liste os campos de data
+            if campo in ["Data", "Data Pedido", "Data Inicio", "Data Fim", "Nascimento"]:  # Liste os campos de data
                 try:
                     # Tentativa de conversão para o formato esperado 'YYYY-MM-DD'
                     dados[campo] = datetime.strptime(valor, "%d-%m-%Y").strftime("%Y-%m-%d")
@@ -821,7 +821,7 @@ class Atualizar:
             title=ft.Text("Redefinir Senha", size=20, color=ft.colors.BLACK, weight="bold"),
             content=ft.Column([self.rg_input, self.senha_atual_input, self.nova_senha_input, self.confirma_nova_senha_input], tight=True, spacing=10),
             actions=[
-                ft.ElevatedButton("Atualizar", on_click=self.atualizar_senha),
+                ft.ElevatedButton("Atualizar", on_click=self.verifica_senha),
                 ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo)
             ],
             actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -831,7 +831,7 @@ class Atualizar:
         self.dialog_atualizar.open = True
         self.page.update()
 
-    def atualizar_senha(self, e):
+    def verifica_senha(self, e):
         from app.components.funcionario import Funcionario
         """
         Atualiza a senha do funcionário após validação dos campos.
