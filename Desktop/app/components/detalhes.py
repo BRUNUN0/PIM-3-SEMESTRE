@@ -4,7 +4,7 @@ from app.components.producao import Producao
 from app.components.pedido import Pedido
 from app.components.atividade import Atividade
 from app.components.cliente import Cliente
-from app.components.fornecedor import Fornecedor
+from app.components.Fornecedor import Fornecedor
 from app.components.estoque import Estoque
 from app.components.funcionario import Funcionario
 from app.components.gerenciamento_banco import GerenciamentoBanco
@@ -651,3 +651,5 @@ class Detalhes:
     def hash_password_sha256(self, password):
         hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
         return hashed
+    
+

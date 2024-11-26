@@ -868,3 +868,5 @@ class Atualizar:
     def hash_password(self, password):
         hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
         return hashed
+    
+    
