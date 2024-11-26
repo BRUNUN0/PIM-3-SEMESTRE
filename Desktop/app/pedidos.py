@@ -4,6 +4,10 @@ from app.components.gerenciamento_banco import GerenciamentoBanco, Cadastro
 from app.components.pedido import Pedido
 from app.components.detalhes import Detalhes
 
+from app.components.fornecedor import Fornecedor
+from app.components.estoque import Estoque
+from app.components.cliente import Cliente
+
 
 def Pedidos(page: ft.Page):
     page.title = "Pedidos"
@@ -277,7 +281,7 @@ def Pedidos(page: ft.Page):
                         )
                     ),
                     ft.Container(
-                        padding=ft.padding.only(left=50, right=50),
+                        padding=ft.padding.only(left=15, right=15),
 
                         content=ft.Row(
                             controls=[
@@ -344,6 +348,83 @@ def Pedidos(page: ft.Page):
         )
         return pedidos_finalizados
     
+    def clientes():
+
+        def cliente(id_cliente, nome, cnpj):
+            banco = GerenciamentoBanco()
+            detalhes = Detalhes(page, banco)
+
+            cliente = ft.Container(
+                bgcolor="#99C2A2",
+                border=ft.border.all(color=ft.colors.BLACK),
+                height=30,
+                border_radius=9,
+                padding=ft.padding.only(left=12, right=12),
+                on_click=lambda e: detalhes.detalhes_cliente(id_cliente),
+                
+                content=ft.Row(
+                    controls=[
+                        ft.Text(
+                            value=nome,
+                            color=ft.colors.BLACK,
+                            ),
+                        ft.Text(
+                            value=f"CNPJ: {cnpj}",
+                            color=ft.colors.BLACK,
+                            ),
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                )
+            )
+            
+            return cliente
+
+        banco = GerenciamentoBanco()
+        banco_fornecedores = Cliente(banco)
+        clientes = banco_fornecedores.obter_clientes()
+        
+        if clientes:
+            lista_fornecedores = [cliente(id_cliente, nome, cnpj) for id_cliente, nome, cnpj in clientes]
+        else:
+            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrato", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+
+        grupo = ft.Container(
+            expand=True,
+            content=ft.Column(
+                controls=[
+                    ft.Container(
+                        expand=True,
+                        width=750,
+                        bgcolor="#D6D6D6",
+                        border_radius=16,
+                        padding=ft.padding.only(left=15, right=15, bottom=10),
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='Clientes', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                                ft.Container(
+                                    expand=True,
+                                    bgcolor=ft.colors.WHITE,
+                                    padding=ft.padding.all(15),
+                                    border_radius=12,
+                                    content=ft.Column(
+                                        controls=
+                                        lista_fornecedores,
+                                        spacing=6,
+                                        scroll=ft.ScrollMode.AUTO
+                                    )
+
+                                )
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                        )
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+        )
+        return grupo
             
     def conteudo():
         conteudo = ft.Container(
@@ -354,7 +435,8 @@ def Pedidos(page: ft.Page):
                     ft.Row(
                         controls=[
                             pedidos_ativos(),
-                            pedidos_finalizados()
+                            pedidos_finalizados(),
+                            clientes()
                         ]
                     )
                 ]

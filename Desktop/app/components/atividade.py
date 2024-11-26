@@ -10,7 +10,7 @@ class Atividade:
             query = '''SELECT 
                         a.id_atividade,
                         p.Plantio AS nome_plantio,
-                        a.Data
+                        FORMAT(a.Data, 'dd/MM/yyyy')
                     FROM 
                         Atividade a
                     INNER JOIN 
@@ -32,6 +32,7 @@ class Atividade:
                         a.id_atividade,
                         f.nome AS nome_funcionario,
                         p.Plantio AS nome_plantio,
+						FORMAT(a.Data, 'dd/MM/yyyy') as data_inicio,
                         a.Descricao,
                         a.Prioridade,
                         a.Duracao,

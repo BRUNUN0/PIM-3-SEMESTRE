@@ -250,11 +250,11 @@ def Atividades(page: ft.Page):
                         ),
                     
                     ft.Text(
-                        value=nome,
+                        value=f"Plantio: {nome}",
                         color=ft.colors.BLACK
                         ),
                     ft.Text(
-                        value=data,
+                        value=f'Data: {data}',
                         color=ft.colors.BLACK
                     ),
                 ],

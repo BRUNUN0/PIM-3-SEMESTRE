@@ -11,7 +11,7 @@ def main(page: ft.Page):
     rotas(page)
     print(page.route)
 
-    page.go('/login')
+    page.go('/adm')
     # page.go('/adm/funcionarios')
     page.update()
 

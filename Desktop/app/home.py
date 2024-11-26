@@ -225,7 +225,7 @@ def Home(page: ft.Page):
         
         return AppBar
 
-    def pproducao(id_plantio, nome, imagem):
+    def pproducao(id_plantio, nome, quantidade):
         banco = GerenciamentoBanco()
         detalhes = Detalhes(page, banco)
 
@@ -251,12 +251,9 @@ def Home(page: ft.Page):
                         color=ft.colors.BLACK
                         ),
                     
-                    ft.Container(
-                        alignment=ft.alignment.center_right,
-                        content=ft.Image(
-                            src=imagem,
-                            width=30,
-                        )
+                    ft.Text(
+                        value=quantidade,
+                        color=ft.colors.BLACK
                     )
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -271,7 +268,7 @@ def Home(page: ft.Page):
         banco_producao = Producao(banco)
         producoes = banco_producao.obter_producao()
         if producoes:
-            lista_producao = [pproducao(id_plantio, nome, imagem) for  id_plantio, _, nome, _, imagem in producoes]
+            lista_producao = [pproducao(id_plantio, nome, quantidade) for  id_plantio, _, nome, quantidade, _ in producoes]
         else:
             lista_producao = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma produção em andamento", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER) )]
 

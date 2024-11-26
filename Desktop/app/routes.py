@@ -75,11 +75,14 @@ def rotas(page: ft.Page):
         print(page.route)
 
     page.on_route_change = route_change
-    
-    def on_resize(event):
-        # Aqui você pode colocar qualquer ação desejada quando a tela for redimensionada
-        # print(f"Nova largura: {page.window.width}, Nova altura: {page.window.height}")
-        page.update()
 
-    # Associa a função `on_resize` ao evento de redimensionamento da página
-    page.on_resized = on_resize
+
+class Rotas:
+    @staticmethod
+    def recarregar_pagina(page: ft.Page):
+        """
+        Recarrega a página atual chamando o método route_change diretamente.
+        """
+        if page.on_route_change:
+            page.on_route_change(page.route)  # Força a execução da lógica de rotas
+            print(f"Página recarregada: {page.route}")

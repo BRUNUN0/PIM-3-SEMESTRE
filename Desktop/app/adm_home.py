@@ -509,6 +509,4 @@ def AdminHome(page: ft.Page):
         )
     )
     
-    # page.on_resized = page.update()
-
     return Main

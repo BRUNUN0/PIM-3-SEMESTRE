@@ -31,7 +31,7 @@ class Producao:
                 SELECT
                     id_plantio,
                     Plantio,
-                    Data_Inicio,
+                    FORMAT(Data_Inicio, 'dd/MM/yyyy'),
                     Nome,
                     Quantidade
                 FROM 
@@ -58,6 +58,17 @@ class Producao:
                             FORMAT(Data_Inicio, 'MMM'), DATEPART(MONTH, Data_Inicio)
                         ORDER BY 
                             DATEPART(MONTH, Data_Inicio);'''
+            
+            ''' CONSULTA RESERVA
+            SELECT 
+                FORMAT(Data_Inicio, 'MMM') AS Mes, 
+                SUM(Quantidade) AS Total_Quantidade
+            FROM 
+                Producao
+            GROUP BY 
+                FORMAT(Data_Inicio, 'MMM'), DATEPART(MONTH, Data_Inicio)
+            ORDER BY 
+                DATEPART(MONTH, Data_Inicio);'''
             self.banco.cursor.execute(query)
             grafico = self.banco.cursor.fetchall()
             return grafico

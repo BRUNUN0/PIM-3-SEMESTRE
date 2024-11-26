@@ -106,8 +106,8 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == 'materia prima':
             try:
-                self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?, ?)}''',
-                (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"], dados["URL imagem (png)"])
+                self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?)}''',
+                (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"])
                 )
                 self.conn.commit()
                 return True, None
@@ -128,6 +128,7 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == 'iniciar producao':
             try:
+                print(dados)
                 self.cursor.execute('''{CALL IniciarProducao (?, ?, ?, ?, ?, ?)}''',
                 (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"])
                 )
@@ -196,8 +197,8 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == "novo produto":
             try:
-                self.cursor.execute('''INSERT INTO Produto (Produto, Previsao) VALUES (?, ?)''',
-                (dados["Novo produto"], dados["Previsao de entrega"])
+                self.cursor.execute('''INSERT INTO Produto (Produto, Quantidade, Previsao) VALUES (?, ?, ?)''',
+                (dados["Novo produto"], 0, dados["Previsao de entrega(dias)"])
                 )
                 self.conn.commit()
                 return True, None
@@ -242,17 +243,12 @@ class GerenciamentoBanco:
                 self.cursor.execute('''{CALL FinalizarPedido (?)}''', dados['ID do Pedido'])
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
             except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
+                # Captura a mensagem da stored procedure diretamente
+                error_message = str(e)
+                if "SQL Server]" in error_message:
+                    error_message = error_message.split("SQL Server]")[-1].strip()
+                print("Erro ao finalizar o pedido:", error_message)
                 return False, error_message
             finally:
                 self.fechar_conexao()
@@ -290,7 +286,7 @@ class Cadastro:
                 {"titulo": "Cargo", "campos": ["Cargo", "Descricao", "Salario", "Data Inicio"]}
             ],
             "materia prima": [
-                {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade", "URL imagem (png)"]}
+                {"titulo": "Informações da Compra", "campos": ["CNPJ Fornecedor", "Data", "Materia Prima", "Quantidade"]}
             ],
             "novo produto": [
                 {"titulo": "Informações do Produto", "campos": ["Novo produto", "Previsao de entrega(dias)"]}
@@ -298,6 +294,11 @@ class Cadastro:
         }
 
         grupos_campos = campos_por_tipo.get(self.tipo_cadastro, [])
+
+        self.campos_relevantes = [
+            campo for grupo in grupos_campos for campo in grupo["campos"]
+        ]
+
 
         conteudo_dialog = [
             ft.Row(
@@ -385,15 +386,11 @@ class Cadastro:
                 )
             )
         )
+        print(self.dados_salvos)
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
-
-        # Imprime todos os itens de self.inputs
-        # print("Conteúdo de self.inputs.items():")
-        # for campo, entrada in self.inputs.items():
-        #     print(f"{campo}: {entrada.value}")
  
     def abrir_registro(self, tipo_cadastro):
         """
@@ -423,6 +420,10 @@ class Cadastro:
 
         grupos_campos = campos_por_tipo.get(self.tipo_cadastro, [])
 
+        self.campos_relevantes = [
+            campo for grupo in grupos_campos for campo in grupo["campos"]
+        ]
+
         conteudo_dialog = [
             ft.Row(
                 controls=[
@@ -437,80 +438,102 @@ class Cadastro:
         self.itens_pedido = []
 
 
-        # Ao clicar para adicionar a data, ele abre o datepicker e permite selecionar a data, porém ao tentar confirmar ou cancelar, o mesmo entra em loop e não fecha a page do datepicker.
+        def criar_campo(nome_campo):
+            if nome_campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim"):
+                campo_texto = ft.TextField(label=nome_campo, read_only=True, width=200)
+                botao_calendario = ft.IconButton(
+                    icon=ft.icons.CALENDAR_TODAY,
+                    tooltip=f"Selecionar {nome_campo}",
+                    on_click=lambda e, dest=campo_texto: abrir_datepicker(e, dest)
+                )
+                self.inputs[nome_campo] = campo_texto
+                return ft.Row(
+                    controls=[campo_texto, botao_calendario],
+                    alignment=ft.MainAxisAlignment.START
+                )
+            elif nome_campo == "Duração":
+                campo_texto = ft.TextField(label=nome_campo, read_only=True, width=200)
+                botao_relogio = ft.IconButton(
+                    icon=ft.icons.ACCESS_TIME,
+                    tooltip=f"Selecionar {nome_campo}",
+                    on_click=lambda e, dest=campo_texto: abrir_timepicker(e, dest)
+                )
+                self.inputs[nome_campo] = campo_texto
+                return ft.Row(
+                    controls=[campo_texto, botao_relogio],
+                    alignment=ft.MainAxisAlignment.START
+                )
+            else:
+                campo_texto = ft.TextField(label=nome_campo, color=ft.colors.BLACK, width=250)
+                self.inputs[nome_campo] = campo_texto
+                return campo_texto
+
+        # Função para abrir o DatePicker
+        def abrir_datepicker(e, campo_destino):
+            self.page.dialog = ft.DatePicker(
+                on_change=lambda event: on_date_selected(event, campo_destino),
+                cancel_text="Cancelar",
+                confirm_text="Confirmar"
+            )
+            self.page.dialog.open = True
+            self.page.update()
+
+        # Função para abrir o TimePicker
+        def abrir_timepicker(e, campo_destino):
+            self.page.dialog = ft.TimePicker(
+                on_change=lambda event: on_time_selected(event, campo_destino),
+                cancel_text="Cancelar",
+                confirm_text="Confirmar"
+            )
+            self.page.dialog.open = True
+            self.page.update()
+
+        # Função chamada ao selecionar uma data
+        def on_date_selected(event, campo_destino):
+            try:
+                data = datetime.strptime(event.data.split('T')[0], '%Y-%m-%d')
+                campo_destino.value = data.strftime('%d-%m-%Y')
+            except Exception as e:
+                print(f"Erro ao selecionar a data: {e}")
+            self.page.dialog.open = False
+            self.page.update()
+
+        # Função chamada ao selecionar uma hora
+        def on_time_selected(event, campo_destino):
+            try:
+                tempo = event.data
+                campo_destino.value = tempo
+            except Exception as e:
+                print(f"Erro ao selecionar o tempo: {e}")
+            self.page.dialog.open = False
+            self.page.update()
+
+        # Itera pelos grupos e organiza os campos em colunas
         for grupo in grupos_campos:
             conteudo_dialog.append(ft.Text(grupo["titulo"], size=16, weight="bold", color=ft.colors.GREY))
             campos = grupo["campos"]
 
-            for campo in campos:
-                if campo in ("Data", "Data Pedido", "Data Inicio", "Data Fim", "Nascimento"):  # Verifica se o campo é "Data"
-                    date_field_flag = {"is_open": False}  # Flag para controlar a abertura
-
-                    def pegar_data(e, campo=campo):
-                        if not date_field_flag["is_open"]:
-                            date_field_flag["is_open"] = True
-                            self.page.open(
-                                ft.DatePicker(
-                                    cancel_text='Cancelar',
-                                    confirm_text='Confirmar',
-                                    error_format_text='Data inválida',
-                                    field_hint_text='MM/DD/YYYY',
-                                    help_text='Selecione uma data no calendário',
-                                    date_picker_entry_mode=ft.DatePickerEntryMode.CALENDAR_ONLY,
-                                    on_change=lambda e: (
-                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%Y-%m-%d')),
-                                        self.dialog.update(),
-                                    ),
-                                )
-                            )
-
-                    date_field = ft.TextField(
-                        label=campo,
-                        width=250,
-                        read_only=True,  # Apenas exibição
-                        on_focus=pegar_data
-                    )
-                    self.inputs[campo] = date_field
-                elif campo == "Duração":
-                    time_field_flag = {"is_open": False}
-
-                    def pegar_hora(e, campo=campo):
-                        if not time_field_flag["is_open"]:
-                            time_field_flag["is_open"] = True
-                            self.page.open(
-                                ft.TimePicker(
-                                    cancel_text='Cancelar',
-                                    confirm_text='Confirmar',
-                                    error_invalid_text='Hora inválida',
-                                    hour_label_text='Hora',
-                                    minute_label_text='Minutos',
-                                    help_text='Selecione o tempo de duração da atividade',
-                                    # value=0,
-                                    on_change=lambda e: (
-                                        setattr(self.inputs[campo], 'value', e.control.value.strftime('%H:%M:%S')),
-                                        self.dialog.update()
-                                    )
-
-                                )
-                            )
-                    time_field = ft.TextField(
-                        label=campo,
-                        width=250,
-                        read_only=True,
-                        on_focus=pegar_hora
-                    )
-                    self.inputs[campo] = time_field
-                else:
-                    # Cria campos normais
-                    self.inputs[campo] = ft.TextField(label=campo, color=ft.colors.BLACK, width=250)
-
+            linhas = []
             for i in range(0, len(campos), 2):
-                linha = ft.Row(
-                    controls=[self.inputs[campos[j]] for j in range(i, min(i + 2, len(campos)))],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                )
-                conteudo_dialog.append(linha)
+                linha = []
+                linha.append(criar_campo(campos[i]))
+                if i + 1 < len(campos):
+                    linha.append(criar_campo(campos[i + 1]))
+                linhas.append(ft.Row(controls=linha, alignment=ft.MainAxisAlignment.START))
 
+            conteudo_dialog.extend(linhas)
+
+        # Botão de salvar
+        conteudo_dialog.append(
+            ft.Row(
+                controls=[
+                    ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
+                ],
+                alignment=ft.MainAxisAlignment.END
+            )
+        )
+
+        # Criar o diálogo
         self.dialog = ft.AlertDialog(
             bgcolor=ft.colors.WHITE,
             modal=True,
@@ -521,23 +544,24 @@ class Cadastro:
                     alignment=ft.MainAxisAlignment.START,
                     scroll=ft.ScrollMode.AUTO
                 )
-            ),
-            actions=[
-                ft.ElevatedButton("Salvar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self._salvar_dados)
-
-            ]
+            )
         )
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()
 
-    def _salvar_dados(self, e):
+    def _salvar_dados(self, e): 
         from app.components.validacao import Validacao
 
-        campos_invalidos = [campo for campo, entrada in self.inputs.items() if not entrada.value.strip()]
+        # Filtra os campos que são obrigatórios para o tipo de cadastro atual
+        campos_invalidos = [
+            campo for campo, entrada in self.inputs.items()
+            if not entrada.value.strip() and campo in self.campos_relevantes
+        ]
+
         if campos_invalidos:
-            # Exibe mensagem de erro se houver campos vazios
+            # Exibe a mensagem de erro de acordo com os campos faltantes
             snackbar = ft.SnackBar(
                 content=ft.Text(f"Os campos {', '.join(campos_invalidos)} não podem estar vazios!"),
                 bgcolor=ft.colors.RED
@@ -552,20 +576,20 @@ class Cadastro:
         self.dados_salvos = {campo: entrada.value for campo, entrada in self.inputs.items()}
 
         # Valida o CPF antes de continuar
-        cpf = self.dados_salvos.get("CPF", "")
-        if not Validacao.validar_cpf(cpf):
-            snackbar = ft.SnackBar(
-                content=ft.Text("CPF inválido. Por favor, insira um CPF válido."),
-                bgcolor=ft.colors.RED
-            )
-            self.page.overlay.append(snackbar)
-            snackbar.open = True
-            self.page.update()
-            return
+        if "CPF" in self.dados_salvos:
+            cpf = self.dados_salvos["CPF"]
+            if not Validacao.validar_cpf(cpf):  # Valida o formato do CPF
+                snackbar = ft.SnackBar(
+                    content=ft.Text("CPF inválido. Por favor, insira um CPF válido."),
+                    bgcolor=ft.colors.RED
+                )
+                self.page.overlay.append(snackbar)
+                snackbar.open = True
+                self.page.update()
+                return
         # Verificação do campo "Senha" e aplica hash
         if "Senha" in self.dados_salvos and self.dados_salvos["Senha"]:
             self.dados_salvos["Senha"] = self.hash_password(self.dados_salvos["Senha"])
-
 
         self.dados_salvos = self.converter_datas(self.dados_salvos)
 
@@ -573,10 +597,12 @@ class Cadastro:
         self.dialog.open = False
         self.page.update()
 
+
         # Insere os dados no banco e mostra o snackbar
         self.inserir_banco()
 
     def inserir_banco(self):
+        from app.routes import Rotas
         banco = GerenciamentoBanco()
         sucesso, error_message = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
 
@@ -584,12 +610,13 @@ class Cadastro:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),
                 bgcolor=ft.colors.GREEN,
-                duration=3000
+                duration=3000   
             )
             self.page.overlay.append(snackbar)
             snackbar.open = True
             self.page.update()
             self.dados_salvos = None  # Limpa os dados salvos
+            Rotas.recarregar_pagina(self.page)
         else:
             # Exibe um snackbar de erro
             snackbar = ft.SnackBar(
@@ -601,12 +628,15 @@ class Cadastro:
             snackbar.open = True
             self.page.update()
             self.dados_salvos = None
+            Rotas.recarregar_pagina(self.page)
 
     def _fechar_dialog(self, e):
+        from app.routes import Rotas
         # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()
-
+        Rotas.recarregar_pagina(self.page)
+        
     def hash_password(self, password):
         """
         Recebe uma senha e retorna o hash com um salt.
@@ -621,7 +651,7 @@ class Cadastro:
         Função que converte as datas no dicionário para o formato 'YYYY-MM-DD'
         """
         for campo, valor in dados.items():
-            if campo in ["Data", "Data Inicio", "Data Fim", "Nascimento"]:  # Liste os campos de data
+            if campo in ["Data", "Data Pedido", "Data Inicio", "Data Fim", "Nascimento"]:  # Liste os campos de data
                 try:
                     # Tentativa de conversão para o formato esperado 'YYYY-MM-DD'
                     dados[campo] = datetime.strptime(valor, "%d-%m-%Y").strftime("%Y-%m-%d")
@@ -729,6 +759,7 @@ class Excluir:
 
     def excluir_registro(self, e, id_para_excluir):
         from app.components.estoque import Estoque
+        from app.routes import Rotas
         """
         Realiza a exclusão do registro com base no tipo de entidade e ID fornecido.
         :param e: Evento de clique.
@@ -747,8 +778,10 @@ class Excluir:
 
         if resultado is True:
             snack_bar = ft.SnackBar(ft.Text(f"{self.tipo_entidade.capitalize()} com ID {id_para_excluir} excluído com sucesso!"), bgcolor=ft.colors.GREEN)
+            Rotas.recarregar_pagina(self.page)
         else:
             snack_bar = ft.SnackBar(ft.Text(f"Erro ao excluir {self.tipo_entidade.capitalize()} com ID {id_para_excluir}!"), bgcolor=ft.colors.RED)
+            Rotas.recarregar_pagina(self.page)
 
         self.page.overlay.append(snack_bar)
         snack_bar.open = True
@@ -756,6 +789,7 @@ class Excluir:
         self.page.update()
 
     def fechar_dialogo(self, e=None):
+        from app.routes import Rotas
         """
         Fecha qualquer diálogo aberto.
         :param e: Evento de clique (opcional).
@@ -765,6 +799,7 @@ class Excluir:
         if self.dialog_confirmacao:
             self.dialog_confirmacao.open = False
         self.page.update()
+        Rotas.recarregar_pagina(self.page)
 
 class Atualizar:
     def __init__(self, page):
@@ -796,7 +831,7 @@ class Atualizar:
             title=ft.Text("Redefinir Senha", size=20, color=ft.colors.BLACK, weight="bold"),
             content=ft.Column([self.rg_input, self.senha_atual_input, self.nova_senha_input, self.confirma_nova_senha_input], tight=True, spacing=10),
             actions=[
-                ft.ElevatedButton("Atualizar", on_click=self.atualizar_senha),
+                ft.ElevatedButton("Atualizar", on_click=self.verifica_senha),
                 ft.ElevatedButton("Cancelar", color=ft.colors.WHITE, bgcolor="#13330D", on_click=self.fechar_dialogo)
             ],
             actions_alignment=ft.MainAxisAlignment.SPACE_BETWEEN
@@ -806,7 +841,7 @@ class Atualizar:
         self.dialog_atualizar.open = True
         self.page.update()
 
-    def atualizar_senha(self, e):
+    def verifica_senha(self, e):
         from app.components.funcionario import Funcionario
         """
         Atualiza a senha do funcionário após validação dos campos.
@@ -816,27 +851,41 @@ class Atualizar:
         nova_senha = self.nova_senha_input.value.strip()
         confirma_nova_senha = self.confirma_nova_senha_input.value.strip()
 
+        print(f'RG do Funcionario: {rg}')
+        print(f'Senha Atual: {senha_atual}')
+        print(f'Nova senha: {nova_senha}')
+        print(f'Confirma Nova Senha: {confirma_nova_senha}')
+
         # Validações
         if not rg or not senha_atual or not nova_senha or not confirma_nova_senha:
             self.exibir_snack_bar("Todos os campos devem ser preenchidos.", ft.colors.RED)
             return
+        print('Todos os campos preenchidos')
 
         if nova_senha != confirma_nova_senha:
             self.exibir_snack_bar("A nova senha e a confirmação não coincidem.", ft.colors.RED)
             return
+        print('Nova senha confirmada')
+        print('Iniciando verificação do RG e Senha no banco de dados')
 
+        banco = GerenciamentoBanco()
+        funcionario = Funcionario(banco)
+
+        senha_atual_hash = self.hash_password(senha_atual)
         # Consulta o funcionário pelo RG
-        self.funcionario = Funcionario.verifica_rg_senha(rg, senha_atual)
+        self.verificacao = funcionario.verifica_rg_senha(rg, senha_atual_hash)
 
-        if not self.funcionario:
+        if not self.verificacao:
             self.exibir_snack_bar(f"Funcionário com RG {rg} não encontrado.", ft.colors.RED)
             return
+        print('Verificação realizada com sucesso')
 
         # Criptografa a nova senha antes de salvar no banco
         nova_senha_hash = self.hash_password(nova_senha)
+        print(f'Nova senha a ser cadastrada: {nova_senha_hash}')
 
         # Atualiza a senha no banco de dados
-        sucesso = Funcionario.atualizar_senha(rg, nova_senha_hash)
+        sucesso = funcionario.atualizar_senha(rg, senha_atual_hash, nova_senha_hash)
         if sucesso:
             self.exibir_snack_bar("Senha atualizada com sucesso!", ft.colors.GREEN)
         else:
@@ -857,6 +906,7 @@ class Atualizar:
         self.page.update()
 
     def fechar_dialogo(self, e=None):
+        from app.routes import Rotas
         """
         Fecha o diálogo aberto.
         :param e: Evento de clique (opcional).
@@ -864,6 +914,7 @@ class Atualizar:
         if self.dialog_atualizar:
             self.dialog_atualizar.open = False
         self.page.update()
+        Rotas.recarregar_pagina(self.page)
 
     def hash_password(self, password):
         hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()

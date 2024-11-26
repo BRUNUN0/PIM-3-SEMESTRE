@@ -6,6 +6,7 @@ from app.components.gerenciamento_banco import GerenciamentoBanco, Cadastro
 from app.components.producao import Producao
 from app.components.estoque import Estoque
 from app.components.detalhes import Detalhes
+from app.components.fornecedor import Fornecedor
 
 
 def Plantacao(page: ft.Page):
@@ -233,7 +234,7 @@ def Plantacao(page: ft.Page):
         return AppBar
 
 
-    def materia(id, nome, quantidade, url):
+    def materia(id, nome, quantidade):
         materia_prima = ft.Container(
             bgcolor="#99C2A2",
             border=ft.border.all(color=ft.colors.BLACK),
@@ -256,14 +257,6 @@ def Plantacao(page: ft.Page):
                         value=quantidade,
                         color=ft.colors.BLACK
                     ),
-                    ft.Container(
-                        alignment=ft.alignment.center_right,
-                        
-                        content=ft.Image(
-                            src=url,
-                            width=30,
-                        )
-                    )
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             )
@@ -277,7 +270,7 @@ def Plantacao(page: ft.Page):
 
         materia_prima_data = banco_materias.obter_materia_prima()
         if materia_prima_data:
-            lista_materias_primas = [materia(id, nome, quantidade, url) for id, nome, quantidade, url in materia_prima_data]
+            lista_materias_primas = [materia(id, nome, quantidade) for id, nome, quantidade, _ in materia_prima_data]
         else:
             lista_materias_primas = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhuma materia prima encontrada", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
         estoque_mater_prima = ft.Container(
@@ -381,6 +374,36 @@ def Plantacao(page: ft.Page):
 
     def grupo():
 
+        def fornecedor(id_fornecedor, nome, cnpj):
+            # Cria um objeto de detalhes (presumivelmente, para exibir mais informações sobre o fornecedor)
+            banco = GerenciamentoBanco()
+            detalhes = Detalhes(page, banco)
+
+            # Cria o contêiner que vai representar o fornecedor.    
+            fornecedor = ft.Container(
+                bgcolor="#99C2A2",
+                border=ft.border.all(color=ft.colors.BLACK),
+                height=30,
+                border_radius=9,
+                padding=ft.padding.only(left=12, right=12),
+                
+                content=ft.Row(
+                    controls=[
+                        ft.Text(
+                            value=nome,
+                            color=ft.colors.BLACK,
+                            ),
+                        ft.Text(
+                            value=f"CNPJ: {cnpj}",
+                            color=ft.colors.BLACK,
+                            ),
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                )
+            )
+            
+            return fornecedor
+
         def produto(id, nome, quantidade):
             plantados = ft.Container(
                 bgcolor="#99C2A2",
@@ -416,6 +439,13 @@ def Plantacao(page: ft.Page):
             lista_produtos = [produto(id, nome, quantidade) for id, nome, quantidade, _ in produtos]
         else:
             lista_produtos = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum produto encontrado", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
+        banco_fornecedores = Fornecedor(banco)
+        fornecedores = banco_fornecedores.obter_fornecedores()
+        
+        if fornecedores:
+            lista_fornecedores = [fornecedor(id_fornecedor, nome, cnpj) for id_fornecedor, nome, cnpj in fornecedores]
+        else:
+            lista_fornecedores = [ft.Container(expand=True, content=ft.Row(controls=[ft.Text(value="Nenhum fornecedor encontrato", color=ft.colors.BLACK)],alignment=ft.MainAxisAlignment.CENTER))]
 
         grupo = ft.Container(
             expand=True,
@@ -447,65 +477,31 @@ def Plantacao(page: ft.Page):
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER
                         )
                     ),
-                    ft.Row(
-                        height=100,
-                        spacing=10,
-                        controls=[
-                            ft.Container(
-                                expand=True,
-                                bgcolor="#D9FFBA",
-                                border_radius=16,
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(value='Valor', color=ft.colors.BLACK)
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    ft.Container(
+                        expand=True,
+                        width=750,
+                        bgcolor="#D6D6D6",
+                        border_radius=16,
+                        padding=ft.padding.only(left=15, right=15, bottom=10),
+                        content=ft.Column(
+                            controls=[
+                                ft.Text(value='Fornecedores', size=20, color=ft.colors.BLACK, weight=ft.FontWeight.BOLD),
+                                ft.Container(
+                                    expand=True,
+                                    bgcolor=ft.colors.WHITE,
+                                    padding=ft.padding.all(15),
+                                    border_radius=12,
+                                    content=ft.Column(
+                                        controls=
+                                        lista_fornecedores,
+                                        spacing=6,
+                                        scroll=ft.ScrollMode.AUTO
+                                    )
+
                                 )
-                            ),
-                            ft.Container(
-                                expand=True,
-                                bgcolor="#D9FFBA",
-                                border_radius=16,
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(value='Valor', color=ft.colors.BLACK)
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            )
-                        ]
-                    ),
-                    ft.Row(
-                        height=100,
-                        spacing=10,
-                        controls=[
-                            ft.Container(
-                                expand=True,
-                                bgcolor="#D9FFBA",
-                                border_radius=16,
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(value='Valor', color=ft.colors.BLACK)
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.Container(
-                                expand=True,
-                                bgcolor="#D9FFBA",
-                                border_radius=16,
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Text(value='Valor', color=ft.colors.BLACK)
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            )
-                        ]
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                        )
                     ),
                     ft.Row(
                         height=50,
