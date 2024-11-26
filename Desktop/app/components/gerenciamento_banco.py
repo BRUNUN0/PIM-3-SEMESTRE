@@ -197,8 +197,8 @@ class GerenciamentoBanco:
 
         elif tipo_cadastro == "novo produto":
             try:
-                self.cursor.execute('''INSERT INTO Produto (Produto, Previsao) VALUES (?, ?)''',
-                (dados["Novo produto"], dados["Previsao de entrega"])
+                self.cursor.execute('''INSERT INTO Produto (Produto, Quantidade, Previsao) VALUES (?, ?, ?)''',
+                (dados["Novo produto"], 0, dados["Previsao de entrega(dias)"])
                 )
                 self.conn.commit()
                 return True, None
@@ -386,6 +386,7 @@ class Cadastro:
                 )
             )
         )
+        print(self.dados_salvos)
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
@@ -550,7 +551,7 @@ class Cadastro:
         self.dialog.open = True
         self.page.update()
 
-    def _salvar_dados(self, e):
+    def _salvar_dados(self, e): 
         from app.components.validacao import Validacao
 
         # Filtra os campos que são obrigatórios para o tipo de cadastro atual
@@ -596,12 +597,12 @@ class Cadastro:
         self.dialog.open = False
         self.page.update()
 
-        print(self.dados_salvos)
 
         # Insere os dados no banco e mostra o snackbar
         self.inserir_banco()
 
     def inserir_banco(self):
+        from app.routes import Rotas
         banco = GerenciamentoBanco()
         sucesso, error_message = banco.cadastro(self.tipo_cadastro, self.dados_salvos)
 
@@ -609,12 +610,13 @@ class Cadastro:
             snackbar = ft.SnackBar(
                 content=ft.Text("Cadastro realizado com sucesso!"),
                 bgcolor=ft.colors.GREEN,
-                duration=3000
+                duration=3000   
             )
             self.page.overlay.append(snackbar)
             snackbar.open = True
             self.page.update()
             self.dados_salvos = None  # Limpa os dados salvos
+            Rotas.recarregar_pagina(self.page)
         else:
             # Exibe um snackbar de erro
             snackbar = ft.SnackBar(
@@ -626,12 +628,15 @@ class Cadastro:
             snackbar.open = True
             self.page.update()
             self.dados_salvos = None
+            Rotas.recarregar_pagina(self.page)
 
     def _fechar_dialog(self, e):
+        from app.routes import Rotas
         # Fecha o diálogo sem salvar
         self.dialog.open = False
         self.page.update()
-
+        Rotas.recarregar_pagina(self.page)
+        
     def hash_password(self, password):
         """
         Recebe uma senha e retorna o hash com um salt.
@@ -754,6 +759,7 @@ class Excluir:
 
     def excluir_registro(self, e, id_para_excluir):
         from app.components.estoque import Estoque
+        from app.routes import Rotas
         """
         Realiza a exclusão do registro com base no tipo de entidade e ID fornecido.
         :param e: Evento de clique.
@@ -772,8 +778,10 @@ class Excluir:
 
         if resultado is True:
             snack_bar = ft.SnackBar(ft.Text(f"{self.tipo_entidade.capitalize()} com ID {id_para_excluir} excluído com sucesso!"), bgcolor=ft.colors.GREEN)
+            Rotas.recarregar_pagina(self.page)
         else:
             snack_bar = ft.SnackBar(ft.Text(f"Erro ao excluir {self.tipo_entidade.capitalize()} com ID {id_para_excluir}!"), bgcolor=ft.colors.RED)
+            Rotas.recarregar_pagina(self.page)
 
         self.page.overlay.append(snack_bar)
         snack_bar.open = True
@@ -781,6 +789,7 @@ class Excluir:
         self.page.update()
 
     def fechar_dialogo(self, e=None):
+        from app.routes import Rotas
         """
         Fecha qualquer diálogo aberto.
         :param e: Evento de clique (opcional).
@@ -790,6 +799,7 @@ class Excluir:
         if self.dialog_confirmacao:
             self.dialog_confirmacao.open = False
         self.page.update()
+        Rotas.recarregar_pagina(self.page)
 
 class Atualizar:
     def __init__(self, page):
@@ -896,6 +906,7 @@ class Atualizar:
         self.page.update()
 
     def fechar_dialogo(self, e=None):
+        from app.routes import Rotas
         """
         Fecha o diálogo aberto.
         :param e: Evento de clique (opcional).
@@ -903,6 +914,7 @@ class Atualizar:
         if self.dialog_atualizar:
             self.dialog_atualizar.open = False
         self.page.update()
+        Rotas.recarregar_pagina(self.page)
 
     def hash_password(self, password):
         hashed = hashlib.sha256(password.encode('utf-8')).hexdigest()
