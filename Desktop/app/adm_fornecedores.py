@@ -3,7 +3,7 @@ import datetime
 from app.components.gerenciamento_banco import Cadastro, GerenciamentoBanco
 from app.components.dialogs import ConfirmationDialog
 from app.components.detalhes import Detalhes
-from app.components.Fornecedor import Fornecedor
+from app.components.fornecedor import Fornecedor
 
 # Função principal que configura a interface da página de administração de fornecedores.
 def AdminFornecedores(page: ft.Page):
