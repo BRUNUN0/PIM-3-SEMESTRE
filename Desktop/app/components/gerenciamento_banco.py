@@ -253,7 +253,6 @@ class GerenciamentoBanco:
             finally:
                 self.fechar_conexao()
 
-
 class Cadastro:
     def __init__(self, page):
         """
@@ -800,17 +799,6 @@ class Excluir:
             self.dialog_confirmacao.open = False
         self.page.update()
         Rotas.recarregar_pagina(self.page)
-
-    # ====== Classe de Texte =======
-
-    def excluir_func_cli(self, cnpj):
-        gg = GerenciamentoBanco
-        tabelas = ['Cliente', 'Fornecedor']
-        with gg.conectar() as conn:
-            for tabela in tabelas:
-                comando = f"DELETE FROM {tabela} WHERE CNPJ = '{cnpj}'"
-                conn.execute(comando)
-                print(f"Registro excluído de {tabela}")
 
 
 

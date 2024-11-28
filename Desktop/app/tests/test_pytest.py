@@ -6,13 +6,32 @@ from unittest.mock import Mock, patch
 from app.components.detalhes import Detalhes
 from flet import app, Page, Text
 
+class bd:
+    def __init__(self, gerenciamento_banco: GerenciamentoBanco):
+        self.banco = gerenciamento_banco
+        self.sessao = {}
+
+
+def excluir_func_cli(cnpj):
+    gg = GerenciamentoBanco
+    tabelas = ['Cliente', 'Fornecedor']
+    conn = gg.conectar()
+    for tabela in tabelas:
+        comando = f"DELETE FROM {tabela} WHERE CNPJ = '{cnpj}'"
+        conn.execute(comando)
+        print(f"Registro excluído de {tabela}")
 
 # ========= Testes =========
 
+@pytest.fixture
+def page():
+    page = ft.Page()
+    return page
 
 @pytest.fixture
 def gbd():
     gbd = GerenciamentoBanco()
+    return gbd
     # Configura um banco de dados de teste
 
 
@@ -29,12 +48,9 @@ def test_hash_password_sha256():
     # Senhas de teste
     senhas = ["senha123", "senhaforte", "123456"]
 
-    # Gera os hashes
     hashes = [detalhes.hash_password_sha256(senha) for senha in senhas]
-
     # Verifica se todos os hashes são diferentes
     assert len(set(hashes)) == len(senhas)
-
     # Verifica se o hash da primeira senha é gerado consistentemente
     primeiro_hash = detalhes.hash_password_sha256(senhas[0])
     assert primeiro_hash == hashes[0]
@@ -49,9 +65,10 @@ def test_hash_password_sha256():
     # ... outros casos de teste
 ])
 def test_cadastro(gbd, tipo_cadastro, dados, resultado_esperado, mensagem_esperada):
-    gbd = Excluir()
+    gbd = GerenciamentoBanco()
     resultado, mensagem = gbd.cadastro(tipo_cadastro, dados)
-    gbd.excluir_func_cli(cnpj = '34567890001155')
+    ex = Excluir()
+    ex.excluir_registro()
     assert resultado == resultado_esperado
     assert mensagem == mensagem_esperada
 
