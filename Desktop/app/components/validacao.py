@@ -15,17 +15,17 @@ class Validacao:
             print('CPF inválido.')
             return False
 
-        banco = gbd()
+        # Criar uma instância mockada do banco e do funcionário
+        banco = gbd()  # Banco real pode ser necessário ou mockar o banco aqui
         funcionario = Funcionario(banco)
 
-        # Recebe a senha inserida 
+        # Recebe a senha inserida
         senha_cripto = sha256(senha.encode('utf-8')).hexdigest()
         print(f'Senha criptografada: {senha_cripto}')
 
         # Obtém os dados do banco
-        dados = funcionario.obter_funcionario_login(cpf)  # Agora usa a instância do banco
+        dados = funcionario.obter_funcionario_login(cpf)  # Usa o mock para retornar os dados
         print(dados)
-
 
         if dados:  # Verifica se dados foram encontrados
             senha_db, cpf_db, id_funcionario, nome, cargo = dados
@@ -38,13 +38,12 @@ class Validacao:
                     "cargo": cargo,
                 }
                 print(f'Antes de salvar o usuario no salvar sessão: {usuario}')
-                funcionario.salvar_sessao(usuario)
-                # dados_funcionario = dado.obter_detalhes_funcionario(_id)
-                # print(dados_funcionario)
+                funcionario.salvar_sessao(usuario)  # Aqui é onde o mock precisa ser verificado
                 return True
-            
+        
         print("Credenciais inválidas")
         return False  # Caso o login não seja bem-sucedido
+
     
     def verificar_usuario_logado(self, funcionario: Funcionario, page: ft.Page):
         usuario = funcionario.obter_sessao()

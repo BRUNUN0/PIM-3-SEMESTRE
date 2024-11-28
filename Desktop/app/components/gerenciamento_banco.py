@@ -34,224 +34,87 @@ class GerenciamentoBanco:
 
     def cadastro(self, tipo_cadastro, dados): 
         self.conectar()
-        if tipo_cadastro == 'fornecedor':
-            try:
-                self.cursor.execute(
-                    '''{CALL InserirFornecedor (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''', 
-                        (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Telefone'], dados['Rua'], dados['Número'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
-                        )
+        
+        try:
+            if tipo_cadastro == 'fornecedor':
+                self.cursor.execute('''{CALL InserirFornecedor (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''', 
+                    (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Telefone'], 
+                    dados['Rua'], dados['Número'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado']))
                 self.conn.commit()
                 print("Fornecedor inserido com sucesso.")
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
             
-        elif tipo_cadastro == 'cliente':
-            try:
-                self.cursor.execute(
-                    '''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado'])
-                    )
+            elif tipo_cadastro == 'cliente':
+                self.cursor.execute('''{CALL InserirCliente (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados['Nome Fantasia'], dados['CNPJ'], dados['Email'], dados['Rua'], dados['Numero'], 
+                    dados['Bairro'], dados['CEP'], dados['Cidade'], dados['Estado']))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
-        
-        elif tipo_cadastro == 'funcionario':
-            try:
-                self.cursor.execute(
-                    '''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
-                    (dados['Nome'], dados["RG"], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data Inicio'])
-                )
-                self.conn.commit()
-                return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-        elif tipo_cadastro == 'materia prima':
-            try:
+            elif tipo_cadastro == 'funcionario':
+                self.cursor.execute('''{CALL CadastrarFuncionario (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}''',
+                    (dados['Nome'], dados["RG"], dados['CPF'], dados['Sexo'], dados['Cargo'], dados['Descricao'], dados['Salario'], 
+                    dados['Senha'], dados['Nascimento'], dados['Email'], dados['Setor'], dados['Data Inicio']))
+                self.conn.commit()
+                return True, None
+
+            elif tipo_cadastro == 'materia prima':
                 self.cursor.execute('''{CALL RegistrarCompra (?, ?, ?, ?)}''',
-                (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"])
-                )
+                    (dados["CNPJ Fornecedor"], dados["Data"], dados["Materia Prima"], dados["Quantidade"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-        elif tipo_cadastro == 'iniciar producao':
-            try:
-                print(dados)
+            elif tipo_cadastro == 'iniciar producao':
                 self.cursor.execute('''{CALL IniciarProducao (?, ?, ?, ?, ?, ?)}''',
-                (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"])
-                )
+                    (dados["Nome Produção"], dados["ID Matéria Prima"], dados["Produto Final"], dados["Quantidade"], dados["Data Inicio"], dados["Fase Atual"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-        elif tipo_cadastro == 'finalizar producao':
-            try:
+            elif tipo_cadastro == 'finalizar producao':
                 self.cursor.execute('''{CALL Finaliza_Producao (?, ?)}''',
-                (dados["ID Plantio"], dados["Data Fim"])
-                )
+                    (dados["ID Plantio"], dados["Data Fim"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-                
-        elif tipo_cadastro == 'atividade':
-            try:
-                print(dados)
+            elif tipo_cadastro == 'atividade':
                 self.cursor.execute('''{CALL RegistrarAtividade (?, ?, ?, ?, ?, ?, ?)}''',
-                (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Data"], dados["Duração"], dados["Fase Atual"])
-                )
+                    (dados["Nome do Funcionario"], dados["Nome Plantio"], dados["Descrição"], dados["Prioridade(1 a 3)"], dados["Data"], dados["Duração"], dados["Fase Atual"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-        elif tipo_cadastro == "novo produto":
-            try:
+            elif tipo_cadastro == "novo produto":
                 self.cursor.execute('''INSERT INTO Produto (Produto, Quantidade, Previsao) VALUES (?, ?, ?)''',
-                (dados["Novo produto"], 0, dados["Previsao de entrega(dias)"])
-                )
+                    (dados["Novo produto"], 0, dados["Previsao de entrega(dias)"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
 
-        elif tipo_cadastro == "pedido":
-            try:
+            elif tipo_cadastro == "pedido":
                 self.cursor.execute('''{CALL RegistrarPedido (?, ?, ?, ?)}''',
-                (dados["CNPJ do Cliente"], dados["Data Pedido"], dados["Produto"], dados["Quantidade"])
-                )
+                    (dados["CNPJ do Cliente"], dados["Data Pedido"], dados["Produto"], dados["Quantidade"]))
                 self.conn.commit()
                 return True, None
-            except pyodbc.IntegrityError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de integridade:", error_message)
-                return False, error_message
-            except pyodbc.ProgrammingError as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro de programação:", e)
-                return False, error_message
-            except pyodbc.Error as e:
-                error_message = str(e).split('(')[1].split(')')[0]
-                print("Erro ao inserir fornecedor:", e)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
-        elif tipo_cadastro == "finalizar pedido":
-            try:
+
+            elif tipo_cadastro == "finalizar pedido":
                 self.cursor.execute('''{CALL FinalizarPedido (?)}''', dados['ID do Pedido'])
                 self.conn.commit()
                 return True, None
-            except pyodbc.Error as e:
-                # Captura a mensagem da stored procedure diretamente
-                error_message = str(e)
-                if "SQL Server]" in error_message:
-                    error_message = error_message.split("SQL Server]")[-1].strip()
-                print("Erro ao finalizar o pedido:", error_message)
-                return False, error_message
-            finally:
-                self.fechar_conexao()
+
+        except pyodbc.IntegrityError as e:
+            self.conn.rollback()  # Realiza rollback em caso de erro
+            return False, str(e.args[0])
+        except pyodbc.ProgrammingError as e:
+            self.conn.rollback()  # Realiza rollback em caso de erro
+            return False, str(e.args[0])
+        except pyodbc.Error as e:
+            self.conn.rollback()  # Realiza rollback em caso de erro
+            return False, str(e.args[0])
+        except Exception as e:
+            self.conn.rollback()  # Realiza rollback em caso de erro
+            return False, str(e)
+        
+        finally:
+            self.fechar_conexao()
+
 
 class Cadastro:
     def __init__(self, page):
